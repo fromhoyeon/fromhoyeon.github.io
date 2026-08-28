@@ -16,6 +16,6 @@ Live site: https://perfumeJaguar.github.io/
 
 ## Project continuity
 
-See [`PROJECT_STATE.md`](PROJECT_STATE.md) for the current design direction, confirmed decisions, experiments, limitations, unresolved issues, and next steps.
+See [`LEGACY_PROJECT_STATE.md`](LEGACY_PROJECT_STATE.md) for the prior design direction, confirmed decisions, experiments, limitations, unresolved issues, and next steps.
 
 The repository files are the source of truth for implementation details.
