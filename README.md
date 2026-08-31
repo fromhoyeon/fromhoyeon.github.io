@@ -1,41 +1,50 @@
 # fromhoyeon.github.io
 
-Personal portfolio and website for Hoyeon.
+Hoyeon의 개인 웹사이트이자 포트폴리오를 위한 저장소다.
 
-## Purpose
+## 목적
 
-This repository owns the public-facing portfolio website at `fromhoyeon.github.io`.
+이 저장소는 `fromhoyeon.github.io`에 공개되는 개인 웹사이트를 소유한다.
 
-Music, photography, video, media art, and web work are not assumed to be permanently separated into fixed professional categories. The site's information architecture and presentation should develop from the actual work and artistic intent rather than from a predetermined taxonomy.
+음악, 사진, 영상, 미디어아트, 웹 작업을 처음부터 고정된 직업 카테고리로 영구 분리하지 않는다. 사이트의 정보 구조와 표현 방식은 미리 정한 분류 체계보다 실제 작업과 예술적 의도에서 발전시킨다.
 
-Individual works and web applications should keep their implementation details in their own project repositories when appropriate. This repository is responsible for how those works are presented, connected, and contextualized on the personal website.
+개별 작품과 웹 애플리케이션의 상세 구현은 적절한 경우 각 프로젝트 저장소가 소유한다. 이 저장소는 그 작업들을 개인 웹사이트에서 어떻게 소개하고, 연결하고, 맥락화할지를 담당한다.
 
-Private memories, unpublished origins of works, and other non-public personal context should not be copied into this public repository by default.
+개인적 기억, 공개되지 않은 작품의 기원, 그 밖의 비공개 개인 맥락은 기본적으로 이 공개 저장소에 복제하지 않는다.
 
-## Current state
+## 현재 상태
 
-Earlier portfolio prototypes have been restored into this repository for evaluation. Their presence does not mean their structure, taxonomy, typography, or visual direction has been adopted as the final site.
+평가를 위해 이전 포트폴리오 프로토타입들을 이 저장소에 복원해두었다. 파일이 존재한다는 사실만으로 해당 구조, 분류, 타이포그래피, 시각 방향이 최종안으로 채택된 것은 아니다.
 
-Current root prototypes and tests:
+현재 루트의 주요 프로토타입과 테스트:
 
-- `index.html` / `style.css` — restored editorial portfolio prototype
-- `gallery.html` / `gallery.css` — continuous gallery/archive layout experiment
-- `Font_test.html` and `Font_test-1.html` through `Font_test-3.html` — typography and palette tests
-- `Embed_test_1.html` — still-image and YouTube embedding/layout experiment
-- `portfolio-v2/` — a later multi-page portfolio prototype with shared CSS/JS and category/project pages; the former DODREI entry is intentionally excluded
-- `styles.css` — retained initial minimal scaffold stylesheet, currently not used by the restored root prototype
-- `LEGACY_README.md` / `LEGACY_PROJECT_STATE.md` — preserved notes from the earlier portfolio iteration, kept separate from the current canonical README
+- `index.html` / `style.css` — 복원된 편집형 포트폴리오 프로토타입
+- `gallery.html` / `gallery.css` — 연속 갤러리·아카이브 배치 실험
+- `Font_test.html`, `Font_test-1.html` ~ `Font_test-3.html` — 타이포그래피와 팔레트 테스트
+- `Embed_test_1.html` — 정지 이미지와 YouTube 임베드·배치 실험
+- `portfolio-v2/` — 공용 CSS/JS와 카테고리·프로젝트 페이지를 가진 이후의 다중 페이지 포트폴리오 프로토타입. 과거 DODREI 항목은 의도적으로 제외되어 있다.
+- `styles.css` — 초기 최소 구조의 스타일시트. 현재 복원된 루트 프로토타입에서는 사용하지 않는다.
+- `LEGACY_README.md` / `LEGACY_PROJECT_STATE.md` — 이전 포트폴리오 단계의 보존 기록. 현재의 기준 문서와 분리해서 유지한다.
 
-No final framework, site generator, content taxonomy, or visual system has been selected yet.
+현재 최종 프레임워크, 사이트 생성기, 콘텐츠 분류 체계, 시각 시스템은 아직 확정하지 않았다.
 
-## Working principle
+## 작업 원칙
 
-Use this README as the first entry point when determining the repository's current structure, implementation state, canonical documents, and relevant reference paths. Do not infer changing project details from prompts or older conversations when the repository can provide the current state.
+저장소의 현재 구조, 구현 상태, 기준 문서와 필요한 참조 경로를 확인할 때는 이 `README.md`를 최초 진입점으로 사용한다. 저장소에서 현재 상태를 확인할 수 있다면 프롬프트나 오래된 대화에서 변경 가능한 프로젝트 정보를 추정하지 않는다.
 
-Ideas, references, proposed navigation structures, restored legacy prototypes, and design experiments are not considered adopted until they are explicitly selected or implemented as the current direction.
+아이디어, 참고 자료, 제안된 탐색 구조, 복원된 과거 프로토타입, 디자인 실험은 명시적으로 현재 방향으로 선택되거나 구현되기 전까지 채택된 것으로 간주하지 않는다.
 
-## Deployment
+## 문서 언어와 용어
 
-The repository is intended to serve the personal site through GitHub Pages at:
+- 이 저장소의 작업 문서와 README는 기본적으로 **한국어를 우선**한다.
+- 코드 식별자, 파일명·경로, API·제품명, 실제 UI 표기, 검색이나 외부 서비스가 원문을 요구하는 기술 용어는 원래 표기를 유지한다.
+- 공개 사이트의 실제 문구처럼 관객·서비스 요구상 영어가 적합한 결과물은 이 규칙의 예외다.
+- 정확한 기술 용어는 유지하되, 사용자를 실무 전문가가 아닌 **준전문가**로 가정한다. 불필요하게 전문 용어만으로 축약하지 않고, 한국어로 자연스럽게 풀어쓸 수 있으면 먼저 풀어쓴 뒤 필요한 경우 첫 등장에 원래 용어를 괄호로 덧붙인다.
+- 할 일과 다음 작업을 적을 때는 내부 구조 용어보다 실제로 무엇을 해야 하는지 바로 이해되는 표현을 우선한다.
+- 현재 운영에 쓰이는 문서는 이 기준에 맞춰 유지한다. 과거 상태를 증거로 보존하는 `LEGACY_*` 문서는 역사 기록의 의미를 훼손하지 않기 위해 별도로 취급할 수 있다.
+
+## 배포
+
+이 저장소는 다음 GitHub Pages 주소에서 개인 사이트를 제공하기 위한 것이다.
 
 `https://fromhoyeon.github.io/`
