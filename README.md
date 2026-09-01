@@ -18,6 +18,7 @@ Hoyeon의 개인 웹사이트이자 포트폴리오를 위한 저장소다.
 
 현재 루트의 주요 프로토타입과 테스트:
 
+- `prototype-random-photo-layout.html` — 10~15장의 사진이 4:3, 3:4, 1:1, 16:9, 2.35:1 비율로 유동적으로 들어온다고 가정하고, crop 없이 원본 비율을 유지한 채 화면 폭에 맞춰 자동으로 justified row를 구성하는 사진 배치 실험
 - `prototype-functional-onepage.html` — 중앙 집중형 정보 영역, 제한된 타이포그래피·간격 규칙, 반복되는 작품 블록과 선택적 wide media를 시험하는 단일 페이지 프로토타입
 - `index.html` / `style.css` — 복원된 편집형 포트폴리오 프로토타입
 - `gallery.html` / `gallery.css` — 연속 갤러리·아카이브 배치 실험
