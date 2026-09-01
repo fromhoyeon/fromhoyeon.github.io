@@ -12,9 +12,9 @@
       --muted:#6a6a66;
       --line:#bdbdb7;
       --panel:#d8d8d1;
-      --panel-dark:#181818;
       --content:680px;
       --wide:1080px;
+      --video:900px;
       --s:8px;
       --m:16px;
       --l:32px;
@@ -35,7 +35,7 @@
 
     a{color:inherit;text-decoration:none}
     p,h1,h2,h3,figure{margin:0}
-    button{font:inherit}
+    button{font:inherit;color:inherit}
 
     .shell{
       width:min(calc(100% - 24px),var(--content));
@@ -105,9 +105,7 @@
 
     .index .num,.index .year{color:var(--muted);font-size:10px}
 
-    .work{
-      padding:0 0 var(--xl);
-    }
+    .work{padding:0 0 var(--xl)}
 
     .work-head{
       display:grid;
@@ -140,22 +138,6 @@
     }
 
     .media.landscape{aspect-ratio:16/10}
-    .media.square{aspect-ratio:1/1}
-    .media.portrait{aspect-ratio:4/5}
-    .media.dark{background:var(--panel-dark)}
-    .media.dark::after{color:rgba(255,255,255,.62)}
-
-    .media.wide{
-      width:min(calc(100vw - 24px),var(--wide));
-      margin-left:50%;
-      transform:translateX(-50%);
-    }
-
-    .two-up{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:var(--s);
-    }
 
     .description{
       display:grid;
@@ -175,6 +157,7 @@
       white-space:nowrap;
     }
 
+    button.action{background:transparent;cursor:pointer}
     .action:hover{background:var(--fg);color:var(--bg)}
 
     .small-strip{
@@ -191,6 +174,132 @@
       color:var(--muted);
       text-transform:uppercase;
     }
+
+    /* Selected Photography: ratios stay intact, rows justify automatically. */
+    .photo-breakout{
+      width:min(calc(100vw - 24px),var(--wide));
+      margin-left:50%;
+      transform:translateX(-50%);
+    }
+
+    .photo-grid{width:100%}
+
+    .photo-row{
+      display:flex;
+      width:100%;
+      gap:var(--s);
+      margin-bottom:var(--s);
+      align-items:flex-start;
+    }
+
+    .photo-row:last-child{margin-bottom:0}
+
+    .photo-cell{
+      position:relative;
+      flex:0 0 auto;
+      overflow:hidden;
+      background:var(--tone,#c7c7c1);
+    }
+
+    .photo-cell::after{
+      content:attr(data-label);
+      position:absolute;
+      left:5px;
+      bottom:4px;
+      padding:2px 4px;
+      background:rgba(242,242,239,.82);
+      font-size:8px;
+      color:#555;
+      line-height:1;
+    }
+
+    .photo-actions{
+      display:flex;
+      justify-content:space-between;
+      gap:var(--m);
+      align-items:center;
+      margin-top:var(--m);
+    }
+
+    .photo-actions p{font-size:11px;color:var(--muted)}
+
+    /* DODREI: real page, embedded as a live viewport. */
+    .live-breakout{
+      width:min(calc(100vw - 24px),var(--wide));
+      margin-left:50%;
+      transform:translateX(-50%);
+    }
+
+    .live-frame{
+      width:100%;
+      height:clamp(420px,70vh,720px);
+      display:block;
+      border:1px solid var(--line);
+      background:#000;
+    }
+
+    /* YouTube: clean poster first, official player after click. */
+    .video-breakout{
+      width:min(calc(100vw - 24px),var(--video));
+      margin-left:50%;
+      transform:translateX(-50%);
+    }
+
+    .yt-stage{
+      position:relative;
+      width:100%;
+      aspect-ratio:16/9;
+      background:#000;
+      overflow:hidden;
+    }
+
+    .yt-stage iframe{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      border:0;
+    }
+
+    .yt-poster{
+      appearance:none;
+      border:0;
+      padding:0;
+      margin:0;
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      cursor:pointer;
+      background:#000;
+    }
+
+    .yt-poster img{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .yt-play{
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      width:58px;
+      height:42px;
+      border:1px solid rgba(255,255,255,.8);
+      background:rgba(0,0,0,.55);
+      color:#fff;
+      display:grid;
+      place-items:center;
+      font-size:18px;
+      line-height:1;
+    }
+
+    .yt-poster:hover .yt-play{background:#000}
 
     .about{
       border-top:1px solid var(--fg);
@@ -210,10 +319,7 @@
     .about-grid p+p{margin-top:var(--m)}
     .label{font-size:9px;text-transform:uppercase;color:var(--muted);margin-bottom:var(--s)}
 
-    .links{
-      border-top:1px solid var(--line);
-    }
-
+    .links{border-top:1px solid var(--line)}
     .links a{
       display:grid;
       grid-template-columns:1fr auto;
@@ -233,7 +339,7 @@
     }
 
     @media (max-width:620px){
-      :root{--l:24px;--xl:48px}
+      :root{--l:24px;--xl:48px;--s:5px}
       .shell{width:calc(100% - 20px)}
       .topbar .shell{min-height:40px}
       .nav{gap:12px}
@@ -246,8 +352,9 @@
       .work-title{font-size:21px}
       .description{grid-template-columns:1fr}
       .description .action{justify-self:start}
-      .media.wide{width:100vw}
-      .two-up{gap:6px}
+      .photo-breakout,.live-breakout,.video-breakout{width:100vw}
+      .live-frame{height:72svh;border-left:0;border-right:0}
+      .photo-actions{align-items:flex-start}
       .about-grid{grid-template-columns:1fr}
     }
   </style>
@@ -268,7 +375,7 @@
     <section class="shell intro">
       <h1>Selected work across image, sound, performance and code.</h1>
       <div class="intro-copy">
-        <p>This is a structural prototype: few text styles, fixed spacing, repeated work blocks, and wider media only when it earns the space.</p>
+        <p>This prototype keeps the information column narrow and lets media expand only when the content benefits from it.</p>
         <span>SEOUL / 2026<br>SELECTED WORKS</span>
       </div>
     </section>
@@ -286,7 +393,7 @@
         <h2 class="work-title">Dual Conversation</h2>
         <div class="work-meta">ONGOING<br>MOVING IMAGE / SOUND</div>
       </header>
-      <figure class="media landscape" data-label="PRIMARY MEDIA / 16:10"></figure>
+      <figure class="media landscape" data-label="PRIMARY MEDIA / PLACEHOLDER"></figure>
       <div class="description">
         <p>A long-running audiovisual work built from accumulated moving-image fragments, playback systems and changing relationships between image and sound.</p>
         <a class="action" href="#">View project ↗</a>
@@ -300,14 +407,20 @@
       <header class="work-head">
         <span class="num">02</span>
         <h2 class="work-title">Selected Photography</h2>
-        <div class="work-meta">IMAGE<br>SELECTION</div>
+        <div class="work-meta">10–15 IMAGES<br>NO CROP</div>
       </header>
-      <div class="two-up">
-        <figure class="media portrait" data-label="IMAGE 01"></figure>
-        <figure class="media portrait dark" data-label="IMAGE 02"></figure>
+
+      <div class="photo-breakout">
+        <div class="photo-grid" id="photo-grid" aria-label="Mixed-ratio selected photography"></div>
       </div>
+
+      <div class="photo-actions">
+        <p>4:3 / 3:4 / 1:1 / 16:9 / 2.35:1 · ratios preserved</p>
+        <button class="action" id="shuffle-photos" type="button">Shuffle selection</button>
+      </div>
+
       <div class="description">
-        <p>A small rotating selection only. The full archive can live elsewhere; the website works as an edited entrance rather than a storage room.</p>
+        <p>A rotating selection. The site keeps the original aspect ratios and only recalculates row height and width to fit the current viewport.</p>
         <a class="action" href="#">More photographs ↗</a>
       </div>
     </section>
@@ -316,12 +429,22 @@
       <header class="work-head">
         <span class="num">03</span>
         <h2 class="work-title">DODREI</h2>
-        <div class="work-meta">2026<br>BROWSER-BASED WORK</div>
+        <div class="work-meta">2026<br>LIVE EMBED</div>
       </header>
-      <figure class="media wide landscape dark" data-label="WIDE MEDIA BREAKOUT / ONLY WHEN NEEDED"></figure>
+
+      <div class="live-breakout">
+        <iframe
+          class="live-frame"
+          src="https://fromhoyeon.github.io/dodrei/web/"
+          title="DODREI live browser work"
+          loading="lazy"
+          allow="autoplay; fullscreen"
+        ></iframe>
+      </div>
+
       <div class="description">
-        <p>A browser-based image work. This block deliberately breaks the central content width to test the rule: text stays compact, media may expand.</p>
-        <a class="action" href="#">Open work ↗</a>
+        <p>The actual browser work is embedded here as a live viewport. The surrounding portfolio stays narrow; only the work itself occupies a larger field.</p>
+        <a class="action" href="https://fromhoyeon.github.io/dodrei/" target="_blank" rel="noopener">Open work ↗</a>
       </div>
     </section>
 
@@ -329,12 +452,25 @@
       <header class="work-head">
         <span class="num">04</span>
         <h2 class="work-title">Moving Image</h2>
-        <div class="work-meta">VIDEO<br>SELECTED</div>
+        <div class="work-meta">VIDEO<br>16:9</div>
       </header>
-      <figure class="media landscape" data-label="VIDEO / 16:10"></figure>
+
+      <div class="video-breakout">
+        <div class="yt-stage" id="yt-stage">
+          <button class="yt-poster" id="yt-poster" type="button" aria-label="Play video">
+            <img
+              src="https://i.ytimg.com/vi/rp-21UvGv0M/maxresdefault.jpg"
+              onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/rp-21UvGv0M/hqdefault.jpg';"
+              alt="YouTube video thumbnail"
+            >
+            <span class="yt-play" aria-hidden="true">▶</span>
+          </button>
+        </div>
+      </div>
+
       <div class="description">
-        <p>Selected film, documentation and short moving-image work. Only a few pieces appear here; longer viewing can continue on YouTube.</p>
-        <a class="action" href="#">YouTube ↗</a>
+        <p>The initial view uses the unmodified YouTube thumbnail plus a play control. After playback starts, the official embedded player loads with its standard controls hidden where YouTube currently allows.</p>
+        <a class="action" href="https://www.youtube.com/watch?v=rp-21UvGv0M" target="_blank" rel="noopener">YouTube ↗</a>
       </div>
     </section>
 
@@ -357,7 +493,6 @@
         <a href="#"><span>Instagram / Photography</span><span>↗</span></a>
         <a href="#"><span>YouTube / Moving Image + Performance</span><span>↗</span></a>
         <a href="#"><span>GitHub / Web + Code</span><span>↗</span></a>
-        <a href="mailto:"><span>Email</span><span>↗</span></a>
       </div>
       <footer>
         <span>© 2026 Hoyeon Choi</span>
@@ -365,5 +500,132 @@
       </footer>
     </section>
   </main>
+
+  <script>
+    const ratioPool = [
+      { label:'4:3', value:4/3, weight:28 },
+      { label:'3:4', value:3/4, weight:28 },
+      { label:'1:1', value:1, weight:17 },
+      { label:'16:9', value:16/9, weight:18 },
+      { label:'2.35:1', value:2.35, weight:9 }
+    ];
+
+    const tones = [
+      '#babbb5','#cdccc4','#a8aaa5','#d7d4ca','#989b98',
+      '#c3c0b8','#b1afa9','#d0d1cc','#a4a6a1','#c8c6bf',
+      '#b9b6ae','#d5d2c9','#9fa19d','#c0c2bd','#adaca6'
+    ];
+
+    const photoGrid = document.querySelector('#photo-grid');
+    const shufflePhotos = document.querySelector('#shuffle-photos');
+    let photos = [];
+    let resizeTimer = null;
+
+    function weightedRatio(){
+      const total = ratioPool.reduce((sum,item)=>sum+item.weight,0);
+      let pick = Math.random()*total;
+      for(const item of ratioPool){
+        pick -= item.weight;
+        if(pick <= 0) return item;
+      }
+      return ratioPool[0];
+    }
+
+    function createPhotoSet(){
+      const count = 10 + Math.floor(Math.random()*6);
+      photos = Array.from({length:count},(_,index)=>{
+        const ratio = weightedRatio();
+        return {
+          id:index+1,
+          label:ratio.label,
+          ratio:ratio.value,
+          tone:tones[Math.floor(Math.random()*tones.length)]
+        };
+      });
+      layoutPhotos();
+    }
+
+    function desiredRowHeight(width){
+      if(width < 420) return 118;
+      if(width < 620) return 150;
+      if(width < 900) return 205;
+      return 250;
+    }
+
+    function makeRows(items,width,gap,targetHeight){
+      const rows=[];
+      let current=[];
+      let ratioSum=0;
+
+      items.forEach((item,index)=>{
+        current.push(item);
+        ratioSum += item.ratio;
+        const estimatedWidth = ratioSum*targetHeight + gap*(current.length-1);
+        const isLast = index === items.length-1;
+        if(estimatedWidth >= width*.94 || isLast){
+          rows.push(current);
+          current=[];
+          ratioSum=0;
+        }
+      });
+      return rows;
+    }
+
+    function layoutPhotos(){
+      const width = photoGrid.clientWidth;
+      if(!width || !photos.length) return;
+
+      const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s')) || 8;
+      const targetHeight = desiredRowHeight(width);
+      const rows = makeRows(photos,width,gap,targetHeight);
+      photoGrid.innerHTML='';
+
+      rows.forEach((row,rowIndex)=>{
+        const isLast = rowIndex === rows.length-1;
+        const ratioSum = row.reduce((sum,item)=>sum+item.ratio,0);
+        const usableWidth = width-gap*(row.length-1);
+        const justifiedHeight = usableWidth/ratioSum;
+        let rowHeight = justifiedHeight;
+
+        if(isLast && justifiedHeight > targetHeight*1.18) rowHeight=targetHeight;
+        rowHeight=Math.max(82,Math.min(rowHeight,width<560?230:330));
+
+        const rowEl=document.createElement('div');
+        rowEl.className='photo-row';
+
+        row.forEach(item=>{
+          const cell=document.createElement('div');
+          cell.className='photo-cell';
+          cell.style.width=`${item.ratio*rowHeight}px`;
+          cell.style.height=`${rowHeight}px`;
+          cell.style.setProperty('--tone',item.tone);
+          cell.dataset.label=`${String(item.id).padStart(2,'0')} / ${item.label}`;
+          rowEl.appendChild(cell);
+        });
+
+        photoGrid.appendChild(rowEl);
+      });
+    }
+
+    shufflePhotos.addEventListener('click',createPhotoSet);
+    window.addEventListener('resize',()=>{
+      clearTimeout(resizeTimer);
+      resizeTimer=setTimeout(layoutPhotos,90);
+    });
+    createPhotoSet();
+
+    const ytPoster = document.querySelector('#yt-poster');
+    const ytStage = document.querySelector('#yt-stage');
+
+    ytPoster.addEventListener('click',()=>{
+      const iframe=document.createElement('iframe');
+      iframe.title='YouTube video player';
+      iframe.src='https://www.youtube-nocookie.com/embed/rp-21UvGv0M?autoplay=1&controls=0&rel=0&playsinline=1&iv_load_policy=3&disablekb=1&fs=0';
+      iframe.allow='autoplay; encrypted-media; picture-in-picture';
+      iframe.referrerPolicy='strict-origin-when-cross-origin';
+      ytStage.innerHTML='';
+      ytStage.appendChild(iframe);
+    });
+  </script>
 </body>
 </html>
