@@ -20,323 +20,75 @@
       --l:32px;
       --xl:64px;
     }
-
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      background:var(--bg);
-      color:var(--fg);
-      font-family:Arial,Helvetica,sans-serif;
-      font-size:15px;
-      line-height:1.35;
-      -webkit-font-smoothing:antialiased;
-    }
-
+    body{margin:0;background:var(--bg);color:var(--fg);font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.35;-webkit-font-smoothing:antialiased}
+    body.lightbox-open{overflow:hidden}
     a{color:inherit;text-decoration:none}
     p,h1,h2,h3,figure{margin:0}
     button{font:inherit;color:inherit}
-
-    .shell{
-      width:min(calc(100% - 24px),var(--content));
-      margin:0 auto;
-    }
-
-    .topbar{
-      position:sticky;
-      top:0;
-      z-index:20;
-      background:rgba(242,242,239,.96);
-      border-bottom:1px solid var(--line);
-    }
-
-    .topbar .shell{
-      min-height:44px;
-      display:grid;
-      grid-template-columns:1fr auto;
-      align-items:center;
-      gap:var(--m);
-    }
-
+    .shell{width:min(calc(100% - 24px),var(--content));margin:0 auto}
+    .topbar{position:sticky;top:0;z-index:20;background:rgba(242,242,239,.96);border-bottom:1px solid var(--line)}
+    .topbar .shell{min-height:44px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:var(--m)}
     .brand{font-size:13px;font-weight:700;letter-spacing:-.02em}
     .nav{display:flex;gap:var(--m);font-size:11px;text-transform:uppercase}
     .nav a{padding:14px 0 12px}
-
-    .intro{
-      padding:var(--l) 0 var(--xl);
-      display:grid;
-      gap:var(--l);
-    }
-
-    .intro h1{
-      max-width:620px;
-      font-size:clamp(34px,7vw,58px);
-      line-height:.95;
-      letter-spacing:-.05em;
-      font-weight:700;
-    }
-
-    .intro-copy{
-      display:grid;
-      grid-template-columns:1fr auto;
-      gap:var(--m);
-      align-items:end;
-      padding-top:var(--m);
-      border-top:1px solid var(--line);
-    }
-
+    .intro{padding:var(--l) 0 var(--xl);display:grid;gap:var(--l)}
+    .intro h1{max-width:620px;font-size:clamp(34px,7vw,58px);line-height:.95;letter-spacing:-.05em;font-weight:700}
+    .intro-copy{display:grid;grid-template-columns:1fr auto;gap:var(--m);align-items:end;padding-top:var(--m);border-top:1px solid var(--line)}
     .intro-copy p{max-width:470px}
     .intro-copy span{font-size:11px;color:var(--muted);text-align:right}
-
-    .index{
-      border-top:1px solid var(--fg);
-      margin-bottom:var(--xl);
-    }
-
-    .index a{
-      display:grid;
-      grid-template-columns:32px 1fr auto;
-      gap:var(--m);
-      align-items:center;
-      padding:10px 0;
-      border-bottom:1px solid var(--line);
-      font-size:12px;
-    }
-
+    .index{border-top:1px solid var(--fg);margin-bottom:var(--xl)}
+    .index a{display:grid;grid-template-columns:32px 1fr auto;gap:var(--m);align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px}
     .index .num,.index .year{color:var(--muted);font-size:10px}
-
     .work{padding:0 0 var(--xl)}
-
-    .work-head{
-      display:grid;
-      grid-template-columns:32px 1fr auto;
-      gap:var(--m);
-      align-items:start;
-      border-top:1px solid var(--fg);
-      padding:10px 0 var(--m);
-    }
-
+    .work-head{display:grid;grid-template-columns:32px 1fr auto;gap:var(--m);align-items:start;border-top:1px solid var(--fg);padding:10px 0 var(--m)}
     .num,.meta{font-size:10px;color:var(--muted);text-transform:uppercase}
     .work-title{font-size:24px;line-height:1;letter-spacing:-.035em;font-weight:700}
     .work-meta{text-align:right;font-size:10px;line-height:1.4;color:var(--muted);text-transform:uppercase}
-
-    .media{
-      width:100%;
-      background:var(--panel);
-      position:relative;
-      overflow:hidden;
-    }
-
-    .media::after{
-      content:attr(data-label);
-      position:absolute;
-      left:8px;
-      bottom:7px;
-      font-size:9px;
-      color:rgba(17,17,17,.56);
-      letter-spacing:.02em;
-    }
-
+    .media{width:100%;background:var(--panel);position:relative;overflow:hidden}
+    .media::after{content:attr(data-label);position:absolute;left:8px;bottom:7px;font-size:9px;color:rgba(17,17,17,.56);letter-spacing:.02em}
     .media.landscape{aspect-ratio:16/10}
-
-    .description{
-      display:grid;
-      grid-template-columns:1fr auto;
-      gap:var(--m);
-      align-items:start;
-      padding-top:var(--m);
-    }
-
+    .description{display:grid;grid-template-columns:1fr auto;gap:var(--m);align-items:start;padding-top:var(--m)}
     .description p{max-width:500px;font-size:13px}
-
-    .action{
-      border:1px solid var(--fg);
-      padding:6px 8px 5px;
-      font-size:10px;
-      text-transform:uppercase;
-      white-space:nowrap;
-    }
-
+    .action{border:1px solid var(--fg);padding:6px 8px 5px;font-size:10px;text-transform:uppercase;white-space:nowrap}
     button.action{background:transparent;cursor:pointer}
     .action:hover{background:var(--fg);color:var(--bg)}
+    .small-strip{margin-top:var(--m);display:flex;flex-wrap:wrap;gap:6px}
+    .tag{border:1px solid var(--line);padding:4px 6px 3px;font-size:9px;color:var(--muted);text-transform:uppercase}
 
-    .small-strip{
-      margin-top:var(--m);
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-    }
-
-    .tag{
-      border:1px solid var(--line);
-      padding:4px 6px 3px;
-      font-size:9px;
-      color:var(--muted);
-      text-transform:uppercase;
-    }
-
-    /* Selected Photography: ratios stay intact, rows justify automatically. */
-    .photo-breakout{
-      width:min(calc(100vw - 24px),var(--wide));
-      margin-left:50%;
-      transform:translateX(-50%);
-    }
-
-    .photo-grid{width:100%}
-
-    .photo-row{
-      display:flex;
-      width:100%;
-      gap:var(--s);
-      margin-bottom:var(--s);
-      align-items:flex-start;
-    }
-
+    .photo-breakout{width:min(calc(100vw - 24px),var(--wide));margin-left:50%;transform:translateX(-50%)}
+    .photo-grid{width:100%;min-height:180px}
+    .photo-row{display:flex;width:100%;gap:var(--s);margin-bottom:var(--s);align-items:flex-start}
     .photo-row:last-child{margin-bottom:0}
-
-    .photo-cell{
-      position:relative;
-      flex:0 0 auto;
-      overflow:hidden;
-      background:var(--tone,#c7c7c1);
-    }
-
-    .photo-cell::after{
-      content:attr(data-label);
-      position:absolute;
-      left:5px;
-      bottom:4px;
-      padding:2px 4px;
-      background:rgba(242,242,239,.82);
-      font-size:8px;
-      color:#555;
-      line-height:1;
-    }
-
-    .photo-actions{
-      display:flex;
-      justify-content:space-between;
-      gap:var(--m);
-      align-items:center;
-      margin-top:var(--m);
-    }
-
+    .photo-cell{appearance:none;border:0;padding:0;position:relative;flex:0 0 auto;overflow:hidden;background:#d0d0ca;cursor:zoom-in}
+    .photo-cell img{width:100%;height:100%;object-fit:cover;display:block}
+    .photo-cell:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+    .photo-actions{display:flex;justify-content:space-between;gap:var(--m);align-items:center;margin-top:var(--m)}
     .photo-actions p{font-size:11px;color:var(--muted)}
 
-    /* DODREI: real page, embedded as a live viewport. */
-    .live-breakout{
-      width:min(calc(100vw - 24px),var(--wide));
-      margin-left:50%;
-      transform:translateX(-50%);
-    }
+    .lightbox{position:fixed;inset:0;z-index:100;display:none;place-items:center;padding:12px;background:rgba(10,10,10,.94);cursor:zoom-out}
+    .lightbox.is-open{display:grid}
+    .lightbox img{display:block;max-width:calc(100vw - 24px);max-height:calc(100svh - 24px);width:auto;height:auto;object-fit:contain;cursor:default}
+    .lightbox-close{position:fixed;top:10px;right:10px;z-index:101;appearance:none;border:1px solid rgba(255,255,255,.75);background:rgba(0,0,0,.45);color:#fff;padding:6px 8px 5px;font-size:10px;text-transform:uppercase;cursor:pointer}
 
-    .live-frame{
-      width:100%;
-      height:clamp(420px,70vh,720px);
-      display:block;
-      border:1px solid var(--line);
-      background:#000;
-    }
-
-    /* YouTube: clean poster first, official player after click. */
-    .video-breakout{
-      width:min(calc(100vw - 24px),var(--video));
-      margin-left:50%;
-      transform:translateX(-50%);
-    }
-
-    .yt-stage{
-      position:relative;
-      width:100%;
-      aspect-ratio:16/9;
-      background:#000;
-      overflow:hidden;
-    }
-
-    .yt-stage iframe{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      border:0;
-    }
-
-    .yt-poster{
-      appearance:none;
-      border:0;
-      padding:0;
-      margin:0;
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      cursor:pointer;
-      background:#000;
-    }
-
-    .yt-poster img{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      display:block;
-    }
-
-    .yt-play{
-      position:absolute;
-      left:50%;
-      top:50%;
-      transform:translate(-50%,-50%);
-      width:58px;
-      height:42px;
-      border:1px solid rgba(255,255,255,.8);
-      background:rgba(0,0,0,.55);
-      color:#fff;
-      display:grid;
-      place-items:center;
-      font-size:18px;
-      line-height:1;
-    }
-
+    .live-breakout{width:min(calc(100vw - 24px),var(--wide));margin-left:50%;transform:translateX(-50%)}
+    .live-frame{width:100%;height:clamp(420px,70vh,720px);display:block;border:1px solid var(--line);background:#000}
+    .video-breakout{width:min(calc(100vw - 24px),var(--video));margin-left:50%;transform:translateX(-50%)}
+    .yt-stage{position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden}
+    .yt-stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+    .yt-poster{appearance:none;border:0;padding:0;margin:0;position:absolute;inset:0;width:100%;height:100%;cursor:pointer;background:#000}
+    .yt-poster img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+    .yt-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:42px;border:1px solid rgba(255,255,255,.8);background:rgba(0,0,0,.55);color:#fff;display:grid;place-items:center;font-size:18px;line-height:1}
     .yt-poster:hover .yt-play{background:#000}
-
-    .about{
-      border-top:1px solid var(--fg);
-      padding:10px 0 var(--xl);
-      display:grid;
-      gap:var(--l);
-    }
-
+    .about{border-top:1px solid var(--fg);padding:10px 0 var(--xl);display:grid;gap:var(--l)}
     .about h2{font-size:24px;letter-spacing:-.035em}
-    .about-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:var(--l);
-      font-size:13px;
-    }
-
+    .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--l);font-size:13px}
     .about-grid p+p{margin-top:var(--m)}
     .label{font-size:9px;text-transform:uppercase;color:var(--muted);margin-bottom:var(--s)}
-
     .links{border-top:1px solid var(--line)}
-    .links a{
-      display:grid;
-      grid-template-columns:1fr auto;
-      padding:9px 0;
-      border-bottom:1px solid var(--line);
-      font-size:12px;
-    }
-
-    footer{
-      border-top:1px solid var(--fg);
-      padding:10px 0 var(--l);
-      display:flex;
-      justify-content:space-between;
-      gap:var(--m);
-      font-size:10px;
-      color:var(--muted);
-    }
+    .links a{display:grid;grid-template-columns:1fr auto;padding:9px 0;border-bottom:1px solid var(--line);font-size:12px}
+    footer{border-top:1px solid var(--fg);padding:10px 0 var(--l);display:flex;justify-content:space-between;gap:var(--m);font-size:10px;color:var(--muted)}
 
     @media (max-width:620px){
       :root{--l:24px;--xl:48px;--s:5px}
@@ -356,6 +108,8 @@
       .live-frame{height:72svh;border-left:0;border-right:0}
       .photo-actions{align-items:flex-start}
       .about-grid{grid-template-columns:1fr}
+      .lightbox{padding:6px}
+      .lightbox img{max-width:calc(100vw - 12px);max-height:calc(100svh - 12px)}
     }
   </style>
 </head>
@@ -407,20 +161,17 @@
       <header class="work-head">
         <span class="num">02</span>
         <h2 class="work-title">Selected Photography</h2>
-        <div class="work-meta">10–15 IMAGES<br>NO CROP</div>
+        <div class="work-meta">12 / 32 IMAGES<br>NO CROP</div>
       </header>
-
       <div class="photo-breakout">
         <div class="photo-grid" id="photo-grid" aria-label="Mixed-ratio selected photography"></div>
       </div>
-
       <div class="photo-actions">
-        <p>4:3 / 3:4 / 1:1 / 16:9 / 2.35:1 · ratios preserved</p>
+        <p>Original ratios · click image to enlarge</p>
         <button class="action" id="shuffle-photos" type="button">Shuffle selection</button>
       </div>
-
       <div class="description">
-        <p>A rotating selection. The site keeps the original aspect ratios and only recalculates row height and width to fit the current viewport.</p>
+        <p>Twelve images are picked from the sample pool on each shuffle. Their real dimensions determine the justified rows, without cropping the source ratio.</p>
         <a class="action" href="#">More photographs ↗</a>
       </div>
     </section>
@@ -431,17 +182,9 @@
         <h2 class="work-title">DODREI</h2>
         <div class="work-meta">2026<br>LIVE EMBED</div>
       </header>
-
       <div class="live-breakout">
-        <iframe
-          class="live-frame"
-          src="https://fromhoyeon.github.io/dodrei/web/"
-          title="DODREI live browser work"
-          loading="lazy"
-          allow="autoplay; fullscreen"
-        ></iframe>
+        <iframe class="live-frame" src="https://fromhoyeon.github.io/dodrei/web/" title="DODREI live browser work" loading="lazy" allow="autoplay; fullscreen"></iframe>
       </div>
-
       <div class="description">
         <p>The actual browser work is embedded here as a live viewport. The surrounding portfolio stays narrow; only the work itself occupies a larger field.</p>
         <a class="action" href="https://fromhoyeon.github.io/dodrei/" target="_blank" rel="noopener">Open work ↗</a>
@@ -454,20 +197,14 @@
         <h2 class="work-title">Moving Image</h2>
         <div class="work-meta">VIDEO<br>16:9</div>
       </header>
-
       <div class="video-breakout">
         <div class="yt-stage" id="yt-stage">
           <button class="yt-poster" id="yt-poster" type="button" aria-label="Play video">
-            <img
-              src="https://i.ytimg.com/vi/rp-21UvGv0M/maxresdefault.jpg"
-              onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/rp-21UvGv0M/hqdefault.jpg';"
-              alt="YouTube video thumbnail"
-            >
+            <img src="https://i.ytimg.com/vi/rp-21UvGv0M/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/rp-21UvGv0M/hqdefault.jpg';" alt="YouTube video thumbnail">
             <span class="yt-play" aria-hidden="true">▶</span>
           </button>
         </div>
       </div>
-
       <div class="description">
         <p>The initial view uses the unmodified YouTube thumbnail plus a play control. After playback starts, the official embedded player loads with its standard controls hidden where YouTube currently allows.</p>
         <a class="action" href="https://www.youtube.com/watch?v=rp-21UvGv0M" target="_blank" rel="noopener">YouTube ↗</a>
@@ -477,14 +214,8 @@
     <section class="shell about" id="about">
       <h2>About</h2>
       <div class="about-grid">
-        <div>
-          <p class="label">Practice</p>
-          <p>Jazz guitar, moving image, photography, performance, browser-based work and interactive systems.</p>
-        </div>
-        <div>
-          <p class="label">Rule</p>
-          <p>Use space because the content needs it. Keep the number of visual elements small, then repeat them consistently.</p>
-        </div>
+        <div><p class="label">Practice</p><p>Jazz guitar, moving image, photography, performance, browser-based work and interactive systems.</p></div>
+        <div><p class="label">Rule</p><p>Use space because the content needs it. Keep the number of visual elements small, then repeat them consistently.</p></div>
       </div>
     </section>
 
@@ -494,61 +225,67 @@
         <a href="#"><span>YouTube / Moving Image + Performance</span><span>↗</span></a>
         <a href="#"><span>GitHub / Web + Code</span><span>↗</span></a>
       </div>
-      <footer>
-        <span>© 2026 Hoyeon Choi</span>
-        <span>PROTOTYPE / NOT FINAL</span>
-      </footer>
+      <footer><span>© 2026 Hoyeon Choi</span><span>PROTOTYPE / NOT FINAL</span></footer>
     </section>
   </main>
 
-  <script>
-    const ratioPool = [
-      { label:'4:3', value:4/3, weight:28 },
-      { label:'3:4', value:3/4, weight:28 },
-      { label:'1:1', value:1, weight:17 },
-      { label:'16:9', value:16/9, weight:18 },
-      { label:'2.35:1', value:2.35, weight:9 }
-    ];
+  <div class="lightbox" id="photo-lightbox" role="dialog" aria-modal="true" aria-label="Expanded photograph" aria-hidden="true">
+    <button class="lightbox-close" id="lightbox-close" type="button">Close</button>
+    <img id="lightbox-image" alt="">
+  </div>
 
-    const tones = [
-      '#babbb5','#cdccc4','#a8aaa5','#d7d4ca','#989b98',
-      '#c3c0b8','#b1afa9','#d0d1cc','#a4a6a1','#c8c6bf',
-      '#b9b6ae','#d5d2c9','#9fa19d','#c0c2bd','#adaca6'
+  <script>
+    const photoBase = 'assets/prototypes/photo-samples/';
+    const photoFiles = [
+      'A7C01836-2.jpg','A7C01836.jpg','A7C02050-2.jpg','A7C02050.jpg',
+      'A7C02995-2.jpg','A7C02995.jpg','A7C03341.jpg','A7C07098-2.jpg',
+      'A7C07098.jpg','A7C07210-2.jpg','A7C07210.jpg','AC200900-2.jpg',
+      'AC200900.jpg','AC201098-2.jpg','AC201098.jpg','AC202959-2.jpg',
+      'AC202959.jpg','AC202986-2.jpg','AC202986.jpg','AC203108-2.jpg',
+      'AC203108.jpg','AC203565.jpg','AC203732.jpg','AC203810.jpg',
+      'AC207961.jpg','AC208741.jpg','AC208858-2.jpg','AC208858.jpg',
+      'AC209511-2.jpg','AC209511.jpg','AC209732-2.jpg','AC209732.jpg'
     ];
 
     const photoGrid = document.querySelector('#photo-grid');
     const shufflePhotos = document.querySelector('#shuffle-photos');
+    const lightbox = document.querySelector('#photo-lightbox');
+    const lightboxImage = document.querySelector('#lightbox-image');
+    const lightboxClose = document.querySelector('#lightbox-close');
     let photos = [];
     let resizeTimer = null;
 
-    function weightedRatio(){
-      const total = ratioPool.reduce((sum,item)=>sum+item.weight,0);
-      let pick = Math.random()*total;
-      for(const item of ratioPool){
-        pick -= item.weight;
-        if(pick <= 0) return item;
+    function shuffled(items){
+      const copy=[...items];
+      for(let i=copy.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [copy[i],copy[j]]=[copy[j],copy[i]];
       }
-      return ratioPool[0];
+      return copy;
     }
 
-    function createPhotoSet(){
-      const count = 10 + Math.floor(Math.random()*6);
-      photos = Array.from({length:count},(_,index)=>{
-        const ratio = weightedRatio();
-        return {
-          id:index+1,
-          label:ratio.label,
-          ratio:ratio.value,
-          tone:tones[Math.floor(Math.random()*tones.length)]
-        };
+    function loadPhoto(file){
+      return new Promise((resolve,reject)=>{
+        const img=new Image();
+        img.onload=()=>resolve({file,src:photoBase+file,ratio:img.naturalWidth/img.naturalHeight,width:img.naturalWidth,height:img.naturalHeight});
+        img.onerror=reject;
+        img.src=photoBase+file;
       });
+    }
+
+    async function createPhotoSet(){
+      shufflePhotos.disabled=true;
+      const selection=shuffled(photoFiles).slice(0,12);
+      const loaded=await Promise.allSettled(selection.map(loadPhoto));
+      photos=loaded.filter(item=>item.status==='fulfilled').map(item=>item.value);
       layoutPhotos();
+      shufflePhotos.disabled=false;
     }
 
     function desiredRowHeight(width){
-      if(width < 420) return 118;
-      if(width < 620) return 150;
-      if(width < 900) return 205;
+      if(width<420) return 118;
+      if(width<620) return 150;
+      if(width<900) return 205;
       return 250;
     }
 
@@ -556,67 +293,80 @@
       const rows=[];
       let current=[];
       let ratioSum=0;
-
       items.forEach((item,index)=>{
         current.push(item);
-        ratioSum += item.ratio;
-        const estimatedWidth = ratioSum*targetHeight + gap*(current.length-1);
-        const isLast = index === items.length-1;
-        if(estimatedWidth >= width*.94 || isLast){
-          rows.push(current);
-          current=[];
-          ratioSum=0;
-        }
+        ratioSum+=item.ratio;
+        const estimatedWidth=ratioSum*targetHeight+gap*(current.length-1);
+        const isLast=index===items.length-1;
+        if(estimatedWidth>=width*.94||isLast){rows.push(current);current=[];ratioSum=0}
       });
       return rows;
     }
 
     function layoutPhotos(){
-      const width = photoGrid.clientWidth;
-      if(!width || !photos.length) return;
-
-      const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s')) || 8;
-      const targetHeight = desiredRowHeight(width);
-      const rows = makeRows(photos,width,gap,targetHeight);
+      const width=photoGrid.clientWidth;
+      if(!width||!photos.length) return;
+      const gap=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s'))||8;
+      const targetHeight=desiredRowHeight(width);
+      const rows=makeRows(photos,width,gap,targetHeight);
       photoGrid.innerHTML='';
 
       rows.forEach((row,rowIndex)=>{
-        const isLast = rowIndex === rows.length-1;
-        const ratioSum = row.reduce((sum,item)=>sum+item.ratio,0);
-        const usableWidth = width-gap*(row.length-1);
-        const justifiedHeight = usableWidth/ratioSum;
-        let rowHeight = justifiedHeight;
-
-        if(isLast && justifiedHeight > targetHeight*1.18) rowHeight=targetHeight;
+        const isLast=rowIndex===rows.length-1;
+        const ratioSum=row.reduce((sum,item)=>sum+item.ratio,0);
+        const usableWidth=width-gap*(row.length-1);
+        const justifiedHeight=usableWidth/ratioSum;
+        let rowHeight=justifiedHeight;
+        if(isLast&&justifiedHeight>targetHeight*1.18) rowHeight=targetHeight;
         rowHeight=Math.max(82,Math.min(rowHeight,width<560?230:330));
 
         const rowEl=document.createElement('div');
         rowEl.className='photo-row';
-
         row.forEach(item=>{
-          const cell=document.createElement('div');
+          const cell=document.createElement('button');
           cell.className='photo-cell';
+          cell.type='button';
           cell.style.width=`${item.ratio*rowHeight}px`;
           cell.style.height=`${rowHeight}px`;
-          cell.style.setProperty('--tone',item.tone);
-          cell.dataset.label=`${String(item.id).padStart(2,'0')} / ${item.label}`;
+          cell.setAttribute('aria-label',`Enlarge ${item.file}`);
+          const img=document.createElement('img');
+          img.src=item.src;
+          img.alt='';
+          img.loading='lazy';
+          img.decoding='async';
+          cell.appendChild(img);
+          cell.addEventListener('click',()=>openLightbox(item));
           rowEl.appendChild(cell);
         });
-
         photoGrid.appendChild(rowEl);
       });
     }
 
+    function openLightbox(item){
+      lightboxImage.src=item.src;
+      lightboxImage.alt=item.file;
+      lightbox.classList.add('is-open');
+      lightbox.setAttribute('aria-hidden','false');
+      document.body.classList.add('lightbox-open');
+      lightboxClose.focus();
+    }
+
+    function closeLightbox(){
+      lightbox.classList.remove('is-open');
+      lightbox.setAttribute('aria-hidden','true');
+      lightboxImage.removeAttribute('src');
+      document.body.classList.remove('lightbox-open');
+    }
+
     shufflePhotos.addEventListener('click',createPhotoSet);
-    window.addEventListener('resize',()=>{
-      clearTimeout(resizeTimer);
-      resizeTimer=setTimeout(layoutPhotos,90);
-    });
+    lightboxClose.addEventListener('click',closeLightbox);
+    lightbox.addEventListener('click',(event)=>{if(event.target===lightbox) closeLightbox()});
+    document.addEventListener('keydown',(event)=>{if(event.key==='Escape'&&lightbox.classList.contains('is-open')) closeLightbox()});
+    window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(layoutPhotos,90)});
     createPhotoSet();
 
-    const ytPoster = document.querySelector('#yt-poster');
-    const ytStage = document.querySelector('#yt-stage');
-
+    const ytPoster=document.querySelector('#yt-poster');
+    const ytStage=document.querySelector('#yt-stage');
     ytPoster.addEventListener('click',()=>{
       const iframe=document.createElement('iframe');
       iframe.title='YouTube video player';
