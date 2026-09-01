@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Randomized mixed-ratio photo flow layout prototype for Hoyeon portfolio.">
+  <title>Photo Flow Test — Hoyeon</title>
+  <style>
+    :root {
+      --page: #f2f2ef;
+      --ink: #111;
+      --muted: #6d6d68;
+      --line: #b9b9b2;
+      --gap: 8px;
+      --pad: 12px;
+      --text-width: 680px;
+      --media-width: 1120px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 13px;
+      line-height: 1.25;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 12px;
+      align-items: center;
+      min-height: 36px;
+      padding: 0 var(--pad);
+      background: rgba(242, 242, 239, .96);
+      border-bottom: 1px solid var(--line);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .topbar .center { text-align: center; color: var(--muted); }
+    .topbar .right { text-align: right; }
+    .topbar button { text-transform: uppercase; }
+    .topbar button:hover { text-decoration: underline; }
+
+    .intro {
+      width: min(var(--text-width), calc(100% - (var(--pad) * 2)));
+      margin: 0 auto;
+      padding: 18px 0 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .intro-row {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 12px;
+    }
+
+    .label {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+
+    .intro h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1;
+      font-weight: 500;
+      letter-spacing: -.025em;
+    }
+
+    .intro p {
+      margin: 10px 0 0;
+      max-width: 470px;
+    }
+
+    .status {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 18px;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+      font-size: 10px;
+    }
+
+    .status div span {
+      display: block;
+      color: var(--muted);
+      margin-bottom: 2px;
+      text-transform: uppercase;
+    }
+
+    .gallery-shell {
+      width: min(var(--media-width), calc(100% - (var(--pad) * 2)));
+      margin: 0 auto;
+      padding: 8px 0 24px;
+    }
+
+    #gallery {
+      width: 100%;
+    }
+
+    .photo-row {
+      display: flex;
+      width: 100%;
+      gap: var(--gap);
+      margin-bottom: var(--gap);
+      align-items: flex-start;
+    }
+
+    .photo {
+      position: relative;
+      flex: 0 0 auto;
+      overflow: hidden;
+      background: #d4d4ce;
+    }
+
+    .photo::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.10), rgba(0,0,0,.08)),
+        var(--tone, #c9c9c3);
+    }
+
+    .photo-info {
+      position: absolute;
+      left: 5px;
+      bottom: 4px;
+      z-index: 2;
+      display: flex;
+      gap: 5px;
+      padding: 2px 4px;
+      background: rgba(242, 242, 239, .82);
+      color: #333;
+      font-size: 9px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .photo-info span:last-child { color: var(--muted); }
+
+    .last-row {
+      justify-content: flex-start;
+    }
+
+    .footer {
+      width: min(var(--text-width), calc(100% - (var(--pad) * 2)));
+      margin: 0 auto;
+      padding: 8px 0 12px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 560px) {
+      :root {
+        --gap: 5px;
+        --pad: 8px;
+      }
+
+      .topbar {
+        min-height: 32px;
+        grid-template-columns: 1fr auto;
+      }
+
+      .topbar .center { display: none; }
+      .intro { padding-top: 12px; }
+      .intro-row { grid-template-columns: 54px 1fr; gap: 8px; }
+      .intro h1 { font-size: 20px; }
+      .intro p { font-size: 12px; }
+      .status { grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
+      .photo-info { font-size: 8px; left: 3px; bottom: 3px; }
+      .gallery-shell { padding-top: 5px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div>Hoyeon Choi</div>
+    <div class="center">Photo Flow Prototype</div>
+    <div class="right"><button id="shuffle" type="button">Shuffle</button></div>
+  </header>
+
+  <main>
+    <section class="intro">
+      <div class="intro-row">
+        <div class="label">Test 02</div>
+        <div>
+          <h1>Mixed-ratio photography</h1>
+          <p>사진의 비율은 디자인에 맞춰 자르지 않는다. 들어온 이미지의 비율을 그대로 사용하고, 현재 화면 폭에 맞춰 각 줄의 조합과 크기만 자동으로 계산한다.</p>
+        </div>
+      </div>
+      <div class="status">
+        <div><span>Images</span><strong id="count">—</strong></div>
+        <div><span>Ratios</span><strong>4:3 · 3:4 · 1:1 · 16:9 · 2.35:1</strong></div>
+        <div><span>Crop</span><strong>None</strong></div>
+      </div>
+    </section>
+
+    <section class="gallery-shell" aria-label="Random mixed-ratio photo layout">
+      <div id="gallery"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>Justified auto layout</span>
+    <span>Resize / Shuffle</span>
+  </footer>
+
+  <script>
+    const ratioPool = [
+      { label: '4:3', value: 4 / 3, weight: 28 },
+      { label: '3:4', value: 3 / 4, weight: 28 },
+      { label: '1:1', value: 1, weight: 17 },
+      { label: '16:9', value: 16 / 9, weight: 18 },
+      { label: '2.35:1', value: 2.35, weight: 9 }
+    ];
+
+    const tones = [
+      '#babbb5', '#cdccc4', '#a8aaa5', '#d7d4ca', '#989b98',
+      '#c3c0b8', '#b1afa9', '#d0d1cc', '#a4a6a1', '#c8c6bf',
+      '#b9b6ae', '#d5d2c9', '#9fa19d', '#c0c2bd', '#adaca6'
+    ];
+
+    const gallery = document.querySelector('#gallery');
+    const countNode = document.querySelector('#count');
+    const shuffleButton = document.querySelector('#shuffle');
+
+    let photos = [];
+    let resizeTimer = null;
+
+    function weightedRatio() {
+      const total = ratioPool.reduce((sum, item) => sum + item.weight, 0);
+      let pick = Math.random() * total;
+      for (const item of ratioPool) {
+        pick -= item.weight;
+        if (pick <= 0) return item;
+      }
+      return ratioPool[0];
+    }
+
+    function createSet() {
+      const count = 10 + Math.floor(Math.random() * 6);
+      photos = Array.from({ length: count }, (_, index) => {
+        const ratio = weightedRatio();
+        return {
+          id: index + 1,
+          label: ratio.label,
+          ratio: ratio.value,
+          tone: tones[Math.floor(Math.random() * tones.length)]
+        };
+      });
+      countNode.textContent = String(count);
+      layout();
+    }
+
+    function desiredRowHeight(width) {
+      if (width < 420) return 118;
+      if (width < 620) return 150;
+      if (width < 900) return 205;
+      return 250;
+    }
+
+    function makeRows(items, width, gap, targetHeight) {
+      const rows = [];
+      let current = [];
+      let ratioSum = 0;
+
+      items.forEach((item, index) => {
+        current.push(item);
+        ratioSum += item.ratio;
+
+        const estimatedWidth = ratioSum * targetHeight + gap * (current.length - 1);
+        const isLast = index === items.length - 1;
+
+        if (estimatedWidth >= width * 0.94 || isLast) {
+          rows.push(current);
+          current = [];
+          ratioSum = 0;
+        }
+      });
+
+      return rows;
+    }
+
+    function layout() {
+      const width = gallery.clientWidth;
+      if (!width || !photos.length) return;
+
+      const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--gap')) || 8;
+      const targetHeight = desiredRowHeight(width);
+      const rows = makeRows(photos, width, gap, targetHeight);
+
+      gallery.innerHTML = '';
+
+      rows.forEach((row, rowIndex) => {
+        const isLast = rowIndex === rows.length - 1;
+        const ratioSum = row.reduce((sum, item) => sum + item.ratio, 0);
+        const usableWidth = width - gap * (row.length - 1);
+        const justifiedHeight = usableWidth / ratioSum;
+
+        let rowHeight = justifiedHeight;
+        if (isLast && justifiedHeight > targetHeight * 1.18) rowHeight = targetHeight;
+        rowHeight = Math.max(82, Math.min(rowHeight, width < 560 ? 230 : 330));
+
+        const rowEl = document.createElement('div');
+        rowEl.className = `photo-row${isLast ? ' last-row' : ''}`;
+
+        row.forEach((item) => {
+          const itemEl = document.createElement('div');
+          itemEl.className = 'photo';
+          itemEl.style.width = `${item.ratio * rowHeight}px`;
+          itemEl.style.height = `${rowHeight}px`;
+          itemEl.style.setProperty('--tone', item.tone);
+          itemEl.innerHTML = `<div class="photo-info"><span>${String(item.id).padStart(2, '0')}</span><span>${item.label}</span></div>`;
+          rowEl.appendChild(itemEl);
+        });
+
+        gallery.appendChild(rowEl);
+      });
+    }
+
+    shuffleButton.addEventListener('click', createSet);
+
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(layout, 90);
+    });
+
+    createSet();
+  </script>
+</body>
+</html>
