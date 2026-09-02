@@ -20,7 +20,9 @@ Hoyeon의 개인 웹사이트이자 포트폴리오를 위한 저장소다.
 
 - `prototype-random-photo-layout.html` — 10~15장의 사진이 4:3, 3:4, 1:1, 16:9, 2.35:1 비율로 유동적으로 들어온다고 가정하고, crop 없이 원본 비율을 유지한 채 화면 폭에 맞춰 자동으로 justified row를 구성하는 사진 배치 실험
 - `prototype-functional-onepage.html` — 중앙 집중형 정보 영역과 제한된 타이포그래피·간격 규칙을 사용하는 단일 페이지 프로토타입. `Selected Photography`는 `assets/prototypes/photo-samples/`의 실제 샘플 이미지 중 12장을 무작위로 골라 실제 비율로 justified layout을 구성하고, 클릭 시 같은 페이지 위에서 확대해 볼 수 있다. DODREI 실제 웹 작품의 live iframe embed와 YouTube 영상의 최소 UI embed 방식도 함께 시험한다.
-- `assets/content/site-copy.js` — 위 단일 페이지 프로토타입에서 자주 수정할 주요 제목, 설명, 버튼·링크 문구를 HTML 구조와 분리해 한곳에서 편집하기 위한 텍스트 source. HTML 안의 기존 문구는 fallback으로 남겨둔다.
+- `assets/content/site-copy.js` — 단일 페이지 프로토타입의 local 텍스트 fallback source. Sanity를 사용할 경우 remote 값이 해당 항목만 덮어쓸 수 있다.
+- `assets/content/sanity-config.js` / `sanity-runtime.js` / `sanity-prototype-bridge.js` — Sanity가 활성화됐을 때 텍스트와 사진 pool을 읽는 선택적 adapter. 현재 프로젝트 정보가 비어 있어 기본적으로 비활성 상태이며, 실패 시 local 콘텐츠를 유지한다.
+- `sanity/` — Sanity Studio에 사용할 `siteCopy`, `portfolioPhoto`, `contentEntry` schema 초안과 연결 절차. Sanity는 웹 프론트엔드가 아니라 content/assets source로만 사용한다.
 - `assets/prototypes/photo-samples/` — 위 단일 페이지 프로토타입의 사진 배치·확대 동작을 시험하기 위한 실제 샘플 이미지 모음
 - `assets/prototypes/photo-samples-size-tests/` — 샘플 이미지 가운데 파일명에 `-2`가 붙은 크기 변형 테스트본을 실제 랜덤 선택 풀과 분리해 둔 폴더
 - `index.html` / `style.css` — 복원된 편집형 포트폴리오 프로토타입
@@ -32,6 +34,17 @@ Hoyeon의 개인 웹사이트이자 포트폴리오를 위한 저장소다.
 - `LEGACY_README.md` / `LEGACY_PROJECT_STATE.md` — 이전 포트폴리오 단계의 보존 기록. 현재의 기준 문서와 분리해서 유지한다.
 
 현재 최종 프레임워크, 사이트 생성기, 콘텐츠 분류 체계, 시각 시스템은 아직 확정하지 않았다.
+
+## 콘텐츠 레이어 기준
+
+2026-09-02에 다음 역할 분리를 현재 작업 기준으로 채택했다.
+
+- **GitHub Pages가 웹사이트 본체다.** HTML, CSS, JavaScript, 레이아웃, 인터랙션, 작품별 특수 구현과 배포는 이 저장소가 계속 소유한다.
+- **Sanity는 DB형 콘텐츠와 asset을 제공하는 외부 content layer로만 사용한다.** Sanity가 웹페이지를 렌더링하거나 사이트 구조를 소유하지 않는다.
+- 자주 바뀌는 텍스트, 반복적으로 쌓이는 게시물·사진 pool, 이미지와 다운로드 파일 등은 필요에 따라 Sanity로 둘 수 있다.
+- 어떤 콘텐츠를 remote/static으로 둘지는 고정하지 않는다. 디자인 테스트 중에는 Sanity에서 읽던 값을 나중에 GitHub에 정적으로 고정하거나, 반대로 정적 영역을 collection으로 전환할 수 있다.
+- 외부 content layer는 교체 가능해야 하며, Sanity 장애나 미설정 상태가 사이트 전체의 장애로 이어지지 않도록 local fallback을 유지한다.
+- 현재 Sanity 연결 scaffold는 코드에 들어가 있으나 실제 Sanity Project ID가 아직 설정되지 않아 **비활성 상태**다. 실제 연결 절차는 `sanity/README.md`를 따른다.
 
 ## 현재 디자인 탐색 기준
 
