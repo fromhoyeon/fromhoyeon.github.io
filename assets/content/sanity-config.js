@@ -3,16 +3,15 @@
   ----------------------------
   This file contains public frontend configuration only. Never put write tokens here.
 
-  After creating the Sanity project:
-  1. set projectId
-  2. keep dataset public (recommended for this public portfolio)
-  3. add https://fromhoyeon.github.io to Sanity CORS origins
-  4. set enabled: true
+  Public website architecture:
+  - GitHub Pages owns HTML / CSS / JS and rendering.
+  - Sanity is used only as a content, database, image and file source.
+  - If Sanity is unavailable or contains no matching content, the prototype keeps its local fallback.
 */
 
 window.SANITY_CONFIG = {
-  enabled: false,
-  projectId: '',
+  enabled: true,
+  projectId: 'a707yvok',
   dataset: 'production',
   apiVersion: '2026-09-02',
   useCdn: true,
