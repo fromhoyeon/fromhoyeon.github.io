@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Hoyeon Choi — Functional One Page Prototype</title>
   <meta name="description" content="One-page portfolio layout prototype for Hoyeon Choi.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root{
       --bg:#f2f2ef;
@@ -22,7 +25,7 @@
     }
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
-    body{margin:0;background:var(--bg);color:var(--fg);font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.35;-webkit-font-smoothing:antialiased}
+    body{margin:0;background:var(--bg);color:var(--fg);font-family:'IBM Plex Sans KR',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.35;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:break-word}
     body.lightbox-open{overflow:hidden}
     a{color:inherit;text-decoration:none}
     p,h1,h2,h3,figure{margin:0}
@@ -67,10 +70,10 @@
     .photo-actions{display:flex;justify-content:space-between;gap:var(--m);align-items:center;margin-top:var(--m)}
     .photo-actions p{font-size:11px;color:var(--muted)}
 
-    .lightbox{position:fixed;inset:0;z-index:100;display:none;place-items:center;padding:12px;background:rgba(10,10,10,.94);cursor:zoom-out}
+    .lightbox{position:fixed;inset:0;z-index:100;display:none;place-items:center;padding:12px;background:#fff;cursor:default;touch-action:pan-y}
     .lightbox.is-open{display:grid}
-    .lightbox img{display:block;max-width:calc(100vw - 24px);max-height:calc(100svh - 24px);width:auto;height:auto;object-fit:contain;cursor:default}
-    .lightbox-close{position:fixed;top:10px;right:10px;z-index:101;appearance:none;border:1px solid rgba(255,255,255,.75);background:rgba(0,0,0,.45);color:#fff;padding:6px 8px 5px;font-size:10px;text-transform:uppercase;cursor:pointer}
+    .lightbox img{display:block;max-width:calc(100vw - 24px);max-height:calc(100svh - 24px);width:auto;height:auto;object-fit:contain;cursor:grab;user-select:none;-webkit-user-drag:none}
+    .lightbox-close{position:fixed;top:10px;right:10px;z-index:101;appearance:none;border:1px solid rgba(17,17,17,.72);background:rgba(255,255,255,.9);color:#111;padding:6px 8px 5px;font-size:10px;text-transform:uppercase;cursor:pointer}
 
     .live-breakout{width:min(calc(100vw - 24px),var(--wide));margin-left:50%;transform:translateX(-50%)}
     .live-frame{width:100%;height:clamp(420px,70vh,720px);display:block;border:1px solid var(--line);background:#000}
@@ -221,7 +224,7 @@
 
     <section class="shell" id="links">
       <div class="links">
-        <a href="#"><span>Instagram / Photography</span><span>↗</span></a>
+        <a href="https://www.instagram.com/hoyeon.choi/" target="_blank" rel="noopener"><span>Instagram / Photography</span><span>↗</span></a>
         <a href="#"><span>YouTube / Moving Image + Performance</span><span>↗</span></a>
         <a href="#"><span>GitHub / Web + Code</span><span>↗</span></a>
       </div>
@@ -231,7 +234,7 @@
 
   <div class="lightbox" id="photo-lightbox" role="dialog" aria-modal="true" aria-label="Expanded photograph" aria-hidden="true">
     <button class="lightbox-close" id="lightbox-close" type="button">Close</button>
-    <img id="lightbox-image" alt="">
+    <img id="lightbox-image" alt="" draggable="false">
   </div>
 
   <script src="assets/content/site-copy.js"></script>
@@ -254,6 +257,9 @@
     const lightboxClose = document.querySelector('#lightbox-close');
     let photos = [];
     let resizeTimer = null;
+    let lightboxIndex = -1;
+    let swipeStartX = null;
+    let swipeStartY = null;
 
     function shuffled(items){
       const copy=[...items];
@@ -278,6 +284,7 @@
       const selection=shuffled(photoFiles).slice(0,12);
       const loaded=await Promise.allSettled(selection.map(loadPhoto));
       photos=loaded.filter(item=>item.status==='fulfilled').map(item=>item.value);
+      lightboxIndex=-1;
       layoutPhotos();
       shufflePhotos.disabled=false;
     }
@@ -303,12 +310,27 @@
       return rows;
     }
 
+    function makeMobileRows(items,rowCount=4){
+      const rows=[];
+      const base=Math.floor(items.length/rowCount);
+      const remainder=items.length%rowCount;
+      let cursor=0;
+      for(let i=0;i<rowCount;i++){
+        const count=base+(i<remainder?1:0);
+        if(count<=0) continue;
+        rows.push(items.slice(cursor,cursor+count));
+        cursor+=count;
+      }
+      return rows;
+    }
+
     function layoutPhotos(){
       const width=photoGrid.clientWidth;
       if(!width||!photos.length) return;
       const gap=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s'))||8;
       const targetHeight=desiredRowHeight(width);
-      const rows=makeRows(photos,width,gap,targetHeight);
+      const isMobile=window.matchMedia('(max-width:620px)').matches;
+      const rows=isMobile?makeMobileRows(photos,4):makeRows(photos,width,gap,targetHeight);
       photoGrid.innerHTML='';
 
       rows.forEach((row,rowIndex)=>{
@@ -317,8 +339,8 @@
         const usableWidth=width-gap*(row.length-1);
         const justifiedHeight=usableWidth/ratioSum;
         let rowHeight=justifiedHeight;
-        if(isLast&&justifiedHeight>targetHeight*1.18) rowHeight=targetHeight;
-        rowHeight=Math.max(82,Math.min(rowHeight,width<560?230:330));
+        if(!isMobile&&isLast&&justifiedHeight>targetHeight*1.18) rowHeight=targetHeight;
+        if(!isMobile) rowHeight=Math.max(82,Math.min(rowHeight,330));
 
         const rowEl=document.createElement('div');
         rowEl.className='photo-row';
@@ -342,13 +364,34 @@
       });
     }
 
+    function showLightboxIndex(index){
+      if(!photos.length) return;
+      lightboxIndex=(index+photos.length)%photos.length;
+      const item=photos[lightboxIndex];
+      lightboxImage.src=item.fullSrc||item.src;
+      lightboxImage.alt=item.alt||item.title||item.file||'';
+
+      const next=photos[(lightboxIndex+1)%photos.length];
+      const prev=photos[(lightboxIndex-1+photos.length)%photos.length];
+      [next,prev].forEach(neighbor=>{
+        if(!neighbor) return;
+        const preload=new Image();
+        preload.src=neighbor.fullSrc||neighbor.src;
+      });
+    }
+
     function openLightbox(item){
-      lightboxImage.src=item.src;
-      lightboxImage.alt=item.file;
+      const index=Math.max(0,photos.indexOf(item));
+      showLightboxIndex(index);
       lightbox.classList.add('is-open');
       lightbox.setAttribute('aria-hidden','false');
       document.body.classList.add('lightbox-open');
       lightboxClose.focus();
+    }
+
+    function stepLightbox(direction){
+      if(!lightbox.classList.contains('is-open')) return;
+      showLightboxIndex(lightboxIndex+direction);
     }
 
     function closeLightbox(){
@@ -356,12 +399,33 @@
       lightbox.setAttribute('aria-hidden','true');
       lightboxImage.removeAttribute('src');
       document.body.classList.remove('lightbox-open');
+      lightboxIndex=-1;
     }
 
     shufflePhotos.addEventListener('click',createPhotoSet);
     lightboxClose.addEventListener('click',closeLightbox);
     lightbox.addEventListener('click',(event)=>{if(event.target===lightbox) closeLightbox()});
-    document.addEventListener('keydown',(event)=>{if(event.key==='Escape'&&lightbox.classList.contains('is-open')) closeLightbox()});
+    lightbox.addEventListener('touchstart',(event)=>{
+      const touch=event.changedTouches[0];
+      swipeStartX=touch.clientX;
+      swipeStartY=touch.clientY;
+    },{passive:true});
+    lightbox.addEventListener('touchend',(event)=>{
+      if(swipeStartX===null||swipeStartY===null) return;
+      const touch=event.changedTouches[0];
+      const dx=touch.clientX-swipeStartX;
+      const dy=touch.clientY-swipeStartY;
+      swipeStartX=null;
+      swipeStartY=null;
+      if(Math.abs(dx)<45||Math.abs(dx)<=Math.abs(dy)) return;
+      stepLightbox(dx<0?1:-1);
+    },{passive:true});
+    document.addEventListener('keydown',(event)=>{
+      if(!lightbox.classList.contains('is-open')) return;
+      if(event.key==='Escape') closeLightbox();
+      if(event.key==='ArrowRight') stepLightbox(1);
+      if(event.key==='ArrowLeft') stepLightbox(-1);
+    });
     window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(layoutPhotos,90)});
     createPhotoSet();
 
