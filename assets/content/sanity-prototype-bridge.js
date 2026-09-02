@@ -7,8 +7,31 @@
 (async function connectPrototypeToSanity(){
   if (!window.SANITY_CONTENT?.isEnabled()) return;
 
+  function resolvePhotoDimensions(item){
+    if (item.ratio && item.width && item.height) return Promise.resolve(item);
+
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve({
+        ...item,
+        width: img.naturalWidth,
+        height: img.naturalHeight,
+        ratio: img.naturalWidth / img.naturalHeight
+      });
+      img.onerror = reject;
+      img.src = item.src;
+    });
+  }
+
   try {
-    const remotePhotos = await window.SANITY_CONTENT.fetchPortfolioPhotos();
+    const rawPhotos = await window.SANITY_CONTENT.fetchPortfolioPhotos();
+    if (!rawPhotos.length) return;
+
+    const loaded = await Promise.allSettled(rawPhotos.map(resolvePhotoDimensions));
+    const remotePhotos = loaded
+      .filter((item) => item.status === 'fulfilled')
+      .map((item) => item.value);
+
     if (!remotePhotos.length) return;
 
     const renderRemoteSelection = () => {
