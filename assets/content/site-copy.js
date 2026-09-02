@@ -148,3 +148,26 @@ window.mergeSiteCopy = function mergeSiteCopy(patch){
 };
 
 window.applySiteCopy(window.SITE_COPY);
+
+function loadSiteScript(src){
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
+
+async function bootOptionalSanityLayer(){
+  try {
+    await loadSiteScript('assets/content/sanity-config.js');
+    await loadSiteScript('assets/content/sanity-runtime.js');
+    await loadSiteScript('assets/content/sanity-prototype-bridge.js');
+  } catch (error) {
+    console.warn('[Sanity] Optional content layer did not load. Local content remains active.', error);
+  }
+}
+
+if (document.readyState === 'complete') bootOptionalSanityLayer();
+else window.addEventListener('load', bootOptionalSanityLayer, {once: true});
