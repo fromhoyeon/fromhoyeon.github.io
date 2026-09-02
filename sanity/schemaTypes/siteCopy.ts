@@ -7,6 +7,13 @@ const textField = (name: string, title: string, rows = 2) => defineField({
   ...(rows > 1 ? {rows} : {}),
 })
 
+const urlField = (name: string, title: string) => defineField({
+  name,
+  title,
+  type: 'url',
+  validation: (rule) => rule.uri({scheme: ['http', 'https']}),
+})
+
 export const siteCopy = defineType({
   name: 'siteCopy',
   title: 'Site Copy',
@@ -40,6 +47,7 @@ export const siteCopy = defineType({
         textField('title', 'Title', 1),
         textField('description', 'Description', 5),
         textField('action', 'Action label', 1),
+        urlField('youtubeUrl', 'YouTube URL'),
       ],
     }),
     defineField({
@@ -63,6 +71,7 @@ export const siteCopy = defineType({
         textField('title', 'Title', 1),
         textField('description', 'Description', 5),
         textField('action', 'Action label', 1),
+        urlField('youtubeUrl', 'YouTube URL'),
       ],
     }),
     defineField({
