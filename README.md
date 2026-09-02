@@ -20,7 +20,9 @@ Hoyeon의 개인 웹사이트이자 포트폴리오를 위한 저장소다.
 
 - `prototype-random-photo-layout.html` — 10~15장의 사진이 4:3, 3:4, 1:1, 16:9, 2.35:1 비율로 유동적으로 들어온다고 가정하고, crop 없이 원본 비율을 유지한 채 화면 폭에 맞춰 자동으로 justified row를 구성하는 사진 배치 실험
 - `prototype-functional-onepage.html` — 중앙 집중형 정보 영역과 제한된 타이포그래피·간격 규칙을 사용하는 단일 페이지 프로토타입. `Selected Photography`는 `assets/prototypes/photo-samples/`의 실제 샘플 이미지 중 12장을 무작위로 골라 실제 비율로 justified layout을 구성하고, 클릭 시 같은 페이지 위에서 확대해 볼 수 있다. DODREI 실제 웹 작품의 live iframe embed와 YouTube 영상의 최소 UI embed 방식도 함께 시험한다.
+- `assets/content/site-copy.js` — 위 단일 페이지 프로토타입에서 자주 수정할 주요 제목, 설명, 버튼·링크 문구를 HTML 구조와 분리해 한곳에서 편집하기 위한 텍스트 source. HTML 안의 기존 문구는 fallback으로 남겨둔다.
 - `assets/prototypes/photo-samples/` — 위 단일 페이지 프로토타입의 사진 배치·확대 동작을 시험하기 위한 실제 샘플 이미지 모음
+- `assets/prototypes/photo-samples-size-tests/` — 샘플 이미지 가운데 파일명에 `-2`가 붙은 크기 변형 테스트본을 실제 랜덤 선택 풀과 분리해 둔 폴더
 - `index.html` / `style.css` — 복원된 편집형 포트폴리오 프로토타입
 - `gallery.html` / `gallery.css` — 연속 갤러리·아카이브 배치 실험
 - `Font_test.html`, `Font_test-1.html` ~ `Font_test-3.html` — 타이포그래피와 팔레트 테스트
