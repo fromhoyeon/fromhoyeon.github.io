@@ -20,8 +20,8 @@ Hoyeon의 개인 웹사이트이자 포트폴리오를 위한 저장소다.
 
 - `index.html` — 현재 공개 사이트의 진입점. `prototype-functional-onepage.html`로 즉시 이동시킨다. 당분간 이 단일 페이지 프로토타입을 메인 사이트로 사용한다.
 - `prototype-random-photo-layout.html` — 10~15장의 사진이 4:3, 3:4, 1:1, 16:9, 2.35:1 비율로 유동적으로 들어온다고 가정하고, crop 없이 원본 비율을 유지한 채 화면 폭에 맞춰 자동으로 justified row를 구성하는 사진 배치 실험
-- `prototype-functional-onepage.html` — 중앙 집중형 정보 영역과 제한된 타이포그래피·간격 규칙을 사용하는 단일 페이지 프로토타입. `Selected Photography`는 현재 `assets/prototypes/photo-samples/`의 실제 샘플 이미지 중 12장을 무작위로 골라 실제 비율로 justified layout을 구성하고, 클릭 시 같은 페이지 위에서 확대해 볼 수 있다. DODREI 실제 웹 작품의 live iframe embed와 YouTube 영상의 최소 UI embed 방식도 함께 시험한다.
-- `assets/content/site-copy.js` — 단일 페이지 프로토타입의 local 텍스트 fallback source. 현재 실제 표시 텍스트는 Sanity `siteCopy` 문서가 우선하며, Sanity가 실패하거나 값이 없을 때 이 파일의 문구를 사용한다.
+- `prototype-functional-onepage.html` — 중앙 집중형 정보 영역과 제한된 타이포그래피·간격 규칙을 사용하는 현재 메인 단일 페이지. `Selected Photography`는 `assets/prototypes/photo-samples/`의 실제 샘플 이미지 중 12장을 무작위로 고른다. 모바일에서는 4개 행으로 고정하고, 데스크탑에서는 mixed-ratio justified layout을 사용한다. 사진 확대는 흰 배경 lightbox와 순환 좌우 swipe/키보드 이동을 지원한다. DODREI는 초기 iframe을 로드하지 않고 `여기서 재생 / 새 창으로 재생` 선택 화면을 먼저 보여주며, `여기서 재생`을 선택했을 때만 iframe을 생성한다. Dual Conversation과 Moving Image의 YouTube URL은 Sanity에서 관리하고, 페이지가 URL을 해석해 썸네일과 공식 embed를 구성한다.
+- `assets/content/site-copy.js` — 단일 페이지 프로토타입의 local 텍스트와 media URL fallback source. 현재 실제 표시 텍스트와 Dual/Moving YouTube URL은 Sanity `siteCopy` 문서가 우선하며, Sanity가 실패하거나 값이 없을 때 이 파일의 값을 사용한다.
 - `assets/content/sanity-config.js` / `sanity-runtime.js` / `sanity-prototype-bridge.js` — Sanity content adapter. 현재 Project ID `a707yvok`, dataset `production`에 연결되어 있으며 `siteCopy`는 활성화되어 있다. 사진 pool은 실제 Sanity asset 이관 전까지 비활성화하여 GitHub의 기존 로컬 샘플 사진을 유지한다.
 - `sanity/` — `siteCopy`, `portfolioPhoto`, `contentEntry` schema 참고 파일과 연결 절차. 실제 현재 schema와 Studio는 Sanity의 MCP-managed workspace에 배포되어 있다. Sanity는 웹 프론트엔드가 아니라 content/assets source로만 사용한다.
 - `assets/prototypes/photo-samples/` — 위 단일 페이지 프로토타입의 사진 배치·확대 동작을 시험하기 위한 실제 샘플 이미지 모음
@@ -43,6 +43,7 @@ Hoyeon의 개인 웹사이트이자 포트폴리오를 위한 저장소다.
 - **GitHub Pages가 웹사이트 본체다.** HTML, CSS, JavaScript, 레이아웃, 인터랙션, 작품별 특수 구현, 텍스트의 시각적 포맷과 배포는 이 저장소가 계속 소유한다.
 - **Sanity는 DB형 콘텐츠와 asset을 제공하는 외부 content layer로만 사용한다.** Sanity가 웹페이지를 렌더링하거나 사이트 구조를 소유하지 않는다.
 - **현재 메인 페이지의 주요 텍스트 값은 Sanity `siteCopy` 문서에서 관리한다.** Sanity에서 문구를 수정하고 Publish하면 GitHub의 레이아웃이나 CSS를 변경하지 않고 사이트에 반영된다.
+- **Dual Conversation과 Moving Image의 YouTube URL도 `siteCopy`에서 관리한다.** URL을 바꾸면 페이지 코드 변경 없이 썸네일, 페이지 내부 재생 대상, 외부 YouTube 링크가 같은 URL을 사용한다.
 - `assets/content/site-copy.js`에는 동일 구조의 local fallback을 유지한다. Sanity 장애나 미설정 상태가 사이트 전체의 장애로 이어지지 않는다.
 - 사진은 향후 Sanity asset으로 이관할 수 있지만, 2026-09-02 현재는 remote photo pool을 비활성화하고 GitHub의 로컬 샘플 사진 표시를 유지한다.
 - 자주 바뀌는 텍스트, 반복적으로 쌓이는 게시물·사진 pool, 이미지와 다운로드 파일 등은 필요에 따라 Sanity로 둘 수 있다.
@@ -62,9 +63,10 @@ Hoyeon의 개인 웹사이트이자 포트폴리오를 위한 저장소다.
 - 많은 종류의 장식·타이포그래피를 쓰기보다 **몇 가지 글자 스타일, 간격, 블록 규격을 반복 조합**해 전체 미학을 만드는 방향을 선호한다.
 - 기능 요소와 정보 구조를 숨기기보다 제목, 번호, 연도, 상태, 버튼, 링크 같은 **실용적 인터페이스가 화면의 디자인 요소로 드러나는 방식**을 선호한다.
 - 모바일에서 본 `rushi.co`, `noplans.studio/work`, `bureauborsche.com`의 밀도와 반복 규칙을 긍정적으로 평가했다. 특히 Bureau Borsche의 화면을 꽉 채우는 성격과 Rushi의 제한된 타이포그래피 사용이 참고점이다. 데스크탑 버전 전체를 그대로 선호한다는 뜻은 아니다.
+- 한국어와 영어를 함께 사용할 예정이며, 현재 기본 서체는 과거 `perfumeJaguar.github.io` 메인 사이트에서도 사용했던 `IBM Plex Sans KR`이다.
 - 데스크탑에서도 화면 전체를 의무적으로 활용하지 않고, **텍스트와 일반 인터페이스는 중앙의 비교적 좁은 영역에 모으고 큰 사진·영상처럼 실제 필요가 있을 때만 폭을 확장**하는 방식을 선호한다.
 - 기본 구조는 한 페이지 중심을 선호하며, 필요할 때만 같은 규격의 개별 작품 페이지를 추가하는 방식을 우선 검토한다. 전체 사진·영상 아카이브를 사이트 안에 모두 넣기보다 주요 작업을 선별해 보여주고 나머지는 외부 플랫폼으로 연결하는 방향도 열어둔다.
-- 사진은 원본 비율을 디자인에 맞춰 자르기보다 그대로 유지하는 쪽을 우선한다. 현재 `Selected Photography` 실험은 mixed-ratio justified layout과 페이지 내부 확대 보기를 사용한다.
+- 사진은 원본 비율을 디자인에 맞춰 자르기보다 그대로 유지하는 쪽을 우선한다. 현재 `Selected Photography` 실험은 mixed-ratio 배치와 페이지 내부 확대 보기를 사용한다.
 
 ## 작업 원칙
 
