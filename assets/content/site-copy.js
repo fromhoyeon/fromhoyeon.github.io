@@ -29,7 +29,8 @@ window.SITE_COPY = {
   dual: {
     title: 'Dual Conversation',
     description: 'A long-running audiovisual work built from accumulated moving-image fragments, playback systems and changing relationships between image and sound.',
-    action: 'View project ↗'
+    action: 'View project ↗',
+    youtubeUrl: 'https://youtu.be/y01i78valMg'
   },
 
   photo: {
@@ -49,7 +50,8 @@ window.SITE_COPY = {
   moving: {
     title: 'Moving Image',
     description: 'The initial view uses the unmodified YouTube thumbnail plus a play control. After playback starts, the official embedded player loads with its standard controls hidden where YouTube currently allows.',
-    action: 'YouTube ↗'
+    action: 'YouTube ↗',
+    youtubeUrl: 'https://www.youtube.com/watch?v=rp-21UvGv0M'
   },
 
   about: {
@@ -157,6 +159,7 @@ window.applySiteCopy = function applySiteCopy(source = window.SITE_COPY){
 window.mergeSiteCopy = function mergeSiteCopy(patch){
   deepMerge(window.SITE_COPY, patch);
   window.applySiteCopy(window.SITE_COPY);
+  window.dispatchEvent(new CustomEvent('sitecopychange', {detail: window.SITE_COPY}));
 };
 
 window.applySiteCopy(window.SITE_COPY);
