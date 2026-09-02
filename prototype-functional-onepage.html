@@ -76,7 +76,16 @@
     .lightbox-close{position:fixed;top:10px;right:10px;z-index:101;appearance:none;border:1px solid rgba(17,17,17,.72);background:rgba(255,255,255,.9);color:#111;padding:6px 8px 5px;font-size:10px;text-transform:uppercase;cursor:pointer}
 
     .live-breakout{width:min(calc(100vw - 24px),var(--wide));margin-left:50%;transform:translateX(-50%)}
-    .live-frame{width:100%;height:clamp(420px,70vh,720px);display:block;border:1px solid var(--line);background:#000}
+    .live-stage{width:100%;height:clamp(420px,70vh,720px);position:relative;overflow:hidden;background:#111;border:1px solid var(--line);touch-action:pan-y}
+    .live-frame{width:100%;height:100%;display:block;border:0;background:#000}
+    .live-gate{position:absolute;inset:0;display:grid;place-items:center;background:rgba(8,8,8,.84);color:#fff;pointer-events:none;touch-action:pan-y}
+    .live-gate-inner{width:min(calc(100% - 32px),420px);display:grid;gap:18px}
+    .live-gate-label{font-size:10px;line-height:1.4;letter-spacing:.05em;color:rgba(255,255,255,.62);text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.28);padding-bottom:9px}
+    .live-gate-title{font-size:clamp(24px,5vw,38px);line-height:1;font-weight:600;letter-spacing:-.035em}
+    .live-gate-actions{display:flex;flex-wrap:wrap;gap:8px;pointer-events:auto}
+    .live-gate .action{border-color:rgba(255,255,255,.72);color:#fff;background:rgba(0,0,0,.18)}
+    .live-gate .action:hover{background:#fff;color:#111}
+
     .video-breakout{width:min(calc(100vw - 24px),var(--video));margin-left:50%;transform:translateX(-50%)}
     .yt-stage{position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden}
     .yt-stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
@@ -84,6 +93,7 @@
     .yt-poster img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
     .yt-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:42px;border:1px solid rgba(255,255,255,.8);background:rgba(0,0,0,.55);color:#fff;display:grid;place-items:center;font-size:18px;line-height:1}
     .yt-poster:hover .yt-play{background:#000}
+    .yt-empty{position:absolute;inset:0;display:grid;place-items:center;color:rgba(255,255,255,.58);font-size:10px;letter-spacing:.04em;text-transform:uppercase}
     .about{border-top:1px solid var(--fg);padding:10px 0 var(--xl);display:grid;gap:var(--l)}
     .about h2{font-size:24px;letter-spacing:-.035em}
     .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--l);font-size:13px}
@@ -108,7 +118,10 @@
       .description{grid-template-columns:1fr}
       .description .action{justify-self:start}
       .photo-breakout,.live-breakout,.video-breakout{width:100vw}
-      .live-frame{height:72svh;border-left:0;border-right:0}
+      .live-stage{height:72svh;border-left:0;border-right:0}
+      .live-gate-inner{width:calc(100% - 28px)}
+      .live-gate-actions{display:grid;grid-template-columns:1fr 1fr}
+      .live-gate .action{text-align:center;padding:9px 8px 8px}
       .photo-actions{align-items:flex-start}
       .about-grid{grid-template-columns:1fr}
       .lightbox{padding:6px}
@@ -150,10 +163,12 @@
         <h2 class="work-title">Dual Conversation</h2>
         <div class="work-meta">ONGOING<br>MOVING IMAGE / SOUND</div>
       </header>
-      <figure class="media landscape" data-label="PRIMARY MEDIA / PLACEHOLDER"></figure>
+      <div class="video-breakout">
+        <div class="yt-stage" data-youtube-stage="dual" aria-label="Dual Conversation video"></div>
+      </div>
       <div class="description">
         <p>A long-running audiovisual work built from accumulated moving-image fragments, playback systems and changing relationships between image and sound.</p>
-        <a class="action" href="#">View project ↗</a>
+        <a class="action" data-youtube-action="dual" href="#">View project ↗</a>
       </div>
       <div class="small-strip">
         <span class="tag">TouchDesigner</span><span class="tag">Archive</span><span class="tag">Performance</span>
@@ -183,14 +198,25 @@
       <header class="work-head">
         <span class="num">03</span>
         <h2 class="work-title">DODREI</h2>
-        <div class="work-meta">2026<br>LIVE EMBED</div>
+        <div class="work-meta">2026<br>LIVE WEB WORK</div>
       </header>
       <div class="live-breakout">
-        <iframe class="live-frame" src="https://fromhoyeon.github.io/dodrei/web/" title="DODREI live browser work" loading="lazy" allow="autoplay; fullscreen"></iframe>
+        <div class="live-stage" id="dodrei-stage">
+          <div class="live-gate" id="dodrei-gate">
+            <div class="live-gate-inner">
+              <div class="live-gate-label">Interactive browser work / touch to choose playback</div>
+              <div class="live-gate-title">DODREI</div>
+              <div class="live-gate-actions">
+                <button class="action" id="dodrei-play-here" type="button">여기서 재생</button>
+                <a class="action" href="https://fromhoyeon.github.io/dodrei/web/" target="_blank" rel="noopener">새 창으로 재생 ↗</a>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="description">
-        <p>The actual browser work is embedded here as a live viewport. The surrounding portfolio stays narrow; only the work itself occupies a larger field.</p>
-        <a class="action" href="https://fromhoyeon.github.io/dodrei/" target="_blank" rel="noopener">Open work ↗</a>
+        <p>The actual browser work can be loaded into this page on demand or opened in a separate window.</p>
+        <a class="action" href="https://fromhoyeon.github.io/dodrei/web/" target="_blank" rel="noopener">Open work ↗</a>
       </div>
     </section>
 
@@ -201,16 +227,11 @@
         <div class="work-meta">VIDEO<br>16:9</div>
       </header>
       <div class="video-breakout">
-        <div class="yt-stage" id="yt-stage">
-          <button class="yt-poster" id="yt-poster" type="button" aria-label="Play video">
-            <img src="https://i.ytimg.com/vi/rp-21UvGv0M/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/rp-21UvGv0M/hqdefault.jpg';" alt="YouTube video thumbnail">
-            <span class="yt-play" aria-hidden="true">▶</span>
-          </button>
-        </div>
+        <div class="yt-stage" data-youtube-stage="moving" aria-label="Moving image video"></div>
       </div>
       <div class="description">
         <p>The initial view uses the unmodified YouTube thumbnail plus a play control. After playback starts, the official embedded player loads with its standard controls hidden where YouTube currently allows.</p>
-        <a class="action" href="https://www.youtube.com/watch?v=rp-21UvGv0M" target="_blank" rel="noopener">YouTube ↗</a>
+        <a class="action" data-youtube-action="moving" href="#">YouTube ↗</a>
       </div>
     </section>
 
@@ -429,17 +450,108 @@
     window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(layoutPhotos,90)});
     createPhotoSet();
 
-    const ytPoster=document.querySelector('#yt-poster');
-    const ytStage=document.querySelector('#yt-stage');
-    ytPoster.addEventListener('click',()=>{
+    const dodreiUrl='https://fromhoyeon.github.io/dodrei/web/';
+    const dodreiStage=document.querySelector('#dodrei-stage');
+    const dodreiPlayHere=document.querySelector('#dodrei-play-here');
+    dodreiPlayHere.addEventListener('click',()=>{
+      if(dodreiStage.querySelector('iframe')) return;
       const iframe=document.createElement('iframe');
-      iframe.title='YouTube video player';
-      iframe.src='https://www.youtube-nocookie.com/embed/rp-21UvGv0M?autoplay=1&controls=0&rel=0&playsinline=1&iv_load_policy=3&disablekb=1&fs=0';
-      iframe.allow='autoplay; encrypted-media; picture-in-picture';
-      iframe.referrerPolicy='strict-origin-when-cross-origin';
-      ytStage.innerHTML='';
-      ytStage.appendChild(iframe);
+      iframe.className='live-frame';
+      iframe.src=dodreiUrl;
+      iframe.title='DODREI live browser work';
+      iframe.allow='autoplay; fullscreen';
+      iframe.setAttribute('allowfullscreen','');
+      dodreiStage.replaceChildren(iframe);
     });
+
+    function extractYouTubeId(value){
+      if(!value||typeof value!=='string') return '';
+      try{
+        const url=new URL(value);
+        const host=url.hostname.replace(/^www\./,'');
+        if(host==='youtu.be') return url.pathname.split('/').filter(Boolean)[0]||'';
+        if(host==='youtube.com'||host==='m.youtube.com'||host==='music.youtube.com'){
+          if(url.searchParams.get('v')) return url.searchParams.get('v');
+          const parts=url.pathname.split('/').filter(Boolean);
+          const marker=parts.findIndex(part=>part==='embed'||part==='shorts'||part==='live');
+          if(marker>=0&&parts[marker+1]) return parts[marker+1];
+        }
+      }catch(error){
+        return '';
+      }
+      return '';
+    }
+
+    function renderYouTubeWork(key){
+      const stage=document.querySelector(`[data-youtube-stage="${key}"]`);
+      const action=document.querySelector(`[data-youtube-action="${key}"]`);
+      const work=window.SITE_COPY?.[key]||{};
+      const url=work.youtubeUrl||'';
+      const videoId=extractYouTubeId(url);
+
+      if(action){
+        if(url){
+          action.href=url;
+          action.target='_blank';
+          action.rel='noopener';
+          action.removeAttribute('aria-disabled');
+        }else{
+          action.href='#';
+          action.setAttribute('aria-disabled','true');
+        }
+      }
+
+      if(!stage) return;
+      if(stage.dataset.videoId===videoId&&stage.childElementCount) return;
+      stage.dataset.videoId=videoId;
+      stage.innerHTML='';
+
+      if(!videoId){
+        const empty=document.createElement('div');
+        empty.className='yt-empty';
+        empty.textContent='YouTube URL not set';
+        stage.appendChild(empty);
+        return;
+      }
+
+      const poster=document.createElement('button');
+      poster.className='yt-poster';
+      poster.type='button';
+      poster.setAttribute('aria-label',`Play ${work.title||'video'}`);
+
+      const image=document.createElement('img');
+      image.src=`https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
+      image.alt='YouTube video thumbnail';
+      image.onerror=()=>{
+        image.onerror=null;
+        image.src=`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+      };
+
+      const play=document.createElement('span');
+      play.className='yt-play';
+      play.setAttribute('aria-hidden','true');
+      play.textContent='▶';
+      poster.append(image,play);
+
+      poster.addEventListener('click',()=>{
+        const iframe=document.createElement('iframe');
+        iframe.title=`${work.title||'YouTube'} video player`;
+        iframe.src=`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&controls=0&rel=0&playsinline=1&iv_load_policy=3&disablekb=1&fs=0`;
+        iframe.allow='autoplay; encrypted-media; picture-in-picture';
+        iframe.referrerPolicy='strict-origin-when-cross-origin';
+        stage.replaceChildren(iframe);
+      });
+
+      stage.appendChild(poster);
+    }
+
+    function syncMediaSources(){
+      renderYouTubeWork('dual');
+      renderYouTubeWork('moving');
+    }
+
+    window.addEventListener('sitecopychange',syncMediaSources);
+    syncMediaSources();
   </script>
   <script src="assets/content/sanity-prototype-bridge.js"></script>
 </body>
