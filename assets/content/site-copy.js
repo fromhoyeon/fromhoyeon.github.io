@@ -115,6 +115,17 @@ const SITE_COPY_BINDINGS = [
   ['ui.close', '#lightbox-close']
 ];
 
+const MULTILINE_COPY_PATHS = new Set([
+  'intro.title',
+  'intro.body',
+  'dual.description',
+  'photo.description',
+  'dodrei.description',
+  'moving.description',
+  'about.practice',
+  'about.rule'
+]);
+
 function getCopyValue(source, path){
   return path.split('.').reduce((value, key) => value && value[key], source);
 }
@@ -137,6 +148,7 @@ window.applySiteCopy = function applySiteCopy(source = window.SITE_COPY){
     const element = document.querySelector(selector);
     const value = getCopyValue(source, path);
     if (!element || typeof value !== 'string') return;
+    if (MULTILINE_COPY_PATHS.has(path)) element.style.whiteSpace = 'pre-line';
     if (allowHtml) element.innerHTML = value;
     else element.textContent = value;
   });
