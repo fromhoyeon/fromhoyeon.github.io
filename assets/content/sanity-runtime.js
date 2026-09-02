@@ -74,7 +74,7 @@
     const rows = await query(`*[
       _type == "portfolioPhoto" &&
       enabled != false &&
-      (defined(image.asset) || defined(externalUrl))
+      defined(image.asset)
     ]{
       _id,
       title,
@@ -82,7 +82,6 @@
       featured,
       series,
       year,
-      externalUrl,
       "url": image.asset->url,
       "filename": image.asset->originalFilename,
       "width": image.asset->metadata.dimensions.width,
@@ -91,17 +90,13 @@
     }`);
 
     return (rows || [])
-      .filter((item) => item.url || item.externalUrl)
-      .map((item) => {
-        const hasSanityAsset = Boolean(item.url);
-        const source = item.url || item.externalUrl;
-        return {
-          ...item,
-          file: item.filename || item.title || item._id,
-          src: hasSanityAsset ? imageUrl(source, 1600) : source,
-          fullSrc: hasSanityAsset ? imageUrl(source, 2600) : source
-        };
-      });
+      .filter((item) => item.url && item.ratio)
+      .map((item) => ({
+        ...item,
+        file: item.filename || item.title || item._id,
+        src: imageUrl(item.url, 1600),
+        fullSrc: imageUrl(item.url, 2600)
+      }));
   }
 
   window.SANITY_CONTENT = {
