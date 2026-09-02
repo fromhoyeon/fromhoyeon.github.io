@@ -13,10 +13,26 @@ export const siteCopy = defineType({
   type: 'document',
   fields: [
     defineField({
+      name: 'site', title: 'Site / Navigation', type: 'object', fields: [
+        textField('brand', 'Brand', 1),
+        textField('navWork', 'Work label', 1),
+        textField('navAbout', 'About label', 1),
+        textField('navLinks', 'Links label', 1),
+      ],
+    }),
+    defineField({
       name: 'intro', title: 'Intro', type: 'object', fields: [
         textField('title', 'Title', 2),
         textField('body', 'Body', 4),
         textField('meta', 'Meta', 2),
+      ],
+    }),
+    defineField({
+      name: 'index', title: 'Work Index Labels', type: 'object', fields: [
+        textField('dual', 'Dual Conversation', 1),
+        textField('photo', 'Photography', 1),
+        textField('dodrei', 'DODREI', 1),
+        textField('moving', 'Moving Image', 1),
       ],
     }),
     defineField({
@@ -56,6 +72,24 @@ export const siteCopy = defineType({
         textField('practice', 'Practice', 6),
         textField('ruleLabel', 'Rule label', 1),
         textField('rule', 'Rule', 6),
+      ],
+    }),
+    defineField({
+      name: 'links', title: 'External Link Labels', type: 'object', fields: [
+        textField('instagram', 'Instagram', 1),
+        textField('youtube', 'YouTube', 1),
+        textField('github', 'GitHub', 1),
+      ],
+    }),
+    defineField({
+      name: 'footer', title: 'Footer', type: 'object', fields: [
+        textField('copyright', 'Copyright', 1),
+        textField('status', 'Status', 1),
+      ],
+    }),
+    defineField({
+      name: 'ui', title: 'UI Labels', type: 'object', fields: [
+        textField('close', 'Close', 1),
       ],
     }),
   ],
