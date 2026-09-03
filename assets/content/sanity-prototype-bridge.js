@@ -19,6 +19,31 @@
   let currentHomepageWorks = [];
   let currentPhotoPoolTotal = null;
 
+  function ensureBlockStyles(){
+    if (document.querySelector('#sanity-work-block-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'sanity-work-block-styles';
+    style.textContent = `
+      .sanity-content-blocks{display:grid;gap:var(--l)}
+      .sanity-content-block{min-width:0}
+      .sanity-block-label{margin:0 0 8px;font-size:9px;line-height:1.3;color:var(--muted);text-transform:uppercase;letter-spacing:.02em}
+      .sanity-text-block{max-width:560px;font-size:13px;white-space:pre-line}
+      .sanity-gallery-breakout{width:min(calc(100vw - 24px),var(--wide));margin-left:50%;transform:translateX(-50%)}
+      .sanity-gallery-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s);align-items:start}
+      .sanity-gallery-item{margin:0;min-width:0}
+      .sanity-gallery-item img{display:block;width:100%;height:auto;background:var(--panel)}
+      .sanity-gallery-item figcaption{padding-top:5px;font-size:9px;color:var(--muted)}
+      @media (max-width:620px){
+        .sanity-content-blocks{gap:var(--l)}
+        .sanity-gallery-breakout{width:100vw}
+        .sanity-gallery-grid{grid-template-columns:1fr}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  ensureBlockStyles();
+
   function anchorForWork(work){
     const selector = LEGACY_SECTIONS[work.slug];
     return selector ? selector.slice(1) : work.slug;
@@ -92,8 +117,12 @@
 
   function setAction(action, work){
     if (!action) return;
-    if (work.actionLabel) action.textContent = work.actionLabel;
     const url = work.externalUrl || work.youtubeUrl || '';
+    const hasAction = Boolean(url || work.actionLabel);
+    action.hidden = !hasAction;
+    if (!hasAction) return;
+
+    if (work.actionLabel) action.textContent = work.actionLabel;
     action.href = url || '#';
     if (url) {
       action.target = '_blank';
@@ -129,6 +158,51 @@
       }
       meta.innerHTML = lines.map((line) => String(line)).join('<br>');
     }
+  }
+
+  function createWebStage(title, embedUrl, externalUrl){
+    const breakout = document.createElement('div');
+    breakout.className = 'live-breakout';
+
+    const stage = document.createElement('div');
+    stage.className = 'live-stage';
+
+    const gate = document.createElement('div');
+    gate.className = 'live-gate';
+    gate.innerHTML = `
+      <div class="live-gate-inner">
+        <div class="live-gate-label">Interactive browser work / touch to choose playback</div>
+        <div class="live-gate-title"></div>
+        <div class="live-gate-actions">
+          <button class="action" type="button">여기서 재생</button>
+          <a class="action" target="_blank" rel="noopener">새 창으로 재생 ↗</a>
+        </div>
+      </div>`;
+
+    const gateTitle = gate.querySelector('.live-gate-title');
+    if (gateTitle) gateTitle.textContent = title || '';
+
+    const button = gate.querySelector('button.action');
+    button?.addEventListener('click', () => {
+      if (!embedUrl || stage.querySelector('iframe')) return;
+      const iframe = document.createElement('iframe');
+      iframe.className = 'live-frame';
+      iframe.src = embedUrl;
+      iframe.title = `${title || 'Interactive work'} live browser work`;
+      iframe.allow = 'autoplay; fullscreen';
+      iframe.setAttribute('allowfullscreen', '');
+      stage.replaceChildren(iframe);
+    });
+
+    const external = gate.querySelector('a.action');
+    if (external) {
+      external.href = externalUrl || embedUrl || '#';
+      external.hidden = !(externalUrl || embedUrl);
+    }
+
+    stage.appendChild(gate);
+    breakout.appendChild(stage);
+    return breakout;
   }
 
   function bindWebEmbed(section, work){
@@ -168,6 +242,110 @@
     });
   }
 
+  function renderContentBlock(block, work){
+    const wrapper = document.createElement('div');
+    wrapper.className = 'sanity-content-block';
+    wrapper.dataset.blockType = block._type || '';
+    wrapper.dataset.blockKey = block._key || '';
+
+    if (block.title) {
+      const label = document.createElement('p');
+      label.className = 'sanity-block-label';
+      label.textContent = block.title;
+      wrapper.appendChild(label);
+    }
+
+    if (block._type === 'workVideoBlock') {
+      const breakout = document.createElement('div');
+      breakout.className = 'video-breakout';
+      const stage = document.createElement('div');
+      stage.className = 'yt-stage';
+      stage.setAttribute('aria-label', `${block.title || work.title || 'Work'} video`);
+      breakout.appendChild(stage);
+      wrapper.appendChild(breakout);
+      renderYouTubeStage(stage, {
+        _id: `${work._id || work.slug}:${block._key || 'video'}`,
+        title: block.title || work.title,
+        youtubeUrl: block.youtubeUrl
+      }, true);
+      return wrapper;
+    }
+
+    if (block._type === 'workTextBlock') {
+      const text = document.createElement('p');
+      text.className = 'sanity-text-block';
+      text.textContent = block.text || '';
+      wrapper.appendChild(text);
+      return wrapper;
+    }
+
+    if (block._type === 'workGalleryBlock') {
+      const breakout = document.createElement('div');
+      breakout.className = 'sanity-gallery-breakout';
+      const grid = document.createElement('div');
+      grid.className = 'sanity-gallery-grid';
+
+      (block.images || []).forEach((item) => {
+        const source = item.imageUrl
+          ? window.SANITY_CONTENT.imageUrl(item.imageUrl, 1800)
+          : item.externalUrl;
+        if (!source) return;
+
+        const figure = document.createElement('figure');
+        figure.className = 'sanity-gallery-item';
+        const image = document.createElement('img');
+        image.src = source;
+        image.alt = item.alt || item.caption || '';
+        image.loading = 'lazy';
+        image.decoding = 'async';
+        figure.appendChild(image);
+
+        if (item.caption) {
+          const caption = document.createElement('figcaption');
+          caption.textContent = item.caption;
+          figure.appendChild(caption);
+        }
+        grid.appendChild(figure);
+      });
+
+      breakout.appendChild(grid);
+      wrapper.appendChild(breakout);
+      return wrapper;
+    }
+
+    if (block._type === 'workWebEmbedBlock') {
+      wrapper.appendChild(createWebStage(block.title || work.title, block.embedUrl, block.externalUrl));
+      return wrapper;
+    }
+
+    return wrapper;
+  }
+
+  function renderContentBlocks(section, work){
+    const blocks = Array.isArray(work.contentBlocks) ? work.contentBlocks : [];
+    let container = section.querySelector(':scope > .sanity-content-blocks');
+
+    if (!blocks.length) {
+      container?.remove();
+      return false;
+    }
+
+    section.querySelectorAll(':scope > .video-breakout, :scope > .live-breakout, :scope > .photo-breakout, :scope > .photo-actions, :scope > .media').forEach((element) => {
+      element.hidden = true;
+    });
+
+    if (!container) {
+      container = document.createElement('div');
+      container.className = 'sanity-content-blocks';
+      const header = section.querySelector(':scope > .work-head');
+      if (header?.nextSibling) section.insertBefore(container, header.nextSibling);
+      else section.appendChild(container);
+    }
+
+    container.replaceChildren(...blocks.map((block) => renderContentBlock(block, work)));
+    return true;
+  }
+
   function applyWorkToSection(section, work, index, forceMedia = false){
     section.dataset.sanityWorkId = work._id || '';
     section.dataset.sanityWorkSlug = work.slug || '';
@@ -193,6 +371,9 @@
       strip.hidden = !(work.tags || []).length;
     }
 
+    const hasBlocks = renderContentBlocks(section, work);
+    if (hasBlocks) return;
+
     if (work.mediaType === 'youtube') {
       renderYouTubeStage(section.querySelector('.yt-stage'), work, forceMedia);
     } else if (work.mediaType === 'webEmbed') {
@@ -211,7 +392,12 @@
     header.innerHTML = '<span class="num"></span><h2 class="work-title"></h2><div class="work-meta"></div>';
     section.appendChild(header);
 
-    if (work.mediaType === 'youtube') {
+    const hasBlocks = Array.isArray(work.contentBlocks) && work.contentBlocks.length;
+    if (hasBlocks) {
+      const content = document.createElement('div');
+      content.className = 'sanity-content-blocks';
+      section.appendChild(content);
+    } else if (work.mediaType === 'youtube') {
       const breakout = document.createElement('div');
       breakout.className = 'video-breakout';
       const stage = document.createElement('div');
@@ -220,24 +406,7 @@
       breakout.appendChild(stage);
       section.appendChild(breakout);
     } else if (work.mediaType === 'webEmbed') {
-      const breakout = document.createElement('div');
-      breakout.className = 'live-breakout';
-      const stage = document.createElement('div');
-      stage.className = 'live-stage';
-      const gate = document.createElement('div');
-      gate.className = 'live-gate';
-      gate.innerHTML = `
-        <div class="live-gate-inner">
-          <div class="live-gate-label">Interactive browser work / touch to choose playback</div>
-          <div class="live-gate-title"></div>
-          <div class="live-gate-actions">
-            <button class="action" data-web-play type="button">여기서 재생</button>
-            <a class="action" target="_blank" rel="noopener">새 창으로 재생 ↗</a>
-          </div>
-        </div>`;
-      stage.appendChild(gate);
-      breakout.appendChild(stage);
-      section.appendChild(breakout);
+      section.appendChild(createWebStage(work.title, work.embedUrl, work.externalUrl));
     } else if (work.mediaType === 'photoCollection') {
       const placeholder = document.createElement('div');
       placeholder.className = 'media landscape';
