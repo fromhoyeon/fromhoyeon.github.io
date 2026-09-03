@@ -1,7 +1,7 @@
 /*
   Optional intro accent image
   ---------------------------
-  The image and its placement are managed in Sanity Site Copy > Intro.
+  The image, placement, size and alignment are managed in Sanity Site Copy > Intro.
   Layout remains owned by GitHub; missing or disabled image content stays hidden.
 */
 
@@ -19,15 +19,14 @@
     const style = document.createElement('style');
     style.id = 'intro-accent-styles';
     style.textContent = `
-      .intro-accent{width:64px;max-width:18vw;margin:0;padding:0}
-      .intro-accent img{display:block;width:100%;height:auto;max-height:96px;object-fit:contain;object-position:left center}
+      .intro-accent{width:var(--intro-accent-width,96px);max-width:min(80vw,320px);margin:0;padding:0}
+      .intro-accent img{display:block;width:100%;height:auto;object-fit:contain}
+      .intro-accent[data-align="left"]{justify-self:start}
+      .intro-accent[data-align="center"]{justify-self:center}
+      .intro-accent[data-align="right"]{justify-self:end}
       .intro-accent[data-position="beforeTitle"]{margin-bottom:calc(12px - var(--l))}
       .intro-accent[data-position="afterTitle"]{margin-top:calc(12px - var(--l));margin-bottom:calc(12px - var(--l))}
       .intro-accent[data-position="afterBody"]{margin-top:calc(12px - var(--l))}
-      @media (max-width:620px){
-        .intro-accent{width:56px;max-width:20vw}
-        .intro-accent img{max-height:84px}
-      }
     `;
     document.head.appendChild(style);
   }
@@ -47,22 +46,40 @@
     }
   }
 
+  function resolveWidth(value){
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return 96;
+    return Math.min(320, Math.max(32, Math.round(parsed)));
+  }
+
+  function resolveAlign(value){
+    return ['left', 'center', 'right'].includes(value) ? value : 'center';
+  }
+
   try {
     const data = await window.SANITY_CONTENT.query(`*[_type == "siteCopy"][0]{
       "accentImageUrl": intro.accentImage.asset->url,
       "accentImageAlt": intro.accentImageAlt,
       "accentImageEnabled": intro.accentImageEnabled,
-      "accentImagePosition": intro.accentImagePosition
+      "accentImagePosition": intro.accentImagePosition,
+      "accentImageWidth": intro.accentImageWidth,
+      "accentImageAlign": intro.accentImageAlign
     }`);
 
     if (!data?.accentImageUrl || data.accentImageEnabled === false) return;
 
+    const width = resolveWidth(data.accentImageWidth);
+    const align = resolveAlign(data.accentImageAlign);
+
     const figure = document.createElement('figure');
     figure.className = 'intro-accent';
+    figure.dataset.align = align;
+    figure.style.setProperty('--intro-accent-width', `${width}px`);
     figure.setAttribute('aria-label', 'Intro accent image');
 
     const image = document.createElement('img');
-    image.src = window.SANITY_CONTENT.imageUrl(data.accentImageUrl, 320);
+    const sourceWidth = Math.min(1200, Math.max(320, width * 3));
+    image.src = window.SANITY_CONTENT.imageUrl(data.accentImageUrl, sourceWidth);
     image.alt = data.accentImageAlt || '';
     image.decoding = 'async';
     figure.appendChild(image);
