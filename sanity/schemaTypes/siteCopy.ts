@@ -84,6 +84,21 @@ export const siteCopy = defineType({
       ],
     }),
     defineField({
+      name: 'presentation',
+      title: 'Presentation',
+      type: 'object',
+      fields: [
+        defineField({
+          name: 'photoRowGap',
+          title: 'Photo row vertical gap (px)',
+          description: 'Vertical breathing room between rows in Selected Photography and work image galleries.',
+          type: 'number',
+          initialValue: 12,
+          validation: (rule) => rule.integer().min(4).max(40),
+        }),
+      ],
+    }),
+    defineField({
       name: 'index', title: 'Work Index Labels', type: 'object', fields: [
         textField('dual', 'Dual Conversation', 1),
         textField('photo', 'Photography', 1),
