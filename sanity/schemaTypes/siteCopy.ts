@@ -27,7 +27,6 @@ export const siteCopy = defineType({
       fields: [
         textField('title', 'Title', 2),
         textField('body', 'Body', 4),
-        textField('meta', 'Meta', 2),
         defineField({
           name: 'accentImage',
           title: 'Accent image',
