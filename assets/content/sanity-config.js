@@ -20,7 +20,7 @@ window.SANITY_CONFIG = {
   features: {
     siteCopy: true,
     workEntries: true,
-    // Keep the current GitHub sample-photo pool until real Sanity assets are migrated.
-    portfolioPhotos: false
+    // Real portfolio assets are now stored in Sanity and power Selected Photography.
+    portfolioPhotos: true
   }
 };
