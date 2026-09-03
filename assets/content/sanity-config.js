@@ -14,7 +14,9 @@ window.SANITY_CONFIG = {
   projectId: 'a707yvok',
   dataset: 'production',
   apiVersion: '2026-09-02',
-  useCdn: true,
+  // During active prototyping, read published content directly so Homepage
+  // reorder/add/remove edits appear immediately instead of waiting on CDN cache.
+  useCdn: false,
   features: {
     siteCopy: true,
     workEntries: true,
