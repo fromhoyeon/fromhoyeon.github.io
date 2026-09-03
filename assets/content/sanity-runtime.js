@@ -81,10 +81,11 @@
     return payload.result;
   }
 
-  function imageUrl(url, width){
+  function imageUrl(url, width, quality){
     if (!url) return '';
     const output = new URL(url);
     if (width) output.searchParams.set('w', String(width));
+    if (quality) output.searchParams.set('q', String(quality));
     output.searchParams.set('fit', 'max');
     output.searchParams.set('auto', 'format');
     return output.toString();
@@ -96,6 +97,7 @@
     const copy = await query(`*[_type == "siteCopy"][0]{
       site,
       intro,
+      presentation,
       index,
       dual,
       photo,
@@ -195,8 +197,8 @@
       .map((item) => ({
         ...item,
         file: item.filename || item.title || item._id,
-        src: imageUrl(item.url, 1600),
-        fullSrc: imageUrl(item.url, 2600)
+        src: imageUrl(item.url, 1200, 75),
+        fullSrc: imageUrl(item.url, 2400, 82)
       }));
   }
 
@@ -210,11 +212,15 @@
 
   function loadGalleryLayout(){
     if (!isEnabled() || config.features?.workEntries === false) return;
-    loadScriptOnce('assets/content/sanity-gallery-layout.js?v=20260903-2', 'data-sanity-gallery-layout');
+    loadScriptOnce('assets/content/sanity-gallery-layout.js?v=20260903-3', 'data-sanity-gallery-layout');
   }
 
   function loadYouTubeCustomUi(){
     loadScriptOnce('assets/content/youtube-custom-ui.js?v=20260903-1', 'data-youtube-custom-ui');
+  }
+
+  function loadPresentationControls(){
+    loadScriptOnce('assets/content/presentation-controls.js?v=20260903-1', 'data-presentation-controls');
   }
 
   function observePhotoGridWidth(){
@@ -258,6 +264,7 @@
   const loadEnhancements = () => {
     loadGalleryLayout();
     loadYouTubeCustomUi();
+    loadPresentationControls();
     observePhotoGridWidth();
   };
 
