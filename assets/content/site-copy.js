@@ -146,6 +146,9 @@ function deepMerge(target, patch){
 }
 
 window.applySiteCopy = function applySiteCopy(source = window.SITE_COPY){
+  const brand = getCopyValue(source, 'site.brand');
+  if (typeof brand === 'string' && brand) document.title = brand;
+
   SITE_COPY_BINDINGS.forEach(([path, selector, allowHtml]) => {
     const element = document.querySelector(selector);
     const value = getCopyValue(source, path);
