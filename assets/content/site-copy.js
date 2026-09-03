@@ -8,11 +8,13 @@
 
 window.SITE_COPY = {};
 
+// Current primary navigation decision: keep only About visible.
+document.querySelector('.nav a[href="#work"]')?.remove();
+document.querySelector('.nav a[href="#links"]')?.remove();
+
 const SITE_COPY_BINDINGS = [
   ['site.brand', '.brand'],
-  ['site.navWork', '.nav a[href="#work"]'],
   ['site.navAbout', '.nav a[href="#about"]'],
-  ['site.navLinks', '.nav a[href="#links"]'],
   ['intro.title', '.intro h1'],
   ['intro.body', '.intro-copy p'],
   ['intro.meta', '.intro-copy span', true],
