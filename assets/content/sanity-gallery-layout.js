@@ -2,6 +2,7 @@
   Sanity work-gallery layout helper.
   Editors choose only rowCount. The browser preserves image ratios, keeps equal image
   heights inside each row, and automatically distributes images across the requested rows.
+  Sparse rows are capped vertically instead of being stretched to fill the full width.
 */
 
 (function initSanityGalleryLayout(){
@@ -11,6 +12,10 @@
 
   let homepageWorks = [];
   let applyTimer = null;
+  let galleryLightboxItems = [];
+  let galleryLightboxIndex = -1;
+  let gallerySwipeStartX = null;
+  let gallerySwipeStartY = null;
 
   function clamp(value, min, max){
     return Math.max(min, Math.min(max, value));
@@ -27,6 +32,12 @@
     if (Number.isFinite(gap)) return gap;
     const rootGap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s'));
     return Number.isFinite(rootGap) ? rootGap : 8;
+  }
+
+  function maxRowHeight(width){
+    const mobile = window.matchMedia('(max-width:620px)').matches;
+    if (mobile) return clamp(width * 0.54, 160, 240);
+    return clamp(width * 0.34, 220, 360);
   }
 
   function rowHeight(ratios, start, end, width, gap){
@@ -104,6 +115,142 @@
     return 0;
   }
 
+  function gallerySource(item, full = false){
+    if (item?.imageUrl) return window.SANITY_CONTENT.imageUrl(item.imageUrl, full ? 2600 : 1800);
+    return item?.externalUrl || '';
+  }
+
+  function ensureGalleryLightbox(){
+    let lightbox = document.querySelector('#work-gallery-lightbox');
+    if (lightbox) return lightbox;
+
+    lightbox = document.createElement('div');
+    lightbox.className = 'lightbox';
+    lightbox.id = 'work-gallery-lightbox';
+    lightbox.setAttribute('role', 'dialog');
+    lightbox.setAttribute('aria-modal', 'true');
+    lightbox.setAttribute('aria-label', 'Expanded work image');
+    lightbox.setAttribute('aria-hidden', 'true');
+
+    const close = document.createElement('button');
+    close.className = 'lightbox-close';
+    close.type = 'button';
+    close.textContent = 'Close';
+    close.setAttribute('aria-label', 'Close expanded image');
+
+    const image = document.createElement('img');
+    image.alt = '';
+    image.draggable = false;
+
+    function showIndex(index){
+      if (!galleryLightboxItems.length) return;
+      galleryLightboxIndex = (index + galleryLightboxItems.length) % galleryLightboxItems.length;
+      const item = galleryLightboxItems[galleryLightboxIndex];
+      image.src = gallerySource(item, true);
+      image.alt = item?.alt || item?.caption || '';
+
+      const next = galleryLightboxItems[(galleryLightboxIndex + 1) % galleryLightboxItems.length];
+      const prev = galleryLightboxItems[(galleryLightboxIndex - 1 + galleryLightboxItems.length) % galleryLightboxItems.length];
+      [next, prev].forEach((neighbor) => {
+        const src = gallerySource(neighbor, true);
+        if (!src) return;
+        const preload = new Image();
+        preload.src = src;
+      });
+    }
+
+    function closeLightbox(){
+      lightbox.classList.remove('is-open');
+      lightbox.setAttribute('aria-hidden', 'true');
+      image.removeAttribute('src');
+      document.body.classList.remove('lightbox-open');
+      galleryLightboxItems = [];
+      galleryLightboxIndex = -1;
+    }
+
+    function step(direction){
+      if (!lightbox.classList.contains('is-open')) return;
+      showIndex(galleryLightboxIndex + direction);
+    }
+
+    close.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (event) => {
+      if (event.target === lightbox) closeLightbox();
+    });
+    lightbox.addEventListener('touchstart', (event) => {
+      const touch = event.changedTouches[0];
+      gallerySwipeStartX = touch.clientX;
+      gallerySwipeStartY = touch.clientY;
+    }, {passive: true});
+    lightbox.addEventListener('touchend', (event) => {
+      if (gallerySwipeStartX === null || gallerySwipeStartY === null) return;
+      const touch = event.changedTouches[0];
+      const dx = touch.clientX - gallerySwipeStartX;
+      const dy = touch.clientY - gallerySwipeStartY;
+      gallerySwipeStartX = null;
+      gallerySwipeStartY = null;
+      if (Math.abs(dx) < 45 || Math.abs(dx) <= Math.abs(dy)) return;
+      step(dx < 0 ? 1 : -1);
+    }, {passive: true});
+    document.addEventListener('keydown', (event) => {
+      if (!lightbox.classList.contains('is-open')) return;
+      if (event.key === 'Escape') closeLightbox();
+      if (event.key === 'ArrowRight') step(1);
+      if (event.key === 'ArrowLeft') step(-1);
+    });
+
+    lightbox.append(close, image);
+    document.body.appendChild(lightbox);
+    lightbox.__showGalleryIndex = showIndex;
+    lightbox.__closeGalleryLightbox = closeLightbox;
+    return lightbox;
+  }
+
+  function openGalleryLightbox(items, index){
+    const validItems = items.filter((item) => gallerySource(item, true));
+    if (!validItems.length) return;
+
+    const requested = items[index];
+    galleryLightboxItems = validItems;
+    const resolvedIndex = Math.max(0, validItems.indexOf(requested));
+    const lightbox = ensureGalleryLightbox();
+    lightbox.__showGalleryIndex?.(resolvedIndex);
+    lightbox.classList.add('is-open');
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('lightbox-open');
+    lightbox.querySelector('.lightbox-close')?.focus();
+  }
+
+  function bindGalleryLightbox(figures, items){
+    figures.forEach((figure, index) => {
+      const source = gallerySource(items[index], true);
+      if (!source) return;
+      figure.dataset.galleryLightbox = 'true';
+      figure.tabIndex = 0;
+      figure.setAttribute('role', 'button');
+      figure.setAttribute('aria-label', `Enlarge ${items[index]?.alt || items[index]?.caption || `image ${index + 1}`}`);
+      if (figure.dataset.galleryLightboxBound === 'true') return;
+      figure.dataset.galleryLightboxBound = 'true';
+      figure.addEventListener('click', () => openGalleryLightbox(items, index));
+      figure.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        openGalleryLightbox(items, index);
+      });
+    });
+  }
+
+  function ensureGalleryStyles(){
+    if (document.querySelector('#sanity-gallery-layout-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'sanity-gallery-layout-styles';
+    style.textContent = `
+      .sanity-gallery-item[data-gallery-lightbox="true"]{cursor:zoom-in}
+      .sanity-gallery-item[data-gallery-lightbox="true"]:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
+    `;
+    document.head.appendChild(style);
+  }
+
   function waitForRatios(grid, block, figures){
     grid.style.visibility = 'hidden';
     figures.forEach((figure) => {
@@ -139,10 +286,13 @@
       return;
     }
 
+    bindGalleryLightbox(figures, items);
+
     const gap = gapSize(grid);
     const rowCount = clamp(Math.round(Number(block.rowCount) || 1), 1, figures.length);
     const partitions = balancedPartitions(ratios, rowCount, width, gap);
     const fragment = document.createDocumentFragment();
+    const heightLimit = maxRowHeight(width);
 
     grid.style.display = 'grid';
     grid.style.gridTemplateColumns = '1fr';
@@ -156,8 +306,13 @@
       row.style.gap = 'var(--s)';
       row.style.width = '100%';
       row.style.alignItems = 'flex-start';
+      row.style.justifyContent = 'flex-start';
 
-      const height = rowHeight(ratios, start, end, width, gap);
+      const justifiedHeight = rowHeight(ratios, start, end, width, gap);
+      const height = Math.min(justifiedHeight, heightLimit);
+      const isCapped = justifiedHeight > heightLimit + 0.5;
+      row.dataset.galleryRowMode = isCapped ? 'capped' : 'justified';
+
       for (let index = start; index < end; index += 1) {
         const figure = figures[index];
         const image = figure.querySelector('img');
@@ -233,6 +388,7 @@
 
   async function start(){
     try {
+      ensureGalleryStyles();
       homepageWorks = await window.SANITY_CONTENT.fetchHomePageWorks();
       applyKnownWorks();
       mutationObserver.observe(document.body, {childList: true, subtree: true});
