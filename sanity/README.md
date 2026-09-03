@@ -1,6 +1,6 @@
 # Sanity content layer
 
-이 디렉터리는 개인 웹사이트의 **외부 콘텐츠·asset 레이어**를 위한 Sanity schema 초안과 연결 기준을 보관한다.
+이 디렉터리는 개인 웹사이트의 **외부 콘텐츠·asset 레이어**를 위한 Sanity schema 참고 파일과 연결 기준을 보관한다.
 
 중요한 경계:
 
@@ -11,100 +11,90 @@
 
 ## 현재 준비된 schema
 
-- `siteCopy` — 자주 바꿀 사이트 텍스트
+- `siteCopy` — 사이트 전역 문구와 About, Links 등 자주 바뀌는 텍스트
 - `portfolioPhoto` — 사진 pool. 이미지, 공개 여부, featured, series, year, tags
-- `contentEntry` — 추후 게시물·기록용. 본문, 이미지 배열, 일반 파일/download 배열 포함
+- `contentEntry` — 일반 게시물·기록용. 본문, 이미지 배열, 일반 파일/download 배열 포함
+- `workEntry` — 홈페이지에 표시할 개별 작업. 제목, slug, 연도 표기, meta, 설명, tags, media type, YouTube/embed/project URL 등을 가진다.
+- `homePage` — 홈페이지 큐레이션 문서. `featuredWorks` reference 배열의 순서가 실제 홈페이지 작업 순서가 된다.
 
-## 사용자가 한 번 해야 하는 일
+실제 현재 Studio는 다음 주소에서 관리한다.
 
-### 1. Sanity 프로젝트 생성
+`https://hoyeon-website-content.sanity.studio/`
 
-Sanity에 로그인해 새 프로젝트를 만든다.
+현재 project/dataset:
 
-권장값:
-
-- Project name: `Hoyeon Website Content`
+- Project ID: `a707yvok`
 - Dataset: `production`
-- Dataset visibility: `public`
 
-공개 포트폴리오에서 읽을 데이터이므로 frontend에 read token을 넣지 않는 구조를 사용한다.
+## frontend 설정
 
-프로젝트를 만든 뒤 **Project ID**를 기록한다.
-
-### 2. CORS origin 추가
-
-Sanity Manage의 API/CORS 설정에서 다음 origin을 추가한다.
-
-`https://fromhoyeon.github.io`
-
-Credentials는 필요하지 않다.
-
-로컬 테스트가 필요하면 사용하는 localhost origin도 별도로 추가한다.
-
-### 3. Project ID 전달 또는 설정
-
-`assets/content/sanity-config.js`의 다음 값을 채운다.
+`assets/content/sanity-config.js`의 public 설정을 사용한다.
 
 ```js
 window.SANITY_CONFIG = {
   enabled: true,
-  projectId: 'YOUR_PROJECT_ID',
+  projectId: 'a707yvok',
   dataset: 'production',
   apiVersion: '2026-09-02',
   useCdn: true,
   features: {
     siteCopy: true,
-    portfolioPhotos: true
+    workEntries: true,
+    portfolioPhotos: false
   }
 };
 ```
 
 이 파일에는 **write token이나 비밀키를 절대 넣지 않는다.**
 
-### 4. Sanity Studio 생성
+## 현재 프로토타입 동작
 
-Node.js/npm이 설치된 PC에서 공식 CLI로 clean Studio를 만든다.
-
-```bash
-npm create sanity@latest -- --project YOUR_PROJECT_ID --dataset production --template clean --typescript --output-path sanity-studio
-```
-
-그 다음 이 저장소의 `sanity/schemaTypes/` 내용을 생성된 Studio의 `schemaTypes/`에 사용하고,
-`sanity/sanity.config.example.ts`를 기준으로 `sanity.config.ts`를 설정한다.
-
-Studio 로컬 실행:
-
-```bash
-cd sanity-studio
-npm run dev
-```
-
-필요하면 Sanity가 제공하는 Studio hosting으로 배포할 수 있다.
-
-```bash
-npx sanity@latest deploy
-```
-
-Studio는 콘텐츠 관리 UI일 뿐이며 GitHub Pages 웹사이트와는 별도다.
-
-## 연결 후 현재 프로토타입 동작
-
-### 텍스트
+### 사이트 전역 텍스트
 
 `siteCopy` document가 있으면 해당 필드만 local `assets/content/site-copy.js` 위에 덮어쓴다.
 비어 있는 필드는 GitHub의 local 값이 그대로 유지된다.
 
-### 사진
+### 홈페이지 작업과 순서
 
-`portfolioPhoto` document 중 다음 조건을 만족하는 사진을 pool로 사용한다.
+홈페이지의 주요 작업은 각각 독립된 `workEntry` document다.
+현재 초기 이관 항목은 다음 네 개다.
+
+- Dual Conversation
+- Photography
+- DODREI
+- Music
+
+`homePage` document의 `featuredWorks` 배열이 홈페이지 노출 여부와 순서를 결정한다.
+Studio에서 reference 배열을 드래그해 순서를 변경하면 GitHub 코드를 수정하지 않아도 다음 페이지 로드부터 순서가 바뀐다.
+
+현재 프로토타입은 기존 HTML 섹션을 fallback으로 그대로 남겨두고, Sanity 연결에 성공하면 해당 섹션의 제목·연도·meta·설명·tag·미디어 URL·순서를 remote `workEntry` 값으로 덮어쓴다.
+Sanity query가 실패하거나 Homepage 문서가 비어 있으면 기존 하드코딩 화면이 그대로 표시된다.
+
+기존 네 작업의 특수 renderer는 보존한다.
+
+- `youtube` — 현재 YouTube poster/player renderer
+- `photoCollection` — 현재 Selected Photography justified grid와 lightbox
+- `webEmbed` — 현재 DODREI on-demand iframe gate
+- `none` — 미디어 없는 일반 작업
+
+추가 `workEntry`는 YouTube, web embed, 일반 항목의 경우 generic section을 만들 수 있다. Photography collection은 현재 기존 단일 사진 섹션 renderer를 우선 사용하며, 여러 독립 사진 collection을 동시에 운영하는 구조는 아직 별도로 설계하지 않았다.
+
+### 사진 pool
+
+`portfolioPhoto` document 중 다음 조건을 만족하는 사진을 remote pool로 사용할 수 있다.
 
 - `enabled != false`
 - image asset이 존재함
 
-Sanity가 활성화되어 있고 사진이 존재하면 현재 `Selected Photography`는 전체 remote pool 가운데 최대 12장을 무작위 선택한다.
-Sanity 연결 실패 또는 사진 0장이면 현재 GitHub의 local sample pool을 그대로 사용한다.
+현재는 실제 사진 asset 이관 전이므로 `portfolioPhotos: false`로 두고 GitHub의 local sample pool을 사용한다.
+활성화하면 `workEntry.photoCount`가 홈페이지 랜덤 선별 장수를 결정한다.
 
 이미지 query에서 Sanity가 보유한 dimensions/aspect ratio metadata를 함께 받아오므로, 원본 파일을 먼저 다운로드하지 않고도 justified layout을 계산할 수 있다.
+
+## schema 관리
+
+이 디렉터리의 `schemaTypes/`는 repository 안에서 현재 데이터 구조를 추적하기 위한 참고 source다.
+실제 현재 hosted Studio/schema는 Sanity의 managed workspace에도 배포되어 있으므로 schema 변경 시 두 상태가 어긋나지 않도록 함께 갱신한다.
 
 ## 향후 원칙
 
