@@ -5,8 +5,8 @@
 
   Public website architecture:
   - GitHub Pages owns HTML / CSS / JS, layout, formatting and rendering.
-  - Sanity supplies editable content values and, when explicitly enabled, assets.
-  - If Sanity is unavailable or contains no matching content, the site keeps its local fallback.
+  - Sanity supplies editable content values, navigation and, when explicitly enabled, assets.
+  - Sanity-bound text/navigation does not mirror stale local copy; unavailable remote content remains OFFLINE.
 */
 
 window.SANITY_CONFIG = {
