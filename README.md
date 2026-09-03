@@ -20,10 +20,10 @@ Hoyeon의 개인 웹사이트이자 포트폴리오를 위한 저장소다.
 
 - `index.html` — 현재 공개 사이트의 진입점. `prototype-functional-onepage.html`로 즉시 이동시킨다. 당분간 이 단일 페이지 프로토타입을 메인 사이트로 사용한다.
 - `prototype-random-photo-layout.html` — 10~15장의 사진이 4:3, 3:4, 1:1, 16:9, 2.35:1 비율로 유동적으로 들어온다고 가정하고, crop 없이 원본 비율을 유지한 채 화면 폭에 맞춰 자동으로 justified row를 구성하는 사진 배치 실험
-- `prototype-functional-onepage.html` — 중앙 집중형 정보 영역과 제한된 타이포그래피·간격 규칙을 사용하는 현재 메인 단일 페이지. `Selected Photography`는 `assets/prototypes/photo-samples/`의 실제 샘플 이미지 중 12장을 무작위로 고른다. 모바일에서는 4개 행으로 고정하고, 데스크탑에서는 mixed-ratio justified layout을 사용한다. 사진 확대는 흰 배경 lightbox와 순환 좌우 swipe/키보드 이동을 지원한다. DODREI는 초기 iframe을 로드하지 않고 `여기서 재생 / 새 창으로 재생` 선택 화면을 먼저 보여주며, `여기서 재생`을 선택했을 때만 iframe을 생성한다. Dual Conversation과 Moving Image의 YouTube URL은 Sanity에서 관리하고, 페이지가 URL을 해석해 썸네일과 공식 embed를 구성한다.
-- `assets/content/site-copy.js` — 단일 페이지 프로토타입의 local 텍스트와 media URL fallback source. 현재 실제 표시 텍스트와 Dual/Moving YouTube URL은 Sanity `siteCopy` 문서가 우선하며, Sanity가 실패하거나 값이 없을 때 이 파일의 값을 사용한다.
-- `assets/content/sanity-config.js` / `sanity-runtime.js` / `sanity-prototype-bridge.js` — Sanity content adapter. 현재 Project ID `a707yvok`, dataset `production`에 연결되어 있으며 `siteCopy`는 활성화되어 있다. 사진 pool은 실제 Sanity asset 이관 전까지 비활성화하여 GitHub의 기존 로컬 샘플 사진을 유지한다.
-- `sanity/` — `siteCopy`, `portfolioPhoto`, `contentEntry` schema 참고 파일과 연결 절차. 실제 현재 schema와 Studio는 Sanity의 MCP-managed workspace에 배포되어 있다. Sanity는 웹 프론트엔드가 아니라 content/assets source로만 사용한다.
+- `prototype-functional-onepage.html` — 중앙 집중형 정보 영역과 제한된 타이포그래피·간격 규칙을 사용하는 현재 메인 단일 페이지. `Selected Photography`는 `assets/prototypes/photo-samples/`의 실제 샘플 이미지 중 12장을 무작위로 고른다. 모바일에서는 4개 행으로 고정하고, 데스크탑에서는 mixed-ratio justified layout을 사용한다. 사진 확대는 흰 배경 lightbox와 순환 좌우 swipe/키보드 이동을 지원한다. DODREI는 초기 iframe을 로드하지 않고 `여기서 재생 / 새 창으로 재생` 선택 화면을 먼저 보여주며, `여기서 재생`을 선택했을 때만 iframe을 생성한다. 현재 주요 작업의 제목·연도·meta·설명·tag·media URL과 홈페이지 순서는 Sanity의 `workEntry` / `homePage`에서 읽고, 실패 시 기존 HTML을 fallback으로 유지한다.
+- `assets/content/site-copy.js` — 단일 페이지 프로토타입의 local 사이트 전역 텍스트 fallback source. 현재 intro, About, Links 등의 실제 표시 텍스트는 Sanity `siteCopy` 문서가 우선하며, Sanity가 실패하거나 값이 없을 때 이 파일의 값을 사용한다.
+- `assets/content/sanity-config.js` / `sanity-runtime.js` / `sanity-prototype-bridge.js` — Sanity content adapter. 현재 Project ID `a707yvok`, dataset `production`에 연결되어 있으며 `siteCopy`와 `workEntries`는 활성화되어 있다. 사진 pool은 실제 Sanity asset 이관 전까지 비활성화하여 GitHub의 기존 로컬 샘플 사진을 유지한다.
+- `sanity/` — `siteCopy`, `portfolioPhoto`, `contentEntry`, `workEntry`, `homePage` schema 참고 파일과 연결 기준. 실제 현재 schema와 Studio는 Sanity의 managed workspace에 배포되어 있다. Sanity는 웹 프론트엔드가 아니라 content/assets source로만 사용한다.
 - `assets/prototypes/photo-samples/` — 위 단일 페이지 프로토타입의 사진 배치·확대 동작을 시험하기 위한 실제 샘플 이미지 모음
 - `assets/prototypes/photo-samples-size-tests/` — 샘플 이미지 가운데 파일명에 `-2`가 붙은 크기 변형 테스트본을 실제 랜덤 선택 풀과 분리해 둔 폴더
 - `style.css` — 이전 루트 편집형 포트폴리오 프로토타입의 스타일시트. 현재 메인 진입점에서는 사용하지 않는다.
@@ -38,15 +38,18 @@ Hoyeon의 개인 웹사이트이자 포트폴리오를 위한 저장소다.
 
 ## 콘텐츠 레이어 기준
 
-2026-09-02에 다음 역할 분리를 현재 작업 기준으로 채택했다.
+2026-09-02에 GitHub/Sanity 역할 분리를 채택했고, 2026-09-03에 홈페이지의 주요 작업을 독립 DB 문서로 분리하는 실험을 추가했다.
 
 - **GitHub Pages가 웹사이트 본체다.** HTML, CSS, JavaScript, 레이아웃, 인터랙션, 작품별 특수 구현, 텍스트의 시각적 포맷과 배포는 이 저장소가 계속 소유한다.
 - **Sanity는 DB형 콘텐츠와 asset을 제공하는 외부 content layer로만 사용한다.** Sanity가 웹페이지를 렌더링하거나 사이트 구조를 소유하지 않는다.
-- **현재 메인 페이지의 주요 텍스트 값은 Sanity `siteCopy` 문서에서 관리한다.** Sanity에서 문구를 수정하고 Publish하면 GitHub의 레이아웃이나 CSS를 변경하지 않고 사이트에 반영된다.
-- **Dual Conversation과 Moving Image의 YouTube URL도 `siteCopy`에서 관리한다.** URL을 바꾸면 페이지 코드 변경 없이 썸네일, 페이지 내부 재생 대상, 외부 YouTube 링크가 같은 URL을 사용한다.
-- `assets/content/site-copy.js`에는 동일 구조의 local fallback을 유지한다. Sanity 장애나 미설정 상태가 사이트 전체의 장애로 이어지지 않는다.
-- 사진은 향후 Sanity asset으로 이관할 수 있지만, 2026-09-02 현재는 remote photo pool을 비활성화하고 GitHub의 로컬 샘플 사진 표시를 유지한다.
-- 자주 바뀌는 텍스트, 반복적으로 쌓이는 게시물·사진 pool, 이미지와 다운로드 파일 등은 필요에 따라 Sanity로 둘 수 있다.
+- **사이트 전역 문구는 Sanity `siteCopy` 문서에서 관리한다.** Sanity에서 문구를 수정하고 Publish하면 GitHub의 레이아웃이나 CSS를 변경하지 않고 사이트에 반영된다.
+- **홈페이지의 개별 주요 작업은 Sanity `workEntry` 문서로 관리한다.** 현재 Dual Conversation, Photography, DODREI, Music 네 항목을 독립 문서로 이관했다.
+- **홈페이지 작업의 노출 여부와 순서는 `homePage` 문서의 `featuredWorks` reference 배열이 결정한다.** Studio에서 배열을 드래그해 순서를 바꾸면 GitHub 코드를 수정하지 않고 다음 페이지 로드부터 반영된다.
+- YouTube URL, web embed URL, 외부 project URL도 해당 `workEntry`에서 관리한다.
+- 기존 HTML 네 섹션은 현재 fallback으로 보존한다. Sanity query 실패나 Homepage 데이터 부재가 사이트 전체 장애로 이어지지 않는다.
+- `assets/content/site-copy.js`에는 사이트 전역 문구의 local fallback을 유지한다.
+- 사진은 향후 Sanity asset으로 이관할 수 있지만, 2026-09-03 현재는 remote photo pool을 비활성화하고 GitHub의 로컬 샘플 사진 표시를 유지한다.
+- 추가 `workEntry`는 YouTube, web embed, 일반 항목의 generic section으로 표시할 수 있다. 여러 독립 Photography collection을 동시에 운영하는 구조는 아직 별도로 설계하지 않았다.
 - 어떤 콘텐츠를 remote/static으로 둘지는 영구 고정하지 않는다. 디자인 테스트 중에는 Sanity에서 읽던 값을 나중에 GitHub에 정적으로 고정하거나, 반대로 정적 영역을 collection으로 전환할 수 있다.
 - 외부 content layer는 교체 가능해야 한다.
 
