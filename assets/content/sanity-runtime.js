@@ -145,6 +145,8 @@
           embedUrl,
           externalUrl,
           rowCount,
+          maxRowHeightDesktop,
+          maxRowHeightMobile,
           _type == "workGalleryBlock" => {
             images[]{
               _key,
@@ -212,7 +214,7 @@
 
   function loadGalleryLayout(){
     if (!isEnabled() || config.features?.workEntries === false) return;
-    loadScriptOnce('assets/content/sanity-gallery-layout.js?v=20260903-3', 'data-sanity-gallery-layout');
+    loadScriptOnce('assets/content/sanity-gallery-layout.js?v=20260903-4', 'data-sanity-gallery-layout');
   }
 
   function loadYouTubeCustomUi(){
@@ -220,7 +222,7 @@
   }
 
   function loadPresentationControls(){
-    loadScriptOnce('assets/content/presentation-controls.js?v=20260903-1', 'data-presentation-controls');
+    loadScriptOnce('assets/content/presentation-controls.js?v=20260903-2', 'data-presentation-controls');
   }
 
   function observePhotoGridWidth(){
