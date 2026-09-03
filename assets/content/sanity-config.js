@@ -17,6 +17,7 @@ window.SANITY_CONFIG = {
   useCdn: true,
   features: {
     siteCopy: true,
+    workEntries: true,
     // Keep the current GitHub sample-photo pool until real Sanity assets are migrated.
     portfolioPhotos: false
   }
