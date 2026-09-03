@@ -84,6 +84,26 @@
         metaLines,
         summary,
         tags,
+        contentBlocks[]{
+          _key,
+          _type,
+          title,
+          text,
+          youtubeUrl,
+          embedUrl,
+          externalUrl,
+          _type == "workGalleryBlock" => {
+            images[]{
+              _key,
+              alt,
+              caption,
+              externalUrl,
+              "imageUrl": image.asset->url,
+              "width": image.asset->metadata.dimensions.width,
+              "height": image.asset->metadata.dimensions.height
+            }
+          }
+        },
         mediaType,
         youtubeUrl,
         embedUrl,
