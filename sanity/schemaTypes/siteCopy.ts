@@ -59,6 +59,28 @@ export const siteCopy = defineType({
             layout: 'radio',
           },
         }),
+        defineField({
+          name: 'accentImageWidth',
+          title: 'Accent image width (px)',
+          description: 'Base rendered width on the site. Choose a value from 32 to 320 px.',
+          type: 'number',
+          initialValue: 96,
+          validation: (rule) => rule.integer().min(32).max(320),
+        }),
+        defineField({
+          name: 'accentImageAlign',
+          title: 'Accent image alignment',
+          type: 'string',
+          initialValue: 'center',
+          options: {
+            list: [
+              {title: 'Left', value: 'left'},
+              {title: 'Center', value: 'center'},
+              {title: 'Right', value: 'right'},
+            ],
+            layout: 'radio',
+          },
+        }),
       ],
     }),
     defineField({
