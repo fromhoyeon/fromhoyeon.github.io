@@ -4,6 +4,9 @@
 */
 
 (function initSanityRuntime(){
+  if (window.__SANITY_RUNTIME_LOADED__) return;
+  window.__SANITY_RUNTIME_LOADED__ = true;
+
   const config = window.SANITY_CONFIG || {};
 
   function isEnabled(){
@@ -68,6 +71,33 @@
     return copy;
   }
 
+  async function fetchHomePageWorks(){
+    if (!isEnabled() || config.features?.workEntries === false) return [];
+
+    const home = await query(`*[_type == "homePage" && _id == "home-page"][0]{
+      "works": featuredWorks[]->{
+        _id,
+        title,
+        "slug": slug.current,
+        enabled,
+        yearLabel,
+        metaLines,
+        summary,
+        tags,
+        mediaType,
+        youtubeUrl,
+        embedUrl,
+        externalUrl,
+        actionLabel,
+        photoCount
+      }
+    }`);
+
+    return (home?.works || []).filter((work) => (
+      work && work.enabled !== false && work.slug && work.title
+    ));
+  }
+
   async function fetchPortfolioPhotos(){
     if (!isEnabled() || config.features?.portfolioPhotos === false) return [];
 
@@ -104,6 +134,7 @@
     query,
     imageUrl,
     fetchSiteCopy,
+    fetchHomePageWorks,
     fetchPortfolioPhotos
   };
 
