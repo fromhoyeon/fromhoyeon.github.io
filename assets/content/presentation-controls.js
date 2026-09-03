@@ -102,8 +102,8 @@
   makeThemeControls();
   applyPhotoSpacing();
 
-  let savedTheme = 'white';
-  try { savedTheme = localStorage.getItem(STORAGE_KEY) || 'white'; } catch (error) {}
+  let savedTheme = 'black';
+  try { savedTheme = localStorage.getItem(STORAGE_KEY) || 'black'; } catch (error) {}
   setTheme(savedTheme, false);
 
   window.addEventListener('sitecopychange', (event) => applyPhotoSpacing(event.detail || window.SITE_COPY));
