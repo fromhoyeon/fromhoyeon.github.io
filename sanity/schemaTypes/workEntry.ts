@@ -23,8 +23,21 @@ export const workEntry = defineType({
       of: [defineArrayMember({type: 'string'})],
     }),
     defineField({
+      name: 'contentBlocks',
+      title: 'Content blocks',
+      description: 'Add and drag blocks to control the content order inside this work.',
+      type: 'array',
+      of: [
+        defineArrayMember({type: 'workVideoBlock'}),
+        defineArrayMember({type: 'workTextBlock'}),
+        defineArrayMember({type: 'workGalleryBlock'}),
+        defineArrayMember({type: 'workWebEmbedBlock'}),
+      ],
+    }),
+    defineField({
       name: 'mediaType',
-      title: 'Media type',
+      title: 'Legacy media type',
+      description: 'Used by existing entries that do not yet use Content blocks.',
       type: 'string',
       options: {
         list: [
@@ -35,8 +48,8 @@ export const workEntry = defineType({
         ],
       },
     }),
-    defineField({name: 'youtubeUrl', title: 'YouTube URL', type: 'url'}),
-    defineField({name: 'embedUrl', title: 'Embed URL', type: 'url'}),
+    defineField({name: 'youtubeUrl', title: 'Legacy YouTube URL', type: 'url'}),
+    defineField({name: 'embedUrl', title: 'Legacy Embed URL', type: 'url'}),
     defineField({name: 'externalUrl', title: 'External / project URL', type: 'url'}),
     defineField({name: 'actionLabel', title: 'Action label', type: 'string'}),
     defineField({name: 'photoCount', title: 'Photography selection count', type: 'number'}),
