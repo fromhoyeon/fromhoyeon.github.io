@@ -39,6 +39,14 @@ export const workGalleryBlock = defineType({
   fields: [
     defineField({name: 'title', title: 'Optional label', type: 'string'}),
     defineField({
+      name: 'rowCount',
+      title: 'Rows',
+      description: 'Choose only the number of rows. Image counts and equal-height layout are balanced automatically.',
+      type: 'number',
+      initialValue: 1,
+      validation: (rule) => rule.integer().min(1).max(8),
+    }),
+    defineField({
       name: 'images',
       title: 'Images',
       type: 'array',
