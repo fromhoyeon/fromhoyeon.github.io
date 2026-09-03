@@ -14,7 +14,11 @@
 - `siteCopy` — 사이트 전역 문구와 About, Links 등 자주 바뀌는 텍스트
 - `portfolioPhoto` — 사진 pool. 이미지, 공개 여부, featured, series, year, tags
 - `contentEntry` — 일반 게시물·기록용. 본문, 이미지 배열, 일반 파일/download 배열 포함
-- `workEntry` — 홈페이지에 표시할 개별 작업. 제목, slug, 연도 표기, meta, 설명, tags, media type, YouTube/embed/project URL 등을 가진다.
+- `workEntry` — 홈페이지에 표시할 개별 작업. 제목, slug, 연도 표기, meta, 설명, tags와 함께 작업 내부의 `contentBlocks` 배열을 가질 수 있다.
+- `workVideoBlock` — 작업 내부 YouTube 영상 블록
+- `workTextBlock` — 작업 내부 텍스트 블록
+- `workGalleryBlock` / `workGalleryImage` — 작업 내부 이미지 갤러리와 개별 이미지
+- `workWebEmbedBlock` — 작업 내부 interactive web embed 블록
 - `homePage` — 홈페이지 큐레이션 문서. `featuredWorks` reference 배열의 순서가 실제 홈페이지 작업 순서가 된다.
 
 실제 현재 Studio는 다음 주소에서 관리한다.
@@ -57,12 +61,7 @@ window.SANITY_CONFIG = {
 ### 홈페이지 작업과 순서
 
 홈페이지의 주요 작업은 각각 독립된 `workEntry` document다.
-현재 초기 이관 항목은 다음 네 개다.
-
-- Dual Conversation
-- Photography
-- DODREI
-- Music
+기존 이관 항목은 Dual Conversation, Photography, DODREI, Music이며 필요에 따라 새 작업을 추가할 수 있다.
 
 `homePage` document의 `featuredWorks` 배열이 홈페이지 노출 여부와 순서를 결정한다.
 Studio에서 reference 배열을 드래그해 순서를 변경하면 GitHub 코드를 수정하지 않아도 다음 페이지 로드부터 순서가 바뀐다.
@@ -70,14 +69,28 @@ Studio에서 reference 배열을 드래그해 순서를 변경하면 GitHub 코�
 현재 프로토타입은 기존 HTML 섹션을 fallback으로 그대로 남겨두고, Sanity 연결에 성공하면 해당 섹션의 제목·연도·meta·설명·tag·미디어 URL·순서를 remote `workEntry` 값으로 덮어쓴다.
 Sanity query가 실패하거나 Homepage 문서가 비어 있으면 기존 하드코딩 화면이 그대로 표시된다.
 
-기존 네 작업의 특수 renderer는 보존한다.
+### 작업 내부 Content blocks
+
+`workEntry.contentBlocks`가 존재하면 기존의 단일 media slot보다 이 배열을 우선한다.
+배열의 순서가 실제 페이지 내부 표시 순서이며 Studio에서 각 블록을 드래그해 재배치할 수 있다.
+
+현재 지원 블록:
+
+- `YouTube Video` — 한 작업 안에 여러 개 추가 가능
+- `Text` — 설명 사이에 독립 텍스트 블록 추가 가능
+- `Image Gallery` — 여러 이미지를 한 블록으로 표시. Sanity image asset 또는 외부 이미지 URL을 사용할 수 있다.
+- `Web Embed` — DODREI와 같은 browser work를 작업 내부 원하는 위치에 삽입 가능
+
+2026-09-03에 `Exhibition Sample`을 테스트 항목으로 추가했다. 현재 구성은 YouTube 영상 2개를 세로로 배치하고, 그 아래 기존 로컬 샘플 사진 4장을 2열 gallery로 표시한다. 모바일에서는 gallery가 1열로 바뀐다. 이 항목은 `homePage.featuredWorks` 맨 위에 배치되어 block 구조 검증용으로 사용한다.
+
+기존 작업에 `contentBlocks`가 없으면 기존 특수 renderer를 그대로 사용한다.
 
 - `youtube` — 현재 YouTube poster/player renderer
 - `photoCollection` — 현재 Selected Photography justified grid와 lightbox
 - `webEmbed` — 현재 DODREI on-demand iframe gate
 - `none` — 미디어 없는 일반 작업
 
-추가 `workEntry`는 YouTube, web embed, 일반 항목의 경우 generic section을 만들 수 있다. Photography collection은 현재 기존 단일 사진 섹션 renderer를 우선 사용하며, 여러 독립 사진 collection을 동시에 운영하는 구조는 아직 별도로 설계하지 않았다.
+따라서 기존 네 작업을 즉시 새 구조로 마이그레이션하지 않아도 되며, block 구조를 개별 작업부터 점진적으로 적용할 수 있다.
 
 ### 사진 pool
 
