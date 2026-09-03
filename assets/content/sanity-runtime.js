@@ -92,6 +92,7 @@
           youtubeUrl,
           embedUrl,
           externalUrl,
+          rowCount,
           _type == "workGalleryBlock" => {
             images[]{
               _key,
@@ -149,6 +150,15 @@
       }));
   }
 
+  function loadGalleryLayout(){
+    if (!isEnabled() || config.features?.workEntries === false) return;
+    if (document.querySelector('script[data-sanity-gallery-layout]')) return;
+    const script = document.createElement('script');
+    script.src = 'assets/content/sanity-gallery-layout.js?v=20260903-1';
+    script.dataset.sanityGalleryLayout = 'true';
+    document.head.appendChild(script);
+  }
+
   window.SANITY_CONTENT = {
     isEnabled,
     query,
@@ -163,4 +173,7 @@
       console.warn('[Sanity] Using local site-copy fallback.', error);
     });
   }
+
+  if (document.readyState === 'complete') loadGalleryLayout();
+  else window.addEventListener('load', loadGalleryLayout, {once: true});
 })();
