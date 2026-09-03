@@ -71,7 +71,7 @@
 
 - `YouTube Video` — 한 작업 안에 여러 개 추가 가능
 - `Text` — 독립 텍스트 블록
-- `Image Gallery` — 여러 이미지를 한 블록으로 표시. `Rows` 값으로 목표 행 수를 지정하며 프론트가 원본 비율을 유지한 채 행 분배와 공통 높이를 계산한다.
+- `Image Gallery` — 여러 이미지를 한 블록으로 표시. `Maximum rows`와 desktop/mobile `Maximum row height`를 지정할 수 있으며, 프론트가 그 한도 안에서 원본 비율을 유지한 채 행 분배와 공통 높이를 계산한다.
 - `Web Embed` — browser work embed
 
 `Exhibition Sample`은 block 구조 검증용 작업이며 영상 2개와 이미지 갤러리를 사용한다.
@@ -97,7 +97,7 @@ control 색상은 `--bg`, `--fg`, `--line`, `--muted` CSS 변수를 사용하므
 
 ### 사진 pool
 
-현재 `portfolioPhotos: false`로 두고 GitHub의 local sample pool을 사용한다. 향후 실제 asset 이관 시 Sanity `portfolioPhoto` pool을 활성화할 수 있다.
+현재 Sanity `portfolioPhoto` pool을 활성화해 실제 portfolio asset을 Selected Photography에 사용한다. 2026-09-03 기준 production에 enabled/published 사진 98장이 이관되어 있으며 frontend는 그중 일부를 무작위로 선택해 표시한다.
 
 ## schema 관리
 
