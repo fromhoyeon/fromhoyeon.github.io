@@ -32,6 +32,33 @@ export const siteCopy = defineType({
         textField('title', 'Title', 2),
         textField('body', 'Body', 4),
         textField('meta', 'Meta', 2),
+        defineField({
+          name: 'accentImage',
+          title: 'Accent image',
+          type: 'image',
+          options: {hotspot: true},
+        }),
+        textField('accentImageAlt', 'Accent image alt text', 1),
+        defineField({
+          name: 'accentImageEnabled',
+          title: 'Show accent image',
+          type: 'boolean',
+          initialValue: true,
+        }),
+        defineField({
+          name: 'accentImagePosition',
+          title: 'Accent image position',
+          type: 'string',
+          initialValue: 'beforeTitle',
+          options: {
+            list: [
+              {title: 'Before title', value: 'beforeTitle'},
+              {title: 'Between title and description', value: 'afterTitle'},
+              {title: 'After description', value: 'afterBody'},
+            ],
+            layout: 'radio',
+          },
+        }),
       ],
     }),
     defineField({
