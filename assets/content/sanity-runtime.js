@@ -217,6 +217,21 @@
     loadScriptOnce('assets/content/youtube-custom-ui.js?v=20260903-1', 'data-youtube-custom-ui');
   }
 
+  function observePhotoGridWidth(){
+    if (typeof ResizeObserver !== 'function') return;
+    const grid = document.querySelector('#photo-grid');
+    if (!grid) return;
+
+    let lastWidth = -1;
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect?.width || 0;
+      if (!width || Math.abs(width - lastWidth) < 0.5) return;
+      lastWidth = width;
+      if (typeof window.layoutPhotos === 'function') window.layoutPhotos();
+    });
+    observer.observe(grid);
+  }
+
   showInitialWorkOfflineState();
 
   window.SANITY_CONTENT = {
@@ -243,6 +258,7 @@
   const loadEnhancements = () => {
     loadGalleryLayout();
     loadYouTubeCustomUi();
+    observePhotoGridWidth();
   };
 
   if (document.readyState === 'complete') loadEnhancements();
