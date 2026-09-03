@@ -1,20 +1,31 @@
 /*
   Sanity-bound site text bridge
   ----------------------------
-  Sanity is the source of truth for editable site text.
+  Sanity is the source of truth for editable site text and navigation.
   Local content does not attempt to mirror remote copy.
   Any bound text that has not arrived from Sanity renders as OFFLINE.
 */
 
 window.SITE_COPY = {};
 
-// Current primary navigation decision: keep only About visible.
-document.querySelector('.nav a[href="#work"]')?.remove();
-document.querySelector('.nav a[href="#links"]')?.remove();
+function applyBasePalette(){
+  document.documentElement.style.setProperty('--bg', '#fff');
+  document.documentElement.style.setProperty('--panel', '#e6e6e6');
+
+  if (document.querySelector('#site-palette-overrides')) return;
+  const style = document.createElement('style');
+  style.id = 'site-palette-overrides';
+  style.textContent = `
+    .topbar{background:rgba(255,255,255,.96)}
+    .photo-cell{background:#e6e6e6}
+  `;
+  document.head.appendChild(style);
+}
+
+applyBasePalette();
 
 const SITE_COPY_BINDINGS = [
   ['site.brand', '.brand'],
-  ['site.navAbout', '.nav a[href="#about"]'],
   ['intro.title', '.intro h1'],
   ['intro.body', '.intro-copy p'],
   ['intro.meta', '.intro-copy span', true],
@@ -94,6 +105,34 @@ window.applySiteCopy = function applySiteCopy(source = window.SITE_COPY){
   });
 };
 
+window.applySiteNavigation = function applySiteNavigation(items){
+  const nav = document.querySelector('.nav');
+  if (!nav) return;
+
+  const validItems = Array.isArray(items)
+    ? items.filter((item) => item && typeof item.label === 'string' && item.label && typeof item.href === 'string' && item.href)
+    : [];
+
+  if (!validItems.length) {
+    const offline = document.createElement('span');
+    offline.textContent = 'OFFLINE';
+    offline.setAttribute('aria-label', 'Navigation offline');
+    nav.replaceChildren(offline);
+    return;
+  }
+
+  nav.replaceChildren(...validItems.map((item) => {
+    const link = document.createElement('a');
+    link.textContent = item.label;
+    link.href = item.href;
+    if (/^https?:\/\//i.test(item.href)) {
+      link.target = '_blank';
+      link.rel = 'noopener';
+    }
+    return link;
+  }));
+};
+
 window.mergeSiteCopy = function mergeSiteCopy(patch){
   deepMerge(window.SITE_COPY, patch);
   window.applySiteCopy(window.SITE_COPY);
@@ -101,6 +140,7 @@ window.mergeSiteCopy = function mergeSiteCopy(patch){
 };
 
 window.applySiteCopy(window.SITE_COPY);
+window.applySiteNavigation([]);
 
 function loadSiteScript(src){
   return new Promise((resolve, reject) => {
