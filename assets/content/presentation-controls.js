@@ -1,7 +1,7 @@
 /*
   Lightweight presentation controls
   ---------------------------------
-  White/black color-set switch is a temporary comparison tool rendered just before About.
+  White/black color-set switch is a temporary comparison tool rendered in the footer area.
   Photo row spacing is read from Sanity Site Copy > Presentation.
 */
 
@@ -44,11 +44,11 @@
       .photo-row{margin-bottom:var(--photo-row-gap,12px)!important}
       .photo-row:last-child{margin-bottom:0!important}
       .sanity-gallery-grid{row-gap:var(--photo-row-gap,12px)!important}
-      .theme-compare{padding:0 0 var(--l);display:flex;justify-content:space-between;align-items:center;gap:var(--m);font-size:10px;color:var(--muted);text-transform:uppercase}
+      .theme-compare{padding:10px 0 var(--m);display:flex;justify-content:space-between;align-items:center;gap:var(--m);border-top:1px solid var(--line);font-size:10px;color:var(--muted);text-transform:uppercase}
       .theme-compare-actions{display:flex;gap:6px}
       .theme-compare button{appearance:none;border:1px solid var(--line);background:transparent;color:var(--fg);padding:5px 7px 4px;cursor:pointer;font:inherit;text-transform:uppercase}
       .theme-compare button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
-      @media (max-width:620px){.theme-compare{padding-bottom:var(--m)}}
+      @media (max-width:620px){.theme-compare{padding-bottom:12px}}
     `;
     document.head.appendChild(style);
   }
@@ -66,11 +66,12 @@
 
   function makeThemeControls(){
     if (document.querySelector('.theme-compare')) return;
-    const about = document.querySelector('#about');
-    if (!about?.parentNode) return;
+    const links = document.querySelector('#links');
+    const footer = links?.querySelector('footer');
+    if (!links || !footer) return;
 
     const controls = document.createElement('div');
-    controls.className = 'shell theme-compare';
+    controls.className = 'theme-compare';
     controls.setAttribute('aria-label', 'Color set preview');
 
     const label = document.createElement('span');
@@ -89,7 +90,7 @@
     });
 
     controls.append(label, actions);
-    about.parentNode.insertBefore(controls, about);
+    links.insertBefore(controls, footer);
   }
 
   function applyPhotoSpacing(source = window.SITE_COPY){
