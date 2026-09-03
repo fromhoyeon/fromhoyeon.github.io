@@ -19,6 +19,11 @@
   let currentHomepageWorks = [];
   let currentPhotoPoolTotal = null;
 
+  function anchorForWork(work){
+    const selector = LEGACY_SECTIONS[work.slug];
+    return selector ? selector.slice(1) : work.slug;
+  }
+
   function extractYouTubeId(value){
     if (!value || typeof value !== 'string') return '';
     try {
@@ -37,10 +42,10 @@
     return '';
   }
 
-  function renderYouTubeStage(stage, work){
+  function renderYouTubeStage(stage, work, force = false){
     if (!stage) return;
     const videoId = extractYouTubeId(work.youtubeUrl || '');
-    if (stage.dataset.sanityVideoId === videoId && stage.dataset.sanityWorkId === work._id) return;
+    if (!force && stage.dataset.sanityVideoId === videoId && stage.dataset.sanityWorkId === work._id && stage.childElementCount) return;
 
     stage.dataset.sanityVideoId = videoId;
     stage.dataset.sanityWorkId = work._id || '';
@@ -163,7 +168,7 @@
     });
   }
 
-  function applyWorkToSection(section, work, index){
+  function applyWorkToSection(section, work, index, forceMedia = false){
     section.dataset.sanityWorkId = work._id || '';
     section.dataset.sanityWorkSlug = work.slug || '';
     applyHeader(section, work, index);
@@ -189,7 +194,7 @@
     }
 
     if (work.mediaType === 'youtube') {
-      renderYouTubeStage(section.querySelector('.yt-stage'), work);
+      renderYouTubeStage(section.querySelector('.yt-stage'), work, forceMedia);
     } else if (work.mediaType === 'webEmbed') {
       bindWebEmbed(section, work);
     }
@@ -253,7 +258,7 @@
 
   function createIndexLink(work, index){
     const link = document.createElement('a');
-    link.href = `#${work.slug}`;
+    link.href = `#${anchorForWork(work)}`;
 
     const num = document.createElement('span');
     num.className = 'num';
@@ -270,7 +275,7 @@
     return link;
   }
 
-  function applyHomepageWorks(works){
+  function applyHomepageWorks(works, forceMedia = false){
     if (!Array.isArray(works) || !works.length) return;
     currentHomepageWorks = works;
 
@@ -287,11 +292,11 @@
     index.replaceChildren();
 
     works.forEach((work, position) => {
-      let section = document.querySelector(LEGACY_SECTIONS[work.slug] || '');
+      const selector = LEGACY_SECTIONS[work.slug];
+      let section = selector ? document.querySelector(selector) : null;
       if (!section) section = createGenericWorkSection(work);
       section.hidden = false;
-      section.id = work.slug;
-      applyWorkToSection(section, work, position);
+      applyWorkToSection(section, work, position, forceMedia);
       parent.insertBefore(section, about);
       index.appendChild(createIndexLink(work, position));
     });
@@ -331,7 +336,7 @@
         photos = shuffled(remotePhotos).slice(0, count);
         lightboxIndex = -1;
         layoutPhotos();
-        if (currentHomepageWorks.length) applyHomepageWorks(currentHomepageWorks);
+        if (currentHomepageWorks.length) applyHomepageWorks(currentHomepageWorks, false);
       };
 
       if (typeof shufflePhotos !== 'undefined' && typeof createPhotoSet === 'function') {
@@ -346,13 +351,14 @@
 
   try {
     const works = await window.SANITY_CONTENT.fetchHomePageWorks();
-    if (works.length) applyHomepageWorks(works);
+    if (works.length) applyHomepageWorks(works, true);
   } catch (error) {
     console.warn('[Sanity] Using hard-coded work order fallback.', error);
   }
 
   window.addEventListener('sitecopychange', () => {
-    if (currentHomepageWorks.length) applyHomepageWorks(currentHomepageWorks);
+    if (!currentHomepageWorks.length) return;
+    setTimeout(() => applyHomepageWorks(currentHomepageWorks, true), 0);
   });
 
   connectRemotePhotoPool();
