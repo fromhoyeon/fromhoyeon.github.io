@@ -36,8 +36,8 @@
 
   function maxRowHeight(width){
     const mobile = window.matchMedia('(max-width:620px)').matches;
-    if (mobile) return clamp(width * 0.54, 160, 240);
-    return clamp(width * 0.34, 220, 360);
+    if (mobile) return clamp(width * 0.48, 145, 210);
+    return clamp(width * 0.29, 195, 310);
   }
 
   function rowHeight(ratios, start, end, width, gap){
@@ -202,7 +202,6 @@
     lightbox.append(close, image);
     document.body.appendChild(lightbox);
     lightbox.__showGalleryIndex = showIndex;
-    lightbox.__closeGalleryLightbox = closeLightbox;
     return lightbox;
   }
 
