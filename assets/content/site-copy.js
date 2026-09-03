@@ -25,6 +25,36 @@ applyBasePalette();
 // The old prototype shipped an inline Intro meta element. It is no longer part of the site.
 document.querySelector('.intro-copy span')?.remove();
 
+function applyStaticExternalLinks(){
+  const links = document.querySelector('#links .links');
+  if (!links) return;
+
+  const items = [
+    {label: 'Email', href: 'mailto:fromhoyeon@gmal.com'},
+    {label: 'Instagram', href: 'https://www.instagram.com/hoyeon.choi/', external: true},
+    {label: 'YouTube', href: '#'},
+    {label: 'GitHub', href: '#'}
+  ];
+
+  links.replaceChildren(...items.map((item) => {
+    const link = document.createElement('a');
+    link.href = item.href;
+    if (item.external) {
+      link.target = '_blank';
+      link.rel = 'noopener';
+    }
+
+    const label = document.createElement('span');
+    label.textContent = item.label;
+    const arrow = document.createElement('span');
+    arrow.textContent = '↗';
+    link.append(label, arrow);
+    return link;
+  }));
+}
+
+applyStaticExternalLinks();
+
 const SITE_COPY_BINDINGS = [
   ['site.brand', '.brand'],
   ['intro.title', '.intro h1'],
