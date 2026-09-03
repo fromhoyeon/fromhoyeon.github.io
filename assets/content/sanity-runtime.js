@@ -210,7 +210,7 @@
 
   function loadGalleryLayout(){
     if (!isEnabled() || config.features?.workEntries === false) return;
-    loadScriptOnce('assets/content/sanity-gallery-layout.js?v=20260903-1', 'data-sanity-gallery-layout');
+    loadScriptOnce('assets/content/sanity-gallery-layout.js?v=20260903-2', 'data-sanity-gallery-layout');
   }
 
   function loadYouTubeCustomUi(){
