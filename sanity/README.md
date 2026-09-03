@@ -11,7 +11,7 @@
 
 ## 현재 준비된 schema
 
-- `siteCopy` — 사이트 전역 문구와 About, Links 등 자주 바뀌는 텍스트
+- `siteCopy` — 사이트 공통 문구 중 Site brand, Intro, About, Footer와 소수의 presentation 설정
 - `siteNavigation` — 상단 primary navigation. 항목 추가·삭제·순서 변경 가능
 - `portfolioPhoto` — 사진 pool. 이미지, 공개 여부, featured, series, year, tags
 - `contentEntry` — 일반 게시물·기록용
@@ -39,11 +39,13 @@
 
 ## 현재 프로토타입 동작
 
-### 사이트 전역 텍스트와 OFFLINE
+### Site Copy와 OFFLINE
 
-`siteCopy`가 사이트 전역 텍스트의 source of truth다.
+`siteCopy`는 현재 **Site brand, Intro, About, Footer와 필요한 presentation 설정만** 관리한다.
 
-`assets/content/site-copy.js`는 더 이상 현재 Sanity 내용을 복사한 local fallback 문구를 저장하지 않는다. 바인딩된 텍스트가 아직 remote에서 오지 않았으면 `OFFLINE`을 표시한다. 따라서 사이트 내용이 장기적으로 변경되어도 GitHub에 남은 낡은 fallback 문구와 충돌하지 않는다.
+작업 제목·설명·링크·Work index 정보는 `workEntry` / `homePage`가 소유하고, primary navigation은 `siteNavigation`이 소유한다. Shuffle, Close, Instagram/YouTube/GitHub 같은 고정 UI label은 GitHub frontend에 둔다. 과거 `siteCopy`에 중복으로 있던 work별 copy, index label, navigation label, external-link label, UI label은 2026-09-04 정리했다.
+
+`assets/content/site-copy.js`는 Sanity에 남겨둔 editable copy만 바인딩한다. 바인딩된 텍스트가 아직 remote에서 오지 않았으면 `OFFLINE`을 표시한다.
 
 ### Primary Navigation
 
@@ -51,7 +53,7 @@
 
 각 item은 `label`과 `href`를 가지며 Studio에서 추가, 삭제, 드래그 재정렬할 수 있다. 2026-09-03 현재 published 메뉴는 `About → #about` 하나다.
 
-기존 `siteCopy.site.navWork`, `navAbout`, `navLinks` 값은 현재 navigation 구조를 결정하지 않는다.
+과거 `siteCopy.site.navWork`, `navAbout`, `navLinks`는 중복 필드였으며 2026-09-04 schema와 published data에서 제거했다.
 
 ### 홈페이지 작업과 순서
 
