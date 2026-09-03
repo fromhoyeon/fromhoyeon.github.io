@@ -1,6 +1,7 @@
 /*
   Optional Sanity content adapter for GitHub Pages.
-  The site remains fully functional when Sanity is disabled or unavailable.
+  The work area starts in an explicit OFFLINE state and is replaced only when
+  published Sanity homepage content arrives successfully.
 */
 
 (function initSanityRuntime(){
@@ -16,6 +17,47 @@
       config.dataset &&
       config.apiVersion
     );
+  }
+
+  function showInitialWorkOfflineState(){
+    const index = document.querySelector('#work');
+    if (!index) return;
+
+    document.querySelectorAll('main > section.work').forEach((section) => {
+      section.hidden = true;
+    });
+
+    if (!document.querySelector('#sanity-offline-state-styles')) {
+      const style = document.createElement('style');
+      style.id = 'sanity-offline-state-styles';
+      style.textContent = `
+        .sanity-offline-row{display:grid;grid-template-columns:32px 1fr auto;gap:var(--m);align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px}
+        .sanity-offline-row .num{color:var(--muted);font-size:10px}
+        .sanity-offline-row .offline-word{font-weight:500;letter-spacing:.01em}
+        @media (max-width:620px){.sanity-offline-row{grid-template-columns:24px 1fr auto;gap:10px}}
+      `;
+      document.head.appendChild(style);
+    }
+
+    const row = document.createElement('div');
+    row.className = 'sanity-offline-row';
+    row.setAttribute('role', 'status');
+    row.setAttribute('aria-live', 'polite');
+
+    const number = document.createElement('span');
+    number.className = 'num';
+    number.textContent = '00';
+
+    const label = document.createElement('span');
+    label.className = 'offline-word';
+    label.textContent = 'OFFLINE';
+
+    const spacer = document.createElement('span');
+    spacer.setAttribute('aria-hidden', 'true');
+
+    row.append(number, label, spacer);
+    index.replaceChildren(row);
+    index.dataset.contentState = 'offline';
   }
 
   function apiHost(){
@@ -159,6 +201,8 @@
     document.head.appendChild(script);
   }
 
+  showInitialWorkOfflineState();
+
   window.SANITY_CONTENT = {
     isEnabled,
     query,
@@ -170,7 +214,7 @@
 
   if (isEnabled()) {
     fetchSiteCopy().catch((error) => {
-      console.warn('[Sanity] Using local site-copy fallback.', error);
+      console.warn('[Sanity] Site copy unavailable.', error);
     });
   }
 
