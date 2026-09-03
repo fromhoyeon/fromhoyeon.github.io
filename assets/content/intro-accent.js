@@ -19,7 +19,7 @@
     const style = document.createElement('style');
     style.id = 'intro-accent-styles';
     style.textContent = `
-      .intro-accent{width:var(--intro-accent-width,96px);max-width:min(80vw,320px);margin:0;padding:0;border:1px solid var(--line)}
+      .intro-accent{width:var(--intro-accent-width,96px);max-width:min(80vw,320px);margin:0;padding:0;border:1px solid var(--fg)}
       .intro-accent img{display:block;width:100%;height:auto;object-fit:contain}
       .intro-accent[data-align="left"]{justify-self:start}
       .intro-accent[data-align="center"]{justify-self:center}
