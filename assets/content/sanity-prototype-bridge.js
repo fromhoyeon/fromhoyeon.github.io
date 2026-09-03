@@ -29,14 +29,13 @@
       .sanity-block-label{margin:0 0 8px;font-size:9px;line-height:1.3;color:var(--muted);text-transform:uppercase;letter-spacing:.02em}
       .sanity-text-block{max-width:560px;font-size:13px;white-space:pre-line}
       .sanity-gallery-breakout{width:min(calc(100vw - 24px),var(--wide));margin-left:50%;transform:translateX(-50%)}
-      .sanity-gallery-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s);align-items:start}
+      .sanity-gallery-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s);align-items:start}
       .sanity-gallery-item{margin:0;min-width:0}
       .sanity-gallery-item img{display:block;width:100%;height:auto;background:var(--panel)}
       .sanity-gallery-item figcaption{padding-top:5px;font-size:9px;color:var(--muted)}
       @media (max-width:620px){
         .sanity-content-blocks{gap:var(--l)}
         .sanity-gallery-breakout{width:100vw}
-        .sanity-gallery-grid{grid-template-columns:1fr}
       }
     `;
     document.head.appendChild(style);
