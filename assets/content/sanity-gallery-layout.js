@@ -1,8 +1,9 @@
 /*
-  Sanity work-gallery layout helper.
-  Editors choose only rowCount. The browser preserves image ratios, keeps equal image
-  heights inside each row, and automatically distributes images across the requested rows.
-  Sparse rows are capped vertically instead of being stretched to fill the full width.
+  Sanity work-gallery layout helper
+  ---------------------------------
+  Gallery blocks expose a maximum row count plus desktop/mobile row-height caps.
+  The browser chooses up to that many rows, preserves original ratios, fills width when
+  appropriate, and leaves sparse portrait-heavy rows left-aligned once the height cap is hit.
 */
 
 (function initSanityGalleryLayout(){
@@ -32,12 +33,6 @@
     if (Number.isFinite(gap)) return gap;
     const rootGap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s'));
     return Number.isFinite(rootGap) ? rootGap : 8;
-  }
-
-  function maxRowHeight(width){
-    const mobile = window.matchMedia('(max-width:620px)').matches;
-    if (mobile) return clamp(width * 0.48, 145, 210);
-    return clamp(width * 0.29, 195, 310);
   }
 
   function rowHeight(ratios, start, end, width, gap){
@@ -85,6 +80,38 @@
     return partitions;
   }
 
+  function rowHeightLimit(block){
+    const mobile = window.matchMedia('(max-width:620px)').matches;
+    const configured = Number(mobile ? block?.maxRowHeightMobile : block?.maxRowHeightDesktop);
+    if (Number.isFinite(configured)) {
+      return mobile ? clamp(Math.round(configured), 100, 320) : clamp(Math.round(configured), 120, 480);
+    }
+    return mobile ? 190 : 280;
+  }
+
+  function choosePartitions(ratios, block, width, gap, heightLimit){
+    const maxRows = clamp(Math.round(Number(block?.rowCount) || 4), 1, ratios.length);
+    const targetHeight = heightLimit * 0.8;
+    let bestPartitions = [[0, ratios.length]];
+    let bestScore = Infinity;
+
+    for (let rows = 1; rows <= maxRows; rows += 1) {
+      const partitions = balancedPartitions(ratios, rows, width, gap);
+      const heights = partitions.map(([start, end]) => rowHeight(ratios, start, end, width, gap));
+      const score = heights.reduce((sum, height) => {
+        const delta = height - targetHeight;
+        return sum + delta * delta;
+      }, 0) / heights.length + (rows - 1) * 24;
+
+      if (score < bestScore) {
+        bestScore = score;
+        bestPartitions = partitions;
+      }
+    }
+
+    return bestPartitions;
+  }
+
   function resetFigure(figure){
     figure.style.removeProperty('width');
     figure.style.removeProperty('flex');
@@ -116,7 +143,7 @@
   }
 
   function gallerySource(item, full = false){
-    if (item?.imageUrl) return window.SANITY_CONTENT.imageUrl(item.imageUrl, full ? 2600 : 1800);
+    if (item?.imageUrl) return window.SANITY_CONTENT.imageUrl(item.imageUrl, full ? 2400 : 1600, full ? 82 : 78);
     return item?.externalUrl || '';
   }
 
@@ -288,10 +315,9 @@
     bindGalleryLightbox(figures, items);
 
     const gap = gapSize(grid);
-    const rowCount = clamp(Math.round(Number(block.rowCount) || 1), 1, figures.length);
-    const partitions = balancedPartitions(ratios, rowCount, width, gap);
+    const heightLimit = rowHeightLimit(block);
+    const partitions = choosePartitions(ratios, block, width, gap, heightLimit);
     const fragment = document.createDocumentFragment();
-    const heightLimit = maxRowHeight(width);
 
     grid.style.display = 'grid';
     grid.style.gridTemplateColumns = '1fr';
@@ -309,8 +335,7 @@
 
       const justifiedHeight = rowHeight(ratios, start, end, width, gap);
       const height = Math.min(justifiedHeight, heightLimit);
-      const isCapped = justifiedHeight > heightLimit + 0.5;
-      row.dataset.galleryRowMode = isCapped ? 'capped' : 'justified';
+      row.dataset.galleryRowMode = justifiedHeight > heightLimit + 0.5 ? 'capped' : 'justified';
 
       for (let index = start; index < end; index += 1) {
         const figure = figures[index];
