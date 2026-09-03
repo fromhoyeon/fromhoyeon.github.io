@@ -1,7 +1,7 @@
 /*
-  Optional Sanity content adapter for GitHub Pages.
-  The work area starts in an explicit OFFLINE state and is replaced only when
-  published Sanity homepage content arrives successfully.
+  Sanity content adapter for GitHub Pages.
+  Sanity owns editable copy, navigation, work records and homepage curation.
+  Missing remote content remains explicitly OFFLINE instead of mirroring stale local copy.
 */
 
 (function initSanityRuntime(){
@@ -113,6 +113,14 @@
     return copy;
   }
 
+  async function fetchNavigation(){
+    if (!isEnabled()) return [];
+    const navigation = await query(`*[_type == "siteNavigation" && _id == "primary-navigation"][0]{
+      items[]{_key,label,href}
+    }`);
+    return (navigation?.items || []).filter((item) => item?.label && item?.href);
+  }
+
   async function fetchHomePageWorks(){
     if (!isEnabled() || config.features?.workEntries === false) return [];
 
@@ -192,13 +200,21 @@
       }));
   }
 
+  function loadScriptOnce(src, dataAttribute){
+    if (document.querySelector(`script[${dataAttribute}]`)) return;
+    const script = document.createElement('script');
+    script.src = src;
+    script.setAttribute(dataAttribute, 'true');
+    document.head.appendChild(script);
+  }
+
   function loadGalleryLayout(){
     if (!isEnabled() || config.features?.workEntries === false) return;
-    if (document.querySelector('script[data-sanity-gallery-layout]')) return;
-    const script = document.createElement('script');
-    script.src = 'assets/content/sanity-gallery-layout.js?v=20260903-1';
-    script.dataset.sanityGalleryLayout = 'true';
-    document.head.appendChild(script);
+    loadScriptOnce('assets/content/sanity-gallery-layout.js?v=20260903-1', 'data-sanity-gallery-layout');
+  }
+
+  function loadYouTubeCustomUi(){
+    loadScriptOnce('assets/content/youtube-custom-ui.js?v=20260903-1', 'data-youtube-custom-ui');
   }
 
   showInitialWorkOfflineState();
@@ -208,6 +224,7 @@
     query,
     imageUrl,
     fetchSiteCopy,
+    fetchNavigation,
     fetchHomePageWorks,
     fetchPortfolioPhotos
   };
@@ -216,8 +233,18 @@
     fetchSiteCopy().catch((error) => {
       console.warn('[Sanity] Site copy unavailable.', error);
     });
+    fetchNavigation()
+      .then((items) => window.applySiteNavigation?.(items))
+      .catch((error) => {
+        console.warn('[Sanity] Navigation unavailable. OFFLINE state remains active.', error);
+      });
   }
 
-  if (document.readyState === 'complete') loadGalleryLayout();
-  else window.addEventListener('load', loadGalleryLayout, {once: true});
+  const loadEnhancements = () => {
+    loadGalleryLayout();
+    loadYouTubeCustomUi();
+  };
+
+  if (document.readyState === 'complete') loadEnhancements();
+  else window.addEventListener('load', loadEnhancements, {once: true});
 })();
