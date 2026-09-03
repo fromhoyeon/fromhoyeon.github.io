@@ -1,82 +1,12 @@
 /*
-  사이트 주요 텍스트 편집 파일
-  --------------------------
-  Sanity가 꺼져 있거나 연결되지 않았을 때 사용하는 local fallback source다.
-  Sanity가 활성화되면 remote 값만 이 객체 위에 덮어쓴다.
+  Sanity-bound site text bridge
+  ----------------------------
+  Sanity is the source of truth for editable site text.
+  Local content does not attempt to mirror remote copy.
+  Any bound text that has not arrived from Sanity renders as OFFLINE.
 */
 
-window.SITE_COPY = {
-  site: {
-    brand: 'OFFLINE',
-    navWork: 'Work',
-    navAbout: 'About',
-    navLinks: 'Links'
-  },
-
-  intro: {
-    title: 'Selected work across image, sound, performance and code.',
-    body: 'This prototype keeps the information column narrow and lets media expand only when the content benefits from it.',
-    meta: 'SEOUL / 2026<br>SELECTED WORKS'
-  },
-
-  index: {
-    dual: 'Dual Conversation',
-    photo: 'Selected Photography',
-    dodrei: 'DODREI',
-    moving: 'Moving Image'
-  },
-
-  dual: {
-    title: 'Dual Conversation',
-    description: 'A long-running audiovisual work built from accumulated moving-image fragments, playback systems and changing relationships between image and sound.',
-    action: 'View project ↗',
-    youtubeUrl: 'https://youtu.be/y01i78valMg'
-  },
-
-  photo: {
-    title: 'Selected Photography',
-    helper: 'Original ratios · click image to enlarge',
-    shuffle: 'Shuffle selection',
-    description: 'Twelve images are picked from the sample pool on each shuffle. Their real dimensions determine the justified rows, without cropping the source ratio.',
-    action: 'More photographs ↗'
-  },
-
-  dodrei: {
-    title: 'DODREI',
-    description: 'The actual browser work is embedded here as a live viewport. The surrounding portfolio stays narrow; only the work itself occupies a larger field.',
-    action: 'Open work ↗'
-  },
-
-  moving: {
-    title: 'Moving Image',
-    description: 'The initial view uses the unmodified YouTube thumbnail plus a play control. After playback starts, the official embedded player loads with its standard controls hidden where YouTube currently allows.',
-    action: 'YouTube ↗',
-    youtubeUrl: 'https://www.youtube.com/watch?v=rp-21UvGv0M'
-  },
-
-  about: {
-    title: 'About',
-    practiceLabel: 'Practice',
-    practice: 'Jazz guitar, moving image, photography, performance, browser-based work and interactive systems.',
-    ruleLabel: 'Rule',
-    rule: 'Use space because the content needs it. Keep the number of visual elements small, then repeat them consistently.'
-  },
-
-  links: {
-    instagram: 'Instagram / Photography',
-    youtube: 'YouTube / Moving Image + Performance',
-    github: 'GitHub / Web + Code'
-  },
-
-  footer: {
-    copyright: '© 2026 Hoyeon Choi',
-    status: 'PROTOTYPE / NOT FINAL'
-  },
-
-  ui: {
-    close: 'Close'
-  }
-};
+window.SITE_COPY = {};
 
 const SITE_COPY_BINDINGS = [
   ['site.brand', '.brand'],
@@ -147,12 +77,15 @@ function deepMerge(target, patch){
 
 window.applySiteCopy = function applySiteCopy(source = window.SITE_COPY){
   const brand = getCopyValue(source, 'site.brand');
-  if (typeof brand === 'string' && brand) document.title = brand;
+  document.title = typeof brand === 'string' && brand ? brand : 'OFFLINE';
 
   SITE_COPY_BINDINGS.forEach(([path, selector, allowHtml]) => {
     const element = document.querySelector(selector);
-    const value = getCopyValue(source, path);
-    if (!element || typeof value !== 'string') return;
+    if (!element) return;
+
+    const remoteValue = getCopyValue(source, path);
+    const value = typeof remoteValue === 'string' && remoteValue.length ? remoteValue : 'OFFLINE';
+
     if (MULTILINE_COPY_PATHS.has(path)) element.style.whiteSpace = 'pre-line';
     if (allowHtml) element.innerHTML = value;
     else element.textContent = value;
@@ -183,7 +116,7 @@ async function bootOptionalSanityLayer(){
     await loadSiteScript('assets/content/sanity-runtime.js');
     await loadSiteScript('assets/content/sanity-prototype-bridge.js');
   } catch (error) {
-    console.warn('[Sanity] Optional content layer did not load. Local content remains active.', error);
+    console.warn('[Sanity] Content layer did not load. OFFLINE state remains active.', error);
   }
 }
 
