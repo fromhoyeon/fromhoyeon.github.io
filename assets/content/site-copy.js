@@ -22,11 +22,13 @@ function applyBasePalette(){
 
 applyBasePalette();
 
+// The old prototype shipped an inline Intro meta element. It is no longer part of the site.
+document.querySelector('.intro-copy span')?.remove();
+
 const SITE_COPY_BINDINGS = [
   ['site.brand', '.brand'],
   ['intro.title', '.intro h1'],
   ['intro.body', '.intro-copy p'],
-  ['intro.meta', '.intro-copy span', true],
   ['about.title', '#about > h2'],
   ['about.practiceLabel', '#about .about-grid > div:nth-child(1) .label'],
   ['about.practice', '#about .about-grid > div:nth-child(1) p:nth-child(2)'],
