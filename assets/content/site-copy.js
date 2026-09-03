@@ -156,6 +156,7 @@ async function bootOptionalSanityLayer(){
   try {
     await loadSiteScript('assets/content/sanity-config.js');
     await loadSiteScript('assets/content/sanity-runtime.js');
+    await loadSiteScript('assets/content/intro-accent.js');
     await loadSiteScript('assets/content/sanity-prototype-bridge.js');
   } catch (error) {
     console.warn('[Sanity] Content layer did not load. OFFLINE state remains active.', error);
