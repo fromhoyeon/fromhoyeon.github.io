@@ -7,7 +7,7 @@
 
 window.SITE_COPY = {
   site: {
-    brand: 'HOYEON CHOI',
+    brand: 'OFFLINE',
     navWork: 'Work',
     navAbout: 'About',
     navLinks: 'Links'
