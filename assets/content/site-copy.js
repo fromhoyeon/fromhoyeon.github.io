@@ -9,15 +9,13 @@
 window.SITE_COPY = {};
 
 function applyBasePalette(){
-  document.documentElement.style.setProperty('--bg', '#fff');
-  document.documentElement.style.setProperty('--panel', '#e6e6e6');
-
   if (document.querySelector('#site-palette-overrides')) return;
   const style = document.createElement('style');
   style.id = 'site-palette-overrides';
   style.textContent = `
-    .topbar{background:rgba(255,255,255,.96)}
-    .photo-cell{background:#e6e6e6}
+    :root:not([data-site-theme]){--bg:#fff;--panel:#e6e6e6}
+    .topbar{background:var(--topbar-bg,rgba(255,255,255,.96))}
+    .photo-cell{background:var(--panel)}
   `;
   document.head.appendChild(style);
 }
