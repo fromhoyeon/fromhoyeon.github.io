@@ -16,12 +16,11 @@ export const workEntry = defineType({
     defineField({name: 'title', title: 'Public title', type: 'text', rows: 2, validation: (rule) => rule.required()}),
     defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'title'}, validation: (rule) => rule.required()}),
     defineField({name: 'enabled', title: 'Public', type: 'boolean', initialValue: true}),
-    defineField({name: 'yearLabel', title: 'Date / year label', type: 'string'}),
     defineField({
-      name: 'metaLines',
-      title: 'Secondary meta lines',
-      type: 'array',
-      of: [defineArrayMember({type: 'string'})],
+      name: 'period',
+      title: 'Period',
+      description: 'When the work happened or remains active. Examples: 2025, ~2025, 2023~, 2022~2024, 2024/04, Ongoing.',
+      type: 'string',
     }),
     defineField({name: 'summary', title: 'Description', type: 'text', rows: 6}),
     defineField({
@@ -84,7 +83,7 @@ export const workEntry = defineType({
     }),
   ],
   preview: {
-    select: {internalTitle: 'internalTitle', title: 'title', subtitle: 'yearLabel'},
+    select: {internalTitle: 'internalTitle', title: 'title', subtitle: 'period'},
     prepare({internalTitle, title, subtitle}) {
       return {
         title: internalTitle || title || 'Untitled item',
