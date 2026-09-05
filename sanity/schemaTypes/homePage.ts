@@ -8,7 +8,8 @@ export const homePage = defineType({
     defineField({name: 'title', title: 'Internal title', type: 'string'}),
     defineField({
       name: 'featuredWorks',
-      title: 'Featured works',
+      title: 'Portfolio items / homepage order',
+      description: 'Choose which Portfolio Items appear on the homepage and drag them into display order.',
       type: 'array',
       of: [
         defineArrayMember({
