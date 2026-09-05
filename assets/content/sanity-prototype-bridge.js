@@ -1,7 +1,7 @@
 /*
   Current prototype bridge.
   Sanity owns work records and homepage curation; GitHub keeps layout and interaction.
-  If the remote layer fails, the original hard-coded page remains intact as fallback.
+  The old HTML sections are structural shells only and are never public content fallbacks.
 */
 
 (async function connectPrototypeToSanity(){
@@ -119,9 +119,16 @@
     const url = work.externalUrl || work.youtubeUrl || '';
     const hasAction = Boolean(url || work.actionLabel);
     action.hidden = !hasAction;
-    if (!hasAction) return;
+    if (!hasAction) {
+      action.textContent = '';
+      action.href = '#';
+      action.removeAttribute('target');
+      action.removeAttribute('rel');
+      action.removeAttribute('aria-disabled');
+      return;
+    }
 
-    if (work.actionLabel) action.textContent = work.actionLabel;
+    action.textContent = work.actionLabel || 'Open ↗';
     action.href = url || '#';
     if (url) {
       action.target = '_blank';
@@ -134,12 +141,6 @@
     }
   }
 
-  function photoPoolTotal(){
-    if (Number.isFinite(currentPhotoPoolTotal)) return currentPhotoPoolTotal;
-    if (typeof photoFiles !== 'undefined' && Array.isArray(photoFiles)) return photoFiles.length;
-    return 0;
-  }
-
   function applyHeader(section, work, index){
     const number = String(index + 1).padStart(2, '0');
     const num = section.querySelector('.work-head .num');
@@ -150,10 +151,10 @@
 
     if (meta) {
       let lines = Array.isArray(work.metaLines) ? [...work.metaLines] : [];
-      if (work.mediaType === 'photoCollection') {
-        const total = photoPoolTotal();
-        const count = Math.min(Number(work.photoCount) || 12, total || Number(work.photoCount) || 12);
-        lines = [`${count} / ${total || '?'} IMAGES`, ...lines];
+      if (work.mediaType === 'photoCollection' && Number.isFinite(currentPhotoPoolTotal)) {
+        const total = currentPhotoPoolTotal;
+        const count = Math.min(Number(work.photoCount) || 12, total);
+        lines = [`${count} / ${total} IMAGES`, ...lines];
       }
       meta.innerHTML = lines.map((line) => String(line)).join('<br>');
     }
@@ -173,8 +174,8 @@
         <div class="live-gate-label">Interactive browser work / touch to choose playback</div>
         <div class="live-gate-title"></div>
         <div class="live-gate-actions">
-          <button class="action" type="button">여기서 재생</button>
-          <a class="action" target="_blank" rel="noopener">새 창으로 재생 ↗</a>
+          <button class="action" type="button">Play here</button>
+          <a class="action" target="_blank" rel="noopener">Open in new window ↗</a>
         </div>
       </div>`;
 
@@ -232,11 +233,16 @@
     }
     if (button) button.dataset.embedUrl = work.embedUrl || work.externalUrl || '';
 
+    const externalUrl = work.externalUrl || work.embedUrl || '';
     section.querySelectorAll('.live-gate a.action').forEach((link) => {
-      if (work.externalUrl) {
-        link.href = work.externalUrl;
+      link.hidden = !externalUrl;
+      link.href = externalUrl || '#';
+      if (externalUrl) {
         link.target = '_blank';
         link.rel = 'noopener';
+      } else {
+        link.removeAttribute('target');
+        link.removeAttribute('rel');
       }
     });
   }
@@ -350,24 +356,29 @@
     section.dataset.sanityWorkSlug = work.slug || '';
     applyHeader(section, work, index);
 
-    const description = section.querySelector('.description p');
-    if (description && typeof work.summary === 'string') {
-      description.textContent = work.summary;
+    const descriptionBox = section.querySelector('.description');
+    const description = descriptionBox?.querySelector('p');
+    const summary = typeof work.summary === 'string' ? work.summary : '';
+    const hasSummary = Boolean(summary.trim());
+    if (description) {
+      description.textContent = hasSummary ? summary : '';
       description.style.whiteSpace = 'pre-line';
     }
 
-    setAction(section.querySelector('.description .action'), work);
+    const action = descriptionBox?.querySelector('.action');
+    setAction(action, work);
+    if (descriptionBox) descriptionBox.hidden = !hasSummary && (!action || action.hidden);
 
     const strip = section.querySelector('.small-strip');
     if (strip) {
       strip.replaceChildren();
-      (work.tags || []).forEach((tag) => {
+      (work.tags || []).filter(Boolean).forEach((tag) => {
         const item = document.createElement('span');
         item.className = 'tag';
         item.textContent = tag;
         strip.appendChild(item);
       });
-      strip.hidden = !(work.tags || []).length;
+      strip.hidden = !strip.childElementCount;
     }
 
     const hasBlocks = renderContentBlocks(section, work);
@@ -415,11 +426,12 @@
 
     const description = document.createElement('div');
     description.className = 'description';
-    description.innerHTML = '<p></p><a class="action" href="#"></a>';
+    description.innerHTML = '<p></p><a class="action" href="#" hidden></a>';
     section.appendChild(description);
 
     const strip = document.createElement('div');
     strip.className = 'small-strip';
+    strip.hidden = true;
     section.appendChild(strip);
     return section;
   }
@@ -513,7 +525,7 @@
       }
       renderRemoteSelection();
     } catch (error) {
-      console.warn('[Sanity] Using local photo pool fallback.', error);
+      console.warn('[Sanity] Photo pool unavailable. OFFLINE state remains active.', error);
     }
   }
 
@@ -521,7 +533,7 @@
     const works = await window.SANITY_CONTENT.fetchHomePageWorks();
     if (works.length) applyHomepageWorks(works, true);
   } catch (error) {
-    console.warn('[Sanity] Using hard-coded work order fallback.', error);
+    console.warn('[Sanity] Homepage works unavailable. OFFLINE state remains active.', error);
   }
 
   window.addEventListener('sitecopychange', () => {
