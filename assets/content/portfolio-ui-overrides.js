@@ -5,6 +5,7 @@
   - Never keep a YouTube iframe before an explicit user tap.
   - After playback starts, use the standard YouTube controls and fullscreen button.
   - Keep consecutive YouTube blocks visually close without merging them.
+  - Preserve alpha in Portfolio Item gallery images with transparent backgrounds.
   - Remove the work-gallery Close button. Desktop gallery lightboxes close with Esc;
     touch devices keep backdrop closing because they do not have an Escape key.
 */
@@ -18,6 +19,10 @@
     const style = document.createElement('style');
     style.id = 'portfolio-ui-overrides-styles';
     style.textContent = `
+      .sanity-content-block[data-block-type="workGalleryBlock"] .sanity-gallery-item,
+      .sanity-content-block[data-block-type="workGalleryBlock"] .sanity-gallery-item img{
+        background:transparent !important;
+      }
       .sanity-content-block[data-block-type="workVideoBlock"] +
       .sanity-content-block[data-block-type="workVideoBlock"]{
         margin-top:calc(10px - var(--l));
