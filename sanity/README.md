@@ -6,21 +6,25 @@
 
 - 웹페이지 구현과 배포는 계속 GitHub Pages가 담당한다.
 - Sanity Studio를 웹사이트 프론트엔드로 사용하지 않는다.
-- Sanity는 DB형 콘텐츠, 이미지, 파일, 메뉴 데이터를 저장하고 API로 전달한다.
-- Sanity에서 관리하는 텍스트나 메뉴가 아직 도착하지 않았을 때 GitHub가 과거 내용을 흉내 내지 않는다. 해당 UI는 `OFFLINE` 상태를 표시한다.
+- Sanity는 DB형 콘텐츠, 이미지, 메뉴와 관계 데이터를 저장하고 API로 전달한다.
+- Sanity에서 관리하는 콘텐츠가 도착하지 않았을 때 GitHub가 과거 내용을 흉내 내지 않는다. 해당 UI는 `OFFLINE` 상태를 표시한다.
 
-## 현재 준비된 schema
+## 현재 콘텐츠 모델
 
-- `siteCopy` — 사이트 공통 문구 중 Site brand, Intro, About, Footer와 소수의 presentation 설정
-- `siteNavigation` — 상단 primary navigation. 항목 추가·삭제·순서 변경 가능
-- `portfolioPhoto` — 사진 pool. 이미지, 공개 여부, featured, series, year, tags
-- `contentEntry` — 일반 게시물·기록용
-- `workEntry` — 홈페이지에 표시할 개별 작업. 제목, slug, 연도, meta, 설명, tags와 `contentBlocks`
-- `workVideoBlock` — 작업 내부 YouTube 영상 블록
-- `workTextBlock` — 작업 내부 텍스트 블록
-- `workGalleryBlock` / `workGalleryImage` — 작업 내부 이미지 갤러리와 개별 이미지
-- `workWebEmbedBlock` — 작업 내부 interactive web embed 블록
-- `homePage` — 홈페이지 큐레이션 문서. `featuredWorks` reference 배열의 순서가 실제 홈페이지 작업 순서가 된다.
+2026-09-05부터 포트폴리오의 일반 콘텐츠를 분야·프로젝트 계층으로 미리 나누지 않고 **동등한 Portfolio Item**으로 관리한다.
+
+- `workEntry` — Studio 표시명 `Portfolio Item`. 기술적 `_type` 이름은 기존 문서 ID와 frontend/reference 호환성을 위해 유지한다.
+- `tag` — 재사용 가능한 독립 Tag document. 현재 모든 tag는 의미상 동등하며 category, year, tool, series 등의 계층을 강제하지 않는다.
+- `portfolioPhoto` — Studio 표시명 `Photograph`. 사진은 Portfolio Item의 구성요소이면서 독립적으로 탐색될 수 있는 유일한 특수 pool이라 별도 document로 유지한다.
+- `homePage` — `featuredWorks` reference 배열로 홈페이지에 표시할 Portfolio Item과 순서를 관리한다.
+- `siteCopy` — Site brand, Intro, About, Footer 등 사이트 공통 문구와 소수 presentation 설정.
+- `siteNavigation` — 상단 primary navigation.
+- `workVideoBlock` — Portfolio Item 내부 YouTube 영상 블록.
+- `workTextBlock` — Portfolio Item 내부 텍스트 블록.
+- `workGalleryBlock` / `workGalleryImage` — Portfolio Item 내부 이미지 갤러리와 개별 이미지.
+- `workWebEmbedBlock` — Portfolio Item 내부 interactive web embed 블록.
+
+과거의 `contentEntry`는 production document가 없으며 현재 active schema source에서 제외했다. hosted Studio에서도 legacy type으로 숨겨두었다.
 
 실제 현재 Studio:
 
@@ -31,83 +35,104 @@
 - Project ID: `a707yvok`
 - Dataset: `production`
 
-## frontend 설정
+## Portfolio Item
 
-`assets/content/sanity-config.js`의 public 설정을 사용한다. 현재 active prototyping 중에는 `useCdn: false`로 published Content Lake를 직접 읽어 순서·내용 수정이 즉시 보이게 한다.
+Portfolio Item은 음악, 공연, 영상, 미디어아트, 웹 작업 등의 분야를 document type으로 구분하지 않는다.
 
-이 파일에는 write token이나 비밀키를 넣지 않는다.
+기본 필드:
 
-## 현재 프로토타입 동작
+- `internalTitle` — Studio 관리용 명칭
+- `title` — 공개 제목
+- `slug`
+- `enabled`
+- `yearLabel`
+- `metaLines`
+- `summary`
+- `tags` — `tag` document reference 배열
+- `contentBlocks` — 필요한 미디어 블록의 순서형 배열
+- `externalUrl` / `actionLabel`
 
-### Site Copy와 OFFLINE
+새 항목은 어떤 분야인지 먼저 선택하는 대신 필요한 `contentBlocks`를 조합하고 tag를 붙인다.
 
-`siteCopy`는 현재 **Site brand, Intro, About, Footer와 필요한 presentation 설정만** 관리한다.
+### Flat tags
 
-작업 제목·설명·링크·Work index 정보는 `workEntry` / `homePage`가 소유하고, primary navigation은 `siteNavigation`이 소유한다. Shuffle, Close, Instagram/YouTube/GitHub 같은 고정 UI label은 GitHub frontend에 둔다. 과거 `siteCopy`에 중복으로 있던 work별 copy, index label, navigation label, external-link label, UI label은 2026-09-04 정리했다.
+현재 tag에는 `label`과 `slug`만 둔다.
 
-`assets/content/site-copy.js`는 Sanity에 남겨둔 editable copy만 바인딩한다. 바인딩된 텍스트가 아직 remote에서 오지 않았으면 `OFFLINE`을 표시한다.
+모든 tag는 동일한 레벨이며 `2026`, `TouchDesigner`, 작품명, 행사명, 장소명 같은 값 사이에 schema 차원의 우선순위나 그룹을 두지 않는다. Portfolio Item 작성 시 기존 Tag document를 검색·재사용하고, 필요한 경우 새 Tag를 만든다.
 
-### Primary Navigation
+콘텐츠가 충분히 쌓여 실제 사용 패턴이 드러난 뒤에만 tag grouping이나 hierarchy를 추가한다.
 
-상단 메뉴는 `_id == "primary-navigation"`인 `siteNavigation` singleton의 `items` 배열을 읽는다.
+2026-09-05 기존 문자열 tag를 다음 독립 document로 이관했다.
 
-각 item은 `label`과 `href`를 가지며 Studio에서 추가, 삭제, 드래그 재정렬할 수 있다. 2026-09-03 현재 published 메뉴는 `About → #about` 하나다.
+- `TouchDesigner`
+- `Archive`
+- `Performance`
+- `Batman`
 
-과거 `siteCopy.site.navWork`, `navAbout`, `navLinks`는 중복 필드였으며 2026-09-04 schema와 published data에서 제거했다.
+기존 Portfolio Item은 이 Tag document들을 reference한다.
 
-### 홈페이지 작업과 순서
+### Content blocks
 
-홈페이지의 주요 작업은 각각 독립된 `workEntry` document다.
-
-`homePage` document의 `featuredWorks` 배열이 홈페이지 노출 여부와 순서를 결정한다. Studio에서 reference 배열을 드래그해 순서를 변경하면 GitHub 코드를 수정하지 않아도 다음 페이지 로드부터 순서가 바뀐다.
-
-작업 데이터가 아직 도착하지 않은 초기 상태 또는 query 실패 상태에서는 과거 하드코딩 작업을 보여주지 않고 Work index에 `OFFLINE`을 표시한다. 기존 HTML 섹션은 renderer reference로 남아 있지만 사용자용 콘텐츠 fallback 역할은 하지 않는다.
-
-### 작업 내부 Content blocks
-
-`workEntry.contentBlocks`가 존재하면 기존의 단일 media slot보다 이 배열을 우선한다. 배열의 순서가 실제 페이지 내부 표시 순서이며 Studio에서 블록을 드래그해 재배치할 수 있다.
+`workEntry.contentBlocks`가 존재하면 기존 단일 media slot보다 이 배열을 우선한다. 배열 순서가 실제 페이지 표시 순서다.
 
 현재 지원 블록:
 
-- `YouTube Video` — 한 작업 안에 여러 개 추가 가능
-- `Text` — 독립 텍스트 블록
-- `Image Gallery` — 여러 이미지를 한 블록으로 표시. `Maximum rows`와 desktop/mobile `Maximum row height`를 지정할 수 있으며, 프론트가 그 한도 안에서 원본 비율을 유지한 채 행 분배와 공통 높이를 계산한다.
-- `Web Embed` — browser work embed
+- `YouTube Video` — 한 항목 안에 여러 개 추가 가능
+- `Text`
+- `Image Gallery` — 원본 비율 유지, row 수와 desktop/mobile 최대 높이 지정 가능
+- `Web Embed`
 
-`Exhibition Sample`은 block 구조 검증용 작업이며 영상 2개와 이미지 갤러리를 사용한다.
+필요해지면 Audio 등 새로운 block type을 같은 레벨에 추가할 수 있다.
 
-기존 작업에 `contentBlocks`가 없으면 기존 특수 renderer를 사용한다.
+기존 Portfolio Item 가운데 아직 `contentBlocks`로 이관되지 않은 항목을 위해 `mediaType`, `youtubeUrl`, `embedUrl`, `photoCount`는 compatibility field로 잠시 유지한다. 새 일반 Portfolio Item에서는 Content blocks를 우선한다.
 
-- `youtube` — YouTube poster/player
-- `photoCollection` — Selected Photography justified grid와 lightbox
-- `webEmbed` — DODREI on-demand iframe gate
-- `none` — 미디어 없는 일반 작업
+## Photography
 
-### YouTube custom UI
+사진은 현재 유일한 특수 케이스다.
 
-`assets/content/youtube-custom-ui.js`는 YouTube 기본 controls를 숨긴 상태에서 IFrame API로 재생을 제어하고, 사이트 자체의 최소 control bar를 추가한다.
+`portfolioPhoto` document는 다음을 관리한다.
 
-현재 control은 다음만 제공한다.
+- image
+- internal title
+- alt text
+- public pool 포함 여부
+- selected / featured 여부
+- `tag` document references
 
-- play / pause
-- seek timeline
-- current time / duration
+과거 `series`, `year`, 자유입력 string tags는 실제 production 사진에 값이 없었으므로 현재 active schema에서는 제거했다. 분류가 필요하면 일반 Portfolio Item과 동일한 Tag documents를 사용한다.
 
-control 색상은 `--bg`, `--fg`, `--line`, `--muted` CSS 변수를 사용하므로 사이트 팔레트 변경을 따라간다. YouTube가 iframe 내부에 자체적으로 표시하는 브랜드·오버레이 요소는 사이트 CSS가 직접 제어하지 않는다.
+현재 production에는 enabled/published Photograph 98장이 있으며 Selected Photography가 이 pool에서 일부를 무작위로 선택한다.
 
-### 사진 pool
+## 홈페이지 작업과 순서
 
-현재 Sanity `portfolioPhoto` pool을 활성화해 실제 portfolio asset을 Selected Photography에 사용한다. 2026-09-03 기준 production에 enabled/published 사진 98장이 이관되어 있으며 frontend는 그중 일부를 무작위로 선택해 표시한다.
+`homePage` document의 `featuredWorks` 배열이 홈페이지 노출 항목과 순서를 결정한다. Studio에서 reference 배열을 드래그해 순서를 변경하면 GitHub 코드를 수정하지 않아도 다음 페이지 로드부터 반영된다.
+
+작업 데이터가 아직 도착하지 않은 초기 상태 또는 query 실패 상태에서는 과거 하드코딩 작업을 보여주지 않고 Work index에 `OFFLINE`을 표시한다.
+
+## frontend 연결
+
+`assets/content/sanity-config.js`의 public 설정을 사용한다. active prototyping 중에는 `useCdn: false`로 published Content Lake를 직접 읽는다.
+
+`assets/content/sanity-runtime.js`는 Portfolio Item tag reference를 label 문자열로 resolve해 기존 frontend tag UI에 전달한다. Photograph 쪽은 label과 slug를 함께 가져와 향후 photography filtering에 사용할 수 있게 준비한다.
+
+primary navigation은 `_id == "primary-navigation"`인 `siteNavigation` singleton의 `items` 배열을 읽는다.
+
+`assets/content/youtube-custom-ui.js`는 YouTube 기본 controls 대신 play/pause, seek timeline, current/duration만 제공하는 최소 control layer를 유지한다.
 
 ## schema 관리
 
-`schemaTypes/`는 repository 안에서 현재 데이터 구조를 추적하기 위한 참고 source다. 실제 hosted Studio/schema는 Sanity managed workspace에도 배포되어 있으므로 schema 변경 시 두 상태를 함께 갱신한다.
+`schemaTypes/`는 repository 안에서 현재 데이터 구조를 추적하는 source다. 실제 hosted Studio/schema도 Sanity managed workspace에 배포되어 있으므로 schema 변경 시 두 상태를 함께 갱신한다.
 
-## 향후 원칙
+2026-09-05 flat Portfolio Item / Tag / Photograph 구조를 repository source와 hosted Studio 양쪽에 반영했다.
 
+## 원칙
+
+- 일반 공개 콘텐츠 → 동등한 Portfolio Item
+- 콘텐츠 사이 관계와 조회 → flat Tag references
+- 사진 pool → 별도 Photograph documents
+- 홈페이지 큐레이션과 순서 → `homePage.featuredWorks`
 - 자주 바뀌는 콘텐츠·메뉴 → Sanity
 - 구조·레이아웃·인터랙션 → GitHub
 - remote 콘텐츠가 없거나 연결되지 않음 → stale local copy 대신 `OFFLINE`
-- 반복적으로 쌓이는 게시물·사진 pool → 필요에 따라 Sanity collection
 
 Sanity는 교체 가능한 콘텐츠 레이어이며 웹사이트 자체의 canonical implementation은 GitHub에 남긴다.
