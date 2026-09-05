@@ -81,10 +81,11 @@
     return payload.result;
   }
 
-  function imageUrl(url, width, quality){
+  function imageUrl(url, width, quality, height){
     if (!url) return '';
     const output = new URL(url);
     if (width) output.searchParams.set('w', String(width));
+    if (height) output.searchParams.set('h', String(height));
     if (quality) output.searchParams.set('q', String(quality));
     output.searchParams.set('fit', 'max');
     output.searchParams.set('auto', 'format');
@@ -198,8 +199,8 @@
       .map((item) => ({
         ...item,
         file: item.filename || item.title || item._id,
-        src: imageUrl(item.url, 1200, 72),
-        fullSrc: imageUrl(item.url, 1800, 80)
+        src: imageUrl(item.url, 1200, 72, 1200),
+        fullSrc: imageUrl(item.url, 1800, 80, 1800)
       }));
   }
 
