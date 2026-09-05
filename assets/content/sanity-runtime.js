@@ -1,6 +1,6 @@
 /*
   Sanity content adapter for GitHub Pages.
-  Sanity owns editable copy, navigation, work records and homepage curation.
+  Sanity owns editable copy, navigation, portfolio items and homepage curation.
   Missing remote content remains explicitly OFFLINE instead of mirroring stale local copy.
 */
 
@@ -135,7 +135,7 @@
         yearLabel,
         metaLines,
         summary,
-        tags,
+        "tags": tags[]->label,
         contentBlocks[]{
           _key,
           _type,
@@ -185,8 +185,7 @@
       title,
       alt,
       featured,
-      series,
-      year,
+      "tags": tags[]->{label,"slug":slug.current},
       "url": image.asset->url,
       "filename": image.asset->originalFilename,
       "width": image.asset->metadata.dimensions.width,
