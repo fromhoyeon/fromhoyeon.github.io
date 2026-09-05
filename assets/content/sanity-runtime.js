@@ -216,8 +216,8 @@
     loadScriptOnce('assets/content/sanity-gallery-layout.js?v=20260903-4', 'data-sanity-gallery-layout');
   }
 
-  function loadYouTubeCustomUi(){
-    loadScriptOnce('assets/content/youtube-custom-ui.js?v=20260903-1', 'data-youtube-custom-ui');
+  function loadPortfolioUiOverrides(){
+    loadScriptOnce('assets/content/portfolio-ui-overrides.js?v=20260905-1', 'data-portfolio-ui-overrides');
   }
 
   function loadPresentationControls(){
@@ -269,7 +269,7 @@
 
   const loadEnhancements = () => {
     loadGalleryLayout();
-    loadYouTubeCustomUi();
+    loadPortfolioUiOverrides();
     loadPresentationControls();
     loadPhotoPoolControls();
     observePhotoGridWidth();
