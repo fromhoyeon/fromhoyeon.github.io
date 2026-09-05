@@ -67,13 +67,17 @@
     .photo-cell{appearance:none;border:0;padding:0;position:relative;flex:0 0 auto;overflow:hidden;background:#d0d0ca;cursor:zoom-in}
     .photo-cell img{width:100%;height:100%;object-fit:cover;display:block}
     .photo-cell:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
-    .photo-actions{display:flex;justify-content:space-between;gap:var(--m);align-items:center;margin-top:var(--m)}
-    .photo-actions p{font-size:11px;color:var(--muted)}
+    .photo-actions{display:flex;justify-content:flex-end;gap:var(--m);align-items:center;margin-top:var(--m)}
+    #shuffle-photos{padding:8px 11px 7px;border-color:var(--fg);background:var(--fg);color:var(--bg);font-size:11px;font-weight:600;letter-spacing:.04em}
+    #shuffle-photos:hover,#shuffle-photos:focus-visible{background:transparent;color:var(--fg)}
+    #shuffle-photos:disabled{opacity:.45;cursor:wait}
 
     .lightbox{position:fixed;inset:0;z-index:100;display:none;place-items:center;padding:12px;background:#fff;cursor:default;touch-action:pan-y}
     .lightbox.is-open{display:grid}
     .lightbox img{display:block;max-width:calc(100vw - 24px);max-height:calc(100svh - 24px);width:auto;height:auto;object-fit:contain;cursor:grab;user-select:none;-webkit-user-drag:none}
     .lightbox-close{position:fixed;top:10px;right:10px;z-index:101;appearance:none;border:1px solid rgba(17,17,17,.72);background:rgba(255,255,255,.9);color:#111;padding:6px 8px 5px;font-size:10px;text-transform:uppercase;cursor:pointer}
+    .lightbox-status{position:fixed;left:50%;bottom:18px;z-index:102;transform:translate(-50%,8px);opacity:0;pointer-events:none;border:1px solid rgba(17,17,17,.45);background:rgba(255,255,255,.94);color:#111;padding:7px 9px 6px;font-size:10px;line-height:1.35;text-align:center;text-transform:uppercase;letter-spacing:.03em;white-space:pre-line;transition:opacity .16s ease,transform .16s ease}
+    .lightbox-status.is-visible{opacity:1;transform:translate(-50%,0)}
 
     .live-breakout{width:min(calc(100vw - 24px),var(--wide));margin-left:50%;transform:translateX(-50%)}
     .live-stage{width:100%;height:clamp(420px,70vh,720px);position:relative;overflow:hidden;background:#111;border:1px solid var(--line);touch-action:pan-y}
@@ -126,6 +130,7 @@
       .about-grid{grid-template-columns:1fr}
       .lightbox{padding:6px}
       .lightbox img{max-width:calc(100vw - 12px);max-height:calc(100svh - 12px)}
+      .lightbox-status{bottom:12px}
     }
   </style>
 </head>
@@ -185,7 +190,6 @@
         <div class="photo-grid" id="photo-grid" aria-label="Mixed-ratio selected photography"></div>
       </div>
       <div class="photo-actions">
-        <p>Original ratios · click image to enlarge</p>
         <button class="action" id="shuffle-photos" type="button">Shuffle selection</button>
       </div>
       <div class="description">
@@ -256,6 +260,7 @@
   <div class="lightbox" id="photo-lightbox" role="dialog" aria-modal="true" aria-label="Expanded photograph" aria-hidden="true">
     <button class="lightbox-close" id="lightbox-close" type="button">Close</button>
     <img id="lightbox-image" alt="" draggable="false">
+    <div class="lightbox-status" id="lightbox-status" role="status" aria-live="polite"></div>
   </div>
 
   <script src="assets/content/site-copy.js"></script>
@@ -276,11 +281,14 @@
     const lightbox = document.querySelector('#photo-lightbox');
     const lightboxImage = document.querySelector('#lightbox-image');
     const lightboxClose = document.querySelector('#lightbox-close');
+    const lightboxStatus = document.querySelector('#lightbox-status');
     let photos = [];
     let resizeTimer = null;
     let lightboxIndex = -1;
     let swipeStartX = null;
     let swipeStartY = null;
+    let lightboxStatusTimer = null;
+    let photoShuffleInProgress = false;
 
     function shuffled(items){
       const copy=[...items];
@@ -300,14 +308,54 @@
       });
     }
 
-    async function createPhotoSet(){
+    function restoreGalleryViewport(anchorTop){
+      if(anchorTop===null||anchorTop===undefined) return;
+      requestAnimationFrame(()=>{
+        const delta=photoGrid.getBoundingClientRect().top-anchorTop;
+        if(Math.abs(delta)<.5) return;
+        const root=document.documentElement;
+        const previousBehavior=root.style.scrollBehavior;
+        root.style.scrollBehavior='auto';
+        window.scrollBy(0,delta);
+        requestAnimationFrame(()=>{root.style.scrollBehavior=previousBehavior});
+      });
+    }
+
+    function showLightboxMessage(message,duration=1500){
+      if(!lightboxStatus) return;
+      clearTimeout(lightboxStatusTimer);
+      lightboxStatus.textContent=message;
+      lightboxStatus.classList.add('is-visible');
+      lightboxStatusTimer=setTimeout(()=>{
+        lightboxStatus.classList.remove('is-visible');
+      },duration);
+    }
+
+    function clearLightboxMessage(){
+      clearTimeout(lightboxStatusTimer);
+      lightboxStatusTimer=null;
+      if(!lightboxStatus) return;
+      lightboxStatus.classList.remove('is-visible');
+      lightboxStatus.textContent='';
+    }
+
+    async function createPhotoSet({preservePosition=false}={}){
+      if(photoShuffleInProgress) return;
+      photoShuffleInProgress=true;
       shufflePhotos.disabled=true;
-      const selection=shuffled(photoFiles).slice(0,12);
-      const loaded=await Promise.allSettled(selection.map(loadPhoto));
-      photos=loaded.filter(item=>item.status==='fulfilled').map(item=>item.value);
-      lightboxIndex=-1;
-      layoutPhotos();
-      shufflePhotos.disabled=false;
+      if(preservePosition) shufflePhotos.blur();
+      const anchorTop=preservePosition?photoGrid.getBoundingClientRect().top:null;
+      try{
+        const selection=shuffled(photoFiles).slice(0,12);
+        const loaded=await Promise.allSettled(selection.map(loadPhoto));
+        photos=loaded.filter(item=>item.status==='fulfilled').map(item=>item.value);
+        lightboxIndex=-1;
+        layoutPhotos();
+        restoreGalleryViewport(anchorTop);
+      }finally{
+        shufflePhotos.disabled=false;
+        photoShuffleInProgress=false;
+      }
     }
 
     function desiredRowHeight(width){
@@ -387,13 +435,13 @@
 
     function showLightboxIndex(index){
       if(!photos.length) return;
-      lightboxIndex=(index+photos.length)%photos.length;
+      lightboxIndex=Math.max(0,Math.min(index,photos.length-1));
       const item=photos[lightboxIndex];
       lightboxImage.src=item.fullSrc||item.src;
       lightboxImage.alt=item.alt||item.title||item.file||'';
 
-      const next=photos[(lightboxIndex+1)%photos.length];
-      const prev=photos[(lightboxIndex-1+photos.length)%photos.length];
+      const next=photos[lightboxIndex+1];
+      const prev=photos[lightboxIndex-1];
       [next,prev].forEach(neighbor=>{
         if(!neighbor) return;
         const preload=new Image();
@@ -403,6 +451,7 @@
 
     function openLightbox(item){
       const index=Math.max(0,photos.indexOf(item));
+      clearLightboxMessage();
       showLightboxIndex(index);
       lightbox.classList.add('is-open');
       lightbox.setAttribute('aria-hidden','false');
@@ -410,9 +459,62 @@
       lightboxClose.focus();
     }
 
+    async function reshuffleFromLightboxEnd(){
+      if(photoShuffleInProgress||!photos.length) return;
+      const current=photos[lightboxIndex];
+      if(!current) return;
+
+      photoShuffleInProgress=true;
+      shufflePhotos.disabled=true;
+      const anchorTop=photoGrid.getBoundingClientRect().top;
+      showLightboxMessage('Last image\nShuffling selection…',2200);
+
+      try{
+        const candidateFiles=photoFiles.filter(file=>file!==current.file);
+        const selection=shuffled(candidateFiles).slice(0,11);
+        const loaded=await Promise.allSettled(selection.map(loadPhoto));
+        const nextPhotos=[current,...loaded.filter(item=>item.status==='fulfilled').map(item=>item.value)];
+        if(nextPhotos.length<2){
+          showLightboxMessage('Last image\nShuffle unavailable',1800);
+          return;
+        }
+
+        photos=nextPhotos;
+        layoutPhotos();
+        restoreGalleryViewport(anchorTop);
+
+        if(lightbox.classList.contains('is-open')){
+          lightboxIndex=0;
+          showLightboxIndex(0);
+          showLightboxMessage(`Last image\nSelection shuffled · 1 / ${photos.length}`,1800);
+        }else{
+          lightboxIndex=-1;
+        }
+      }finally{
+        shufflePhotos.disabled=false;
+        photoShuffleInProgress=false;
+      }
+    }
+
     function stepLightbox(direction){
-      if(!lightbox.classList.contains('is-open')) return;
-      showLightboxIndex(lightboxIndex+direction);
+      if(!lightbox.classList.contains('is-open')||!photos.length) return;
+
+      if(direction<0){
+        if(lightboxIndex<=0){
+          showLightboxMessage(`First image · 1 / ${photos.length}`);
+          return;
+        }
+        showLightboxIndex(lightboxIndex-1);
+        return;
+      }
+
+      if(direction>0){
+        if(lightboxIndex>=photos.length-1){
+          reshuffleFromLightboxEnd();
+          return;
+        }
+        showLightboxIndex(lightboxIndex+1);
+      }
     }
 
     function closeLightbox(){
@@ -420,10 +522,11 @@
       lightbox.setAttribute('aria-hidden','true');
       lightboxImage.removeAttribute('src');
       document.body.classList.remove('lightbox-open');
+      clearLightboxMessage();
       lightboxIndex=-1;
     }
 
-    shufflePhotos.addEventListener('click',createPhotoSet);
+    shufflePhotos.addEventListener('click',()=>createPhotoSet({preservePosition:true}));
     lightboxClose.addEventListener('click',closeLightbox);
     lightbox.addEventListener('click',(event)=>{if(event.target===lightbox) closeLightbox()});
     lightbox.addEventListener('touchstart',(event)=>{
