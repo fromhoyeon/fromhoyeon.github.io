@@ -20,7 +20,7 @@ Hoyeon의 개인 웹사이트이자 포트폴리오를 위한 저장소다.
 
 - `index.html` — 현재 공개 사이트의 진입점. `prototype-functional-onepage.html`로 즉시 이동시킨다. 당분간 이 단일 페이지 프로토타입을 메인 사이트로 사용한다.
 - `prototype-random-photo-layout.html` — 10~15장의 사진이 서로 다른 비율로 유동적으로 들어온다고 가정하고, crop 없이 원본 비율을 유지한 채 화면 폭에 맞춰 justified row를 구성하는 사진 배치 실험.
-- `prototype-functional-onepage.html` — 중앙 집중형 정보 영역과 제한된 타이포그래피·간격 규칙을 사용하는 현재 메인 단일 페이지. `Selected Photography`는 Sanity `portfolioPhoto`의 published/enabled 사진 pool에서 12장을 무작위로 선택한다. 모바일에서는 4개 행으로 배치하고 데스크탑에서는 mixed-ratio justified layout을 사용한다. 확대 보기에서 첫 사진 이전 이동은 막고, 마지막 사진에 도착하면 현재 사진을 유지한 채 selection을 새로 섞어 그 사진을 새 목록의 1번으로 만든다. Selected Photography lightbox는 별도 Close 버튼 없이 Esc 또는 배경 클릭으로 닫는다. Portfolio Item 내부 Image Gallery lightbox는 데스크탑에서 Close 버튼과 배경 클릭 종료를 없애고 Esc로 닫으며, 모바일에서는 Esc 키가 없으므로 배경 탭 종료를 유지한다. DODREI는 iframe을 즉시 로드하지 않고 투명한 외부 여백 안의 단일 dark-gray gate에서 `Play here / Open in new window`를 선택하게 한다. 주요 Portfolio Item의 제목·연도·meta·설명·tag·media URL과 홈페이지 순서는 Sanity에서 읽는다.
+- `prototype-functional-onepage.html` — 중앙 집중형 정보 영역과 제한된 타이포그래피·간격 규칙을 사용하는 현재 메인 단일 페이지. `Selected Photography`는 Sanity `portfolioPhoto`의 published/enabled 사진 pool에서 12장을 무작위로 선택한다. 모바일에서는 4개 행으로 배치하고 데스크탑에서는 mixed-ratio justified layout을 사용한다. 확대 보기에서 첫 사진 이전 이동은 막고, 마지막 사진에 도착하면 현재 사진을 유지한 채 selection을 새로 섞어 그 사진을 새 목록의 1번으로 만든다. Selected Photography lightbox는 별도 Close 버튼 없이 Esc 또는 배경 클릭으로 닫는다. Portfolio Item 내부 Image Gallery lightbox는 데스크탑에서 Close 버튼과 배경 클릭 종료를 없애고 Esc로 닫으며, 모바일에서는 Esc 키가 없으므로 배경 탭 종료를 유지한다. DODREI는 iframe을 즉시 로드하지 않고 투명한 외부 여백 안의 단일 dark-gray gate에서 `Play here / Open in new window`를 선택하게 한다. 주요 Portfolio Item의 제목·Period·설명·tag·media URL과 홈페이지 순서는 Sanity에서 읽는다.
 - `assets/content/site-copy.js` — Sanity-bound 전역 텍스트와 navigation bridge. Sanity 내용을 local copy로 복제하지 않으며 아직 remote 값이 없는 bound text/navigation은 `OFFLINE`으로 표시한다. 현재 기본 사이트 배경은 흰색이다. 하단 Email은 `Email: fromhoyeon@gmail.com`으로 표시하고 첫 클릭에 주소를 clipboard로 복사한 뒤 `Open mail app` mailto 동작을 별도로 제안한다.
 - `assets/content/sanity-config.js` / `sanity-runtime.js` / `sanity-prototype-bridge.js` — Sanity content adapter. Project ID `a707yvok`, dataset `production`에 연결되어 있으며 active prototyping 중에는 CDN cache를 사용하지 않고 published data를 직접 읽는다. Portfolio Item의 Tag reference는 frontend에서 label로 resolve한다.
 - `assets/content/portfolio-ui-overrides.js` — 현재 Portfolio Item media UI 보정 레이어. YouTube는 재생 전 iframe을 띄우지 않고 thumbnail + play button만 보여주며, 사용자가 재생을 시작한 뒤에만 YouTube 기본 player를 생성해 native seek/fullscreen controls를 사용한다. 연속된 YouTube block 간격을 일반 content block보다 좁게 유지하고 Portfolio Item gallery lightbox의 desktop 종료 동작도 여기서 보정한다.
@@ -57,6 +57,7 @@ Hoyeon의 개인 웹사이트이자 포트폴리오를 위한 저장소다.
 - production의 기존 문자열 tag `TouchDesigner`, `Archive`, `Performance`, `Batman`은 독립 Tag documents로 이관했다. `Batman`은 기존 테스트 데이터 보존을 위한 값이며 채택된 taxonomy가 아니다.
 - Tag reference와 `homePage.featuredWorks` reference는 현재 작업 단계에서 삭제를 쉽게 하기 위해 weak reference로 운영한다. target 문서를 지워도 source 문서 삭제가 차단되지 않으며, 남은 dangling reference는 frontend에서 의미 있는 콘텐츠로 취급하지 않는 방향을 따른다.
 - Portfolio Item의 `Public title`은 Studio에서 줄바꿈 입력이 가능하도록 `text` 타입, 2-row 입력 UI로 변경했다.
+- 2026-09-06 Portfolio Item의 제목 옆 짧은 정보 영역을 자유 형식 **Period** 하나로 통일했다. 기존 `yearLabel` 값은 `period`로 이관했고 `yearLabel`과 `metaLines`는 production 데이터와 active schema에서 제거했다. `Period`는 `2025`, `2024/04`, `2022~2024`, `Ongoing`처럼 시점·기간만 표시하며 분류나 포맷 정보는 섞지 않는다.
 - 기존 5개 Portfolio Item의 공개 제목과 내용은 content-model 구조 변경 자체에서는 자동 변경하지 않았다. 실제 콘텐츠로 교체·보강하는 작업은 별도의 콘텐츠 편집으로 진행한다.
 - 사용되지 않는 `contentEntry`는 active repository schema 목록에서 제외하고 hosted Studio에서도 legacy type으로 숨겼다.
 
@@ -82,6 +83,7 @@ Hoyeon의 개인 웹사이트이자 포트폴리오를 위한 저장소다.
 - **상단 메뉴는 Sanity `siteNavigation`의 `primary-navigation` singleton에서 관리한다.**
 - **일반 공개 콘텐츠는 Sanity Portfolio Item 문서로 관리한다.** 기술적 `_type`은 기존 호환성을 위해 `workEntry`를 유지한다.
 - **Portfolio Item의 노출 여부와 홈페이지 순서는 `homePage.featuredWorks` reference 배열이 결정한다.** 현재 이 reference는 weak다.
+- **Portfolio Item의 제목 옆 시간 정보는 `period` 하나만 사용한다.** 날짜, 연도, 월, 기간, 진행 상태를 짧은 자유 형식 문자열로 표현한다.
 - **Portfolio Item과 Photograph의 관계·필터링용 메타데이터는 재사용 가능한 `tag` documents를 weak reference한다.** 현재 tag는 별도 그룹 없이 flat하게 운영한다.
 - **작품 내부 구성은 `contentBlocks` 배열을 우선한다.** 현재 YouTube Video, Text, Image Gallery, Web Embed block을 조합하고 순서를 바꿀 수 있다.
 - 기존 Portfolio Item 중 content block으로 아직 이관되지 않은 항목을 위해 legacy media fields는 compatibility 용도로 잠시 유지한다.
@@ -102,7 +104,7 @@ Hoyeon의 개인 웹사이트이자 포트폴리오를 위한 저장소다.
 - 시각적으로 여백 자체를 강조하는 미니멀리즘보다 **구조적으로 단순한 사이트**를 선호한다.
 - 빈 공간은 장식이나 분위기를 위해 만들기보다 가독성, 매체 크기, 조작 편의 등 **기능적 이유의 결과**로 생기는 편을 선호한다.
 - 많은 종류의 장식·타이포그래피를 쓰기보다 **몇 가지 글자 스타일, 간격, 블록 규격을 반복 조합**해 전체 미학을 만드는 방향을 선호한다.
-- 기능 요소와 정보 구조를 숨기기보다 제목, 번호, 연도, 상태, 버튼, 링크 같은 **실용적 인터페이스가 화면의 디자인 요소로 드러나는 방식**을 선호한다.
+- 기능 요소와 정보 구조를 숨기기보다 제목, 번호, 기간, 상태, 버튼, 링크 같은 **실용적 인터페이스가 화면의 디자인 요소로 드러나는 방식**을 선호한다.
 - 모바일에서 본 `rushi.co`, `noplans.studio/work`, `bureauborsche.com`의 밀도와 반복 규칙을 긍정적으로 평가했다. 특히 Bureau Borsche의 화면을 꽉 채우는 성격과 Rushi의 제한된 타이포그래피 사용이 참고점이다. 데스크탑 버전 전체를 그대로 선호한다는 뜻은 아니다.
 - 한국어와 영어를 함께 사용할 예정이며 현재 기본 서체는 `IBM Plex Sans KR`이다.
 - 데스크탑에서도 화면 전체를 의무적으로 활용하지 않고, **텍스트와 일반 인터페이스는 중앙의 비교적 좁은 영역에 모으고 큰 사진·영상처럼 실제 필요가 있을 때만 폭을 확장**하는 방식을 선호한다.
