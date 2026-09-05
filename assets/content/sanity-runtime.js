@@ -133,8 +133,7 @@
         title,
         "slug": slug.current,
         enabled,
-        yearLabel,
-        metaLines,
+        period,
         summary,
         "tags": tags[]->label,
         contentBlocks[]{
