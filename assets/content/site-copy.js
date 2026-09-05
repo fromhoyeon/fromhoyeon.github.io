@@ -16,6 +16,14 @@ function applyBasePalette(){
     :root:not([data-site-theme]){--bg:#fff;--panel:#e6e6e6}
     .topbar{background:var(--topbar-bg,rgba(255,255,255,.96))}
     .photo-cell{background:var(--panel)}
+    .email-copy-row{appearance:none;width:100%;border:0;border-bottom:1px solid var(--line);padding:9px 0;background:transparent;color:inherit;display:grid;grid-template-columns:1fr auto;align-items:center;text-align:left;font:inherit;font-size:12px;cursor:pointer}
+    .email-copy-row:hover .email-copy-label{text-decoration:underline;text-underline-offset:2px}
+    .email-copy-row:focus-visible{outline:1px solid var(--fg);outline-offset:3px}
+    .email-followup{display:none;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:10px;color:var(--muted)}
+    .email-followup.is-visible{display:flex}
+    .email-followup a{display:inline-block;border:1px solid var(--line);padding:5px 7px 4px;background:#f7f7f4;color:var(--fg);font-size:9px;text-transform:uppercase;white-space:nowrap}
+    .email-followup a:hover,.email-followup a:focus-visible{border-color:var(--fg);background:var(--fg);color:var(--bg)}
+    @media (max-width:620px){.email-followup{align-items:flex-start;flex-direction:column}.email-followup a{align-self:flex-start}}
   `;
   document.head.appendChild(style);
 }
@@ -25,18 +33,86 @@ applyBasePalette();
 // The old prototype shipped an inline Intro meta element. It is no longer part of the site.
 document.querySelector('.intro-copy span')?.remove();
 
+const CONTACT_EMAIL = 'fromhoyeon@gmail.com';
+
+async function copyText(value){
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(value);
+    return;
+  }
+
+  const fallback = document.createElement('textarea');
+  fallback.value = value;
+  fallback.setAttribute('readonly', '');
+  fallback.style.position = 'fixed';
+  fallback.style.opacity = '0';
+  document.body.appendChild(fallback);
+  fallback.select();
+  document.execCommand('copy');
+  fallback.remove();
+}
+
+function createEmailContact(){
+  const wrapper = document.createElement('div');
+  wrapper.className = 'email-contact';
+
+  const copyButton = document.createElement('button');
+  copyButton.className = 'email-copy-row';
+  copyButton.type = 'button';
+  copyButton.setAttribute('aria-describedby', 'email-copy-followup');
+
+  const label = document.createElement('span');
+  label.className = 'email-copy-label';
+  label.textContent = `Email: ${CONTACT_EMAIL}`;
+
+  const marker = document.createElement('span');
+  marker.textContent = 'Copy';
+  marker.setAttribute('aria-hidden', 'true');
+
+  const followup = document.createElement('div');
+  followup.className = 'email-followup';
+  followup.id = 'email-copy-followup';
+  followup.setAttribute('role', 'status');
+  followup.setAttribute('aria-live', 'polite');
+
+  const message = document.createElement('span');
+  message.textContent = 'Email address copied. Open your mail app?';
+
+  const compose = document.createElement('a');
+  compose.href = `mailto:${CONTACT_EMAIL}`;
+  compose.textContent = 'Open mail app ↗';
+
+  followup.append(message, compose);
+  copyButton.append(label, marker);
+  wrapper.append(copyButton, followup);
+
+  copyButton.addEventListener('click', async () => {
+    try {
+      await copyText(CONTACT_EMAIL);
+      marker.textContent = 'Copied';
+      followup.classList.add('is-visible');
+    } catch (error) {
+      marker.textContent = 'Copy failed';
+      message.textContent = 'Could not copy automatically. Open your mail app?';
+      followup.classList.add('is-visible');
+    }
+  });
+
+  return wrapper;
+}
+
 function applyStaticExternalLinks(){
   const links = document.querySelector('#links .links');
   if (!links) return;
 
   const items = [
-    {label: 'Email', href: 'mailto:fromhoyeon@gmal.com'},
     {label: 'Instagram', href: 'https://www.instagram.com/hoyeon.choi/', external: true},
     {label: 'YouTube', href: '#'},
     {label: 'GitHub', href: '#'}
   ];
 
-  links.replaceChildren(...items.map((item) => {
+  const email = createEmailContact();
+  const externalLinks = items.map((item) => {
     const link = document.createElement('a');
     link.href = item.href;
     if (item.external) {
@@ -50,7 +126,9 @@ function applyStaticExternalLinks(){
     arrow.textContent = '↗';
     link.append(label, arrow);
     return link;
-  }));
+  });
+
+  links.replaceChildren(email, ...externalLinks);
 }
 
 applyStaticExternalLinks();
