@@ -20,10 +20,10 @@ Hoyeon의 개인 웹사이트이자 포트폴리오를 위한 저장소다.
 
 - `index.html` — 현재 공개 사이트의 진입점. `prototype-functional-onepage.html`로 즉시 이동시킨다. 당분간 이 단일 페이지 프로토타입을 메인 사이트로 사용한다.
 - `prototype-random-photo-layout.html` — 10~15장의 사진이 서로 다른 비율로 유동적으로 들어온다고 가정하고, crop 없이 원본 비율을 유지한 채 화면 폭에 맞춰 justified row를 구성하는 사진 배치 실험.
-- `prototype-functional-onepage.html` — 중앙 집중형 정보 영역과 제한된 타이포그래피·간격 규칙을 사용하는 현재 메인 단일 페이지. `Selected Photography`는 Sanity `portfolioPhoto`의 published/enabled 사진 pool에서 12장을 무작위로 선택한다. 모바일에서는 4개 행으로 배치하고 데스크탑에서는 mixed-ratio justified layout을 사용한다. 확대 보기에서 첫 사진 이전 이동은 막고, 마지막 사진에 도착하면 현재 사진을 유지한 채 selection을 새로 섞어 그 사진을 새 목록의 1번으로 만든다. 별도 Close 버튼은 없으며 흰 여백 클릭 또는 Esc로 닫는다. DODREI는 iframe을 즉시 로드하지 않고 투명한 외부 여백 안의 단일 dark-gray gate에서 `Play here / Open in new window`를 선택하게 한다. 주요 Portfolio Item의 제목·연도·meta·설명·tag·media URL과 홈페이지 순서는 Sanity에서 읽는다.
-- `assets/content/site-copy.js` — Sanity-bound 전역 텍스트와 navigation bridge. Sanity 내용을 local copy로 복제하지 않으며 아직 remote 값이 없는 bound text/navigation은 `OFFLINE`으로 표시한다. 현재 기본 사이트 배경은 흰색이다.
+- `prototype-functional-onepage.html` — 중앙 집중형 정보 영역과 제한된 타이포그래피·간격 규칙을 사용하는 현재 메인 단일 페이지. `Selected Photography`는 Sanity `portfolioPhoto`의 published/enabled 사진 pool에서 12장을 무작위로 선택한다. 모바일에서는 4개 행으로 배치하고 데스크탑에서는 mixed-ratio justified layout을 사용한다. 확대 보기에서 첫 사진 이전 이동은 막고, 마지막 사진에 도착하면 현재 사진을 유지한 채 selection을 새로 섞어 그 사진을 새 목록의 1번으로 만든다. Selected Photography lightbox는 별도 Close 버튼 없이 Esc 또는 배경 클릭으로 닫는다. Portfolio Item 내부 Image Gallery lightbox는 데스크탑에서 Close 버튼과 배경 클릭 종료를 없애고 Esc로 닫으며, 모바일에서는 Esc 키가 없으므로 배경 탭 종료를 유지한다. DODREI는 iframe을 즉시 로드하지 않고 투명한 외부 여백 안의 단일 dark-gray gate에서 `Play here / Open in new window`를 선택하게 한다. 주요 Portfolio Item의 제목·연도·meta·설명·tag·media URL과 홈페이지 순서는 Sanity에서 읽는다.
+- `assets/content/site-copy.js` — Sanity-bound 전역 텍스트와 navigation bridge. Sanity 내용을 local copy로 복제하지 않으며 아직 remote 값이 없는 bound text/navigation은 `OFFLINE`으로 표시한다. 현재 기본 사이트 배경은 흰색이다. 하단 Email은 `Email: fromhoyeon@gmail.com`으로 표시하고 첫 클릭에 주소를 clipboard로 복사한 뒤 `Open mail app` mailto 동작을 별도로 제안한다.
 - `assets/content/sanity-config.js` / `sanity-runtime.js` / `sanity-prototype-bridge.js` — Sanity content adapter. Project ID `a707yvok`, dataset `production`에 연결되어 있으며 active prototyping 중에는 CDN cache를 사용하지 않고 published data를 직접 읽는다. Portfolio Item의 Tag reference는 frontend에서 label로 resolve한다.
-- `assets/content/youtube-custom-ui.js` — YouTube 기본 controls 대신 play/pause, seek timeline, current/duration만 제공하는 최소 control layer. 사이트의 CSS color variables를 사용한다.
+- `assets/content/portfolio-ui-overrides.js` — 현재 Portfolio Item media UI 보정 레이어. YouTube는 재생 전 iframe을 띄우지 않고 thumbnail + play button만 보여주며, 사용자가 재생을 시작한 뒤에만 YouTube 기본 player를 생성해 native seek/fullscreen controls를 사용한다. 연속된 YouTube block 간격을 일반 content block보다 좁게 유지하고 Portfolio Item gallery lightbox의 desktop 종료 동작도 여기서 보정한다.
 - `assets/content/sanity-gallery-layout.js` — Portfolio Item의 Image Gallery block에서 지정한 `Rows` 수를 기준으로 사진의 실제 비율을 읽어 행 분할을 자동 계산한다. 각 행 안에서는 사진 높이를 동일하게 맞추되 crop하지 않는다.
 - `sanity/` — `Portfolio Item`(`_type: workEntry`), `Tag`, `Photograph`(`_type: portfolioPhoto`), `homePage`, `siteCopy`, `siteNavigation`과 content block schema source 및 연결 기준. 실제 schema와 hosted Studio도 같은 content model로 배포되어 있다.
 - `assets/prototypes/photo-samples/` — 과거 사진 배치·확대 동작 테스트를 위한 로컬 샘플 이미지. 현재 Selected Photography의 canonical pool은 아니다.
@@ -54,11 +54,25 @@ Hoyeon의 개인 웹사이트이자 포트폴리오를 위한 저장소다.
 - 현재 모든 Tag는 완전히 동등하다. `year`, `series`, `tool`, `event`, `medium` 등의 tag group이나 hierarchy는 아직 만들지 않는다. 실제 콘텐츠가 충분히 쌓인 뒤 필요가 확인되면 추가한다.
 - Portfolio Item 작성 시 기존 Tag를 검색·재사용하고, 필요할 때 새 Tag를 만든다.
 - 사진은 현재 유일한 특수 케이스다. `Photograph` document pool을 따로 두되 일반 Portfolio Item과 동일한 Tag documents를 공유한다.
-- production의 기존 문자열 tag `TouchDesigner`, `Archive`, `Performance`, `Batman`은 독립 Tag documents로 이관했다.
-- 기존 5개 Portfolio Item의 공개 제목과 내용은 이번 구조 변경에서 바꾸지 않았다. 새 실제 콘텐츠로 교체·보강하는 작업은 다음 콘텐츠 편집 단계에서 진행한다.
+- production의 기존 문자열 tag `TouchDesigner`, `Archive`, `Performance`, `Batman`은 독립 Tag documents로 이관했다. `Batman`은 기존 테스트 데이터 보존을 위한 값이며 채택된 taxonomy가 아니다.
+- Tag reference와 `homePage.featuredWorks` reference는 현재 작업 단계에서 삭제를 쉽게 하기 위해 weak reference로 운영한다. target 문서를 지워도 source 문서 삭제가 차단되지 않으며, 남은 dangling reference는 frontend에서 의미 있는 콘텐츠로 취급하지 않는 방향을 따른다.
+- Portfolio Item의 `Public title`은 Studio에서 줄바꿈 입력이 가능하도록 `text` 타입, 2-row 입력 UI로 변경했다.
+- 기존 5개 Portfolio Item의 공개 제목과 내용은 content-model 구조 변경 자체에서는 자동 변경하지 않았다. 실제 콘텐츠로 교체·보강하는 작업은 별도의 콘텐츠 편집으로 진행한다.
 - 사용되지 않는 `contentEntry`는 active repository schema 목록에서 제외하고 hosted Studio에서도 legacy type으로 숨겼다.
 
 세부 schema와 runtime 기준은 `sanity/README.md`를 따른다.
+
+## 2026-09-05 interface checkpoint
+
+현재 콘텐츠 입력과 실제 모바일/데스크탑 사용을 시험하면서 다음 인터랙션을 적용했다.
+
+- YouTube 커스텀 seek bar 실험은 폐기했다. 간헐적으로 IFrame API와 DOM rerender timing이 엇갈리며 안정적이지 않았기 때문이다.
+- YouTube는 **poster-first** 방식으로 전환했다. 재생 전에는 YouTube iframe을 만들지 않고 thumbnail + play button만 표시하며, 사용자가 누른 뒤에는 YouTube native player와 기본 seek/fullscreen controls를 사용한다.
+- 한 Portfolio Item 안에 YouTube Video block이 연속될 경우 일반 block 간격보다 훨씬 좁게 보이도록 조정한다. 현재 desktop 약 10px, mobile 약 8px을 기준으로 한다.
+- Portfolio Item 내부 사진 확대 보기의 별도 Close 버튼은 제거했다. desktop은 Esc 중심으로 닫고, mobile은 backdrop tap을 남긴다.
+- 하단 Email 링크는 즉시 mail app을 여는 대신 주소 복사를 먼저 수행하고 `Email address copied. Open your mail app?` 안내와 `Open mail app` mailto action을 두 번째 단계로 표시한다.
+
+이 항목들은 현재 구현된 인터랙션 기준이며 사이트의 최종 디자인 시스템 전체를 확정한 것은 아니다.
 
 ## 콘텐츠 레이어 기준
 
@@ -67,12 +81,12 @@ Hoyeon의 개인 웹사이트이자 포트폴리오를 위한 저장소다.
 - **사이트 전역 문구는 Sanity `siteCopy` 문서에서 관리한다.** remote 값이 없거나 연결되지 않은 bound text는 `OFFLINE`으로 표시한다.
 - **상단 메뉴는 Sanity `siteNavigation`의 `primary-navigation` singleton에서 관리한다.**
 - **일반 공개 콘텐츠는 Sanity Portfolio Item 문서로 관리한다.** 기술적 `_type`은 기존 호환성을 위해 `workEntry`를 유지한다.
-- **Portfolio Item의 노출 여부와 홈페이지 순서는 `homePage.featuredWorks` reference 배열이 결정한다.**
-- **Portfolio Item의 관계·필터링용 메타데이터는 재사용 가능한 `tag` documents를 reference한다.** 현재 tag는 별도 그룹 없이 flat하게 운영한다.
+- **Portfolio Item의 노출 여부와 홈페이지 순서는 `homePage.featuredWorks` reference 배열이 결정한다.** 현재 이 reference는 weak다.
+- **Portfolio Item과 Photograph의 관계·필터링용 메타데이터는 재사용 가능한 `tag` documents를 weak reference한다.** 현재 tag는 별도 그룹 없이 flat하게 운영한다.
 - **작품 내부 구성은 `contentBlocks` 배열을 우선한다.** 현재 YouTube Video, Text, Image Gallery, Web Embed block을 조합하고 순서를 바꿀 수 있다.
 - 기존 Portfolio Item 중 content block으로 아직 이관되지 않은 항목을 위해 legacy media fields는 compatibility 용도로 잠시 유지한다.
 - **Image Gallery는 사진 비율을 보고 지정된 행 수 안에서 균형 있는 분할 지점을 계산하며 crop하지 않는다.**
-- **YouTube는 기본 controls를 숨기고 사이트 자체의 최소 control bar를 실험 중이다.** 현재 play/pause, seek timeline, current/duration을 제공한다.
+- **YouTube는 재생 전 poster-only, 재생 후 native player 방식이다.** 커스텀 control bar는 현재 사용하지 않는다.
 - **Work 영역의 사용자-facing fallback은 `OFFLINE`이다.** Sanity query가 실패하거나 Homepage 데이터가 없으면 과거 하드코딩 콘텐츠를 대신 노출하지 않는다.
 - **Selected Photography의 canonical pool은 Sanity `portfolioPhoto`다.** 2026-09-05 기준 production에 enabled/published Photograph 98장이 있으며 그중 일부를 무작위 선택한다.
 - 어떤 콘텐츠를 remote/static으로 둘지는 영구 고정하지 않는다. 외부 content layer도 교체 가능해야 한다.
