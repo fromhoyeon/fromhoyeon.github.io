@@ -2,6 +2,21 @@
 
 Portfolio photographs use a two-layer import path so editorial metadata can be retained without embedding it in the image files delivered by the public website.
 
+## Current status
+
+This pipeline is prepared now but is **not intended to be used for the current sample photo pool**.
+
+The current Sanity photographs are temporary samples. The intended workflow is:
+
+1. finish selecting and organizing the real portfolio photographs in Lightroom;
+2. export the final web-bound photographs with the desired embedded metadata intact;
+3. test this importer with a small number of files first;
+4. verify both the private metadata record and the sanitized public image;
+5. replace the current sample pool with the final photographs;
+6. only after that, decide which metadata fields, if any, should be copied into public `production` for display in the enlarged-photo UI.
+
+Do not treat the presence of the private metadata pipeline as a decision to display camera, lens, exposure, date, copyright, caption, GPS, or any other metadata publicly.
+
 ## Privacy boundary
 
 ### Public website dataset
