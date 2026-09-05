@@ -21,7 +21,7 @@ export const portfolioPhoto = defineType({
       title: 'Tags',
       description: 'Uses the same flat Tag documents as Portfolio Items.',
       type: 'array',
-      of: [defineArrayMember({type: 'reference', to: [{type: 'tag'}]})],
+      of: [defineArrayMember({type: 'reference', to: [{type: 'tag'}], weak: true})],
       validation: (rule) => rule.unique(),
     }),
   ],
