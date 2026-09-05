@@ -2,7 +2,7 @@
   Sanity-bound site text bridge
   ----------------------------
   Sanity is the source of truth for editable site text and navigation.
-  Local content does not attempt to mirror remote copy.
+  Local prototype copy is never used as public fallback content.
   Any bound text that has not arrived from Sanity renders as OFFLINE.
 */
 
@@ -30,8 +30,41 @@ function applyBasePalette(){
 
 applyBasePalette();
 
-// The old prototype shipped an inline Intro meta element. It is no longer part of the site.
-document.querySelector('.intro-copy span')?.remove();
+function scrubLegacyPrototypeContent(){
+  // Keep the old HTML only as a structural shell. None of its sample copy is
+  // allowed to survive as public fallback when a Sanity field is empty.
+  document.querySelector('.intro-copy span')?.remove();
+
+  const index = document.querySelector('#work');
+  index?.replaceChildren();
+
+  document.querySelectorAll('main > section.work').forEach((section) => {
+    section.hidden = true;
+
+    const title = section.querySelector('.work-title');
+    const meta = section.querySelector('.work-meta');
+    const description = section.querySelector('.description p');
+    const action = section.querySelector('.description .action');
+    const strip = section.querySelector('.small-strip');
+
+    if (title) title.textContent = '';
+    if (meta) meta.textContent = '';
+    if (description) description.textContent = '';
+    if (action) {
+      action.textContent = '';
+      action.hidden = true;
+      action.removeAttribute('target');
+      action.removeAttribute('rel');
+      action.href = '#';
+    }
+    if (strip) {
+      strip.replaceChildren();
+      strip.hidden = true;
+    }
+  });
+}
+
+scrubLegacyPrototypeContent();
 
 const CONTACT_EMAIL = 'fromhoyeon@gmail.com';
 
