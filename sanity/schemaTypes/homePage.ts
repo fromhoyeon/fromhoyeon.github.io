@@ -15,6 +15,7 @@ export const homePage = defineType({
         defineArrayMember({
           type: 'reference',
           to: [{type: 'workEntry'}],
+          weak: true,
         }),
       ],
     }),
