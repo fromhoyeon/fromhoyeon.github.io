@@ -1,7 +1,8 @@
 /*
   Portfolio media interaction overrides
   -------------------------------------
-  - Normalize every YouTube stage to the standard YouTube player controls.
+  - Keep YouTube clean before playback: thumbnail + play button only.
+  - After the user starts playback, normalize the iframe to standard YouTube controls.
   - Keep consecutive YouTube blocks visually close without merging them.
   - Remove the work-gallery Close button. Desktop gallery lightboxes close with Esc;
     touch devices keep backdrop closing because they do not have an Escape key.
@@ -66,38 +67,31 @@
   function normalizeYouTubeStage(stage){
     if (!(stage instanceof Element) || !stage.classList.contains('yt-stage')) return;
 
+    // Before playback, keep the renderer's clean poster shell exactly as-is.
+    // Once the user taps it, the renderer inserts an iframe and the observer below
+    // upgrades only that iframe to the stable native YouTube player controls.
+    if (stage.querySelector(':scope > .yt-poster')) return;
+
+    const currentIframe = stage.querySelector(':scope > iframe');
+    if (!currentIframe) return;
+
     const videoId = youtubeIdFromStage(stage);
     if (!videoId) return;
 
-    const currentIframe = stage.querySelector(':scope > iframe');
-    if (currentIframe) {
-      let autoplay = false;
-      try {
-        autoplay = new URL(currentIframe.src, window.location.href).searchParams.get('autoplay') === '1';
-      } catch (error) {
-        autoplay = false;
-      }
-
-      const desiredSrc = standardEmbedUrl(videoId, autoplay);
-      if (currentIframe.src !== desiredSrc) currentIframe.src = desiredSrc;
-      currentIframe.title ||= 'YouTube video player';
-      currentIframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
-      currentIframe.referrerPolicy = 'strict-origin-when-cross-origin';
-      currentIframe.setAttribute('allowfullscreen', '');
-      currentIframe.dataset.standardYoutubePlayer = 'true';
-      return;
+    let autoplay = false;
+    try {
+      autoplay = new URL(currentIframe.src, window.location.href).searchParams.get('autoplay') === '1';
+    } catch (error) {
+      autoplay = false;
     }
 
-    // Replace custom poster/play-button shells with the stable native YouTube player.
-    const iframe = document.createElement('iframe');
-    iframe.src = standardEmbedUrl(videoId, false);
-    iframe.title = stage.getAttribute('aria-label') || 'YouTube video player';
-    iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
-    iframe.referrerPolicy = 'strict-origin-when-cross-origin';
-    iframe.loading = 'lazy';
-    iframe.setAttribute('allowfullscreen', '');
-    iframe.dataset.standardYoutubePlayer = 'true';
-    stage.replaceChildren(iframe);
+    const desiredSrc = standardEmbedUrl(videoId, autoplay);
+    if (currentIframe.src !== desiredSrc) currentIframe.src = desiredSrc;
+    currentIframe.title ||= 'YouTube video player';
+    currentIframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    currentIframe.referrerPolicy = 'strict-origin-when-cross-origin';
+    currentIframe.setAttribute('allowfullscreen', '');
+    currentIframe.dataset.standardYoutubePlayer = 'true';
   }
 
   function tuneGalleryLightbox(lightbox){
