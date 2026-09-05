@@ -1,7 +1,7 @@
 /*
   Keep every photography shuffle path on the active Sanity photo pool.
-  The inline prototype still contains a small local sample list as an offline fallback,
-  so this layer overrides shuffle behavior only when the remote pool is available.
+  The local sample list remains only inside the old prototype source for layout testing;
+  it is never used as a public fallback.
 */
 
 (function installRemotePhotoPoolControls(){
@@ -11,9 +11,17 @@
   if (!window.SANITY_CONTENT?.isEnabled?.() || typeof window.SANITY_CONTENT.fetchPortfolioPhotos !== 'function') return;
   if (typeof createPhotoSet !== 'function' || typeof reshuffleFromLightboxEnd !== 'function') return;
 
-  const localCreatePhotoSet = createPhotoSet;
-  const localReshuffleFromLightboxEnd = reshuffleFromLightboxEnd;
   let remotePoolPromise = null;
+
+  function ensureStyles(){
+    if (document.querySelector('#photo-pool-offline-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'photo-pool-offline-styles';
+    style.textContent = `
+      .photo-pool-offline{min-height:120px;display:grid;place-items:center;border:1px solid var(--line);color:var(--muted);font-size:10px;letter-spacing:.04em;text-transform:uppercase}
+    `;
+    document.head.appendChild(style);
+  }
 
   function identity(item){
     if (!item) return '';
@@ -58,9 +66,30 @@
     return Math.max(1, Math.min(currentCount, poolLength));
   }
 
+  function clearLocalSelection(){
+    photos = [];
+    lightboxIndex = -1;
+    photoGrid?.replaceChildren();
+    if (lightbox?.classList.contains('is-open')) closeLightbox?.();
+  }
+
+  function showUnavailable(){
+    clearLocalSelection();
+    if (shufflePhotos) shufflePhotos.disabled = true;
+    if (!photoGrid) return;
+    const offline = document.createElement('div');
+    offline.className = 'photo-pool-offline';
+    offline.textContent = 'OFFLINE';
+    photoGrid.replaceChildren(offline);
+    photoGrid.dataset.photoPoolState = 'offline';
+  }
+
   async function renderRemoteSelection({preservePosition=false}={}){
     const pool = await remotePool();
-    if (!pool.length) return false;
+    if (!pool.length) {
+      showUnavailable();
+      return false;
+    }
     if (photoShuffleInProgress) return true;
 
     photoShuffleInProgress = true;
@@ -72,6 +101,7 @@
       const count = requestedCount(pool.length);
       photos = shuffled(pool).slice(0, count);
       lightboxIndex = -1;
+      delete photoGrid.dataset.photoPoolState;
       layoutPhotos();
       restoreGalleryViewport(anchorTop);
       return true;
@@ -83,12 +113,11 @@
 
   createPhotoSet = async function(options={}){
     try {
-      const handled = await renderRemoteSelection(options);
-      if (handled) return;
+      await renderRemoteSelection(options);
     } catch (error) {
-      console.warn('[Photography] Remote shuffle unavailable; using local fallback.', error);
+      console.warn('[Photography] Remote photo pool unavailable.', error);
+      showUnavailable();
     }
-    return localCreatePhotoSet(options);
   };
 
   reshuffleFromLightboxEnd = async function(){
@@ -100,10 +129,14 @@
     try {
       pool = await remotePool();
     } catch (error) {
-      console.warn('[Photography] Remote end shuffle unavailable; using local fallback.', error);
-      return localReshuffleFromLightboxEnd();
+      console.warn('[Photography] Remote end shuffle unavailable.', error);
+      showUnavailable();
+      return;
     }
-    if (!pool.length) return localReshuffleFromLightboxEnd();
+    if (!pool.length) {
+      showUnavailable();
+      return;
+    }
 
     photoShuffleInProgress = true;
     shufflePhotos.disabled = true;
@@ -139,15 +172,22 @@
   };
 
   // The prototype and the Sanity bridge both registered click handlers historically.
-  // Capture the click first so only the unified createPhotoSet path runs once.
+  // Capture the click first so only the remote-pool path runs once.
   shufflePhotos.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopImmediatePropagation();
     createPhotoSet({preservePosition:true});
   }, {capture:true});
 
-  // Warm the pool so the first user shuffle is immediate in normal conditions.
-  remotePool().catch((error) => {
-    console.warn('[Photography] Could not warm remote photo pool.', error);
+  ensureStyles();
+
+  // Erase any local sample selection created by the legacy inline prototype before
+  // attempting the canonical Sanity pool.
+  clearLocalSelection();
+  shufflePhotos.disabled = true;
+
+  renderRemoteSelection().catch((error) => {
+    console.warn('[Photography] Could not load remote photo pool.', error);
+    showUnavailable();
   });
 })();
