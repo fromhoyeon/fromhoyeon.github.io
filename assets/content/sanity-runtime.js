@@ -199,7 +199,7 @@
       .map((item) => ({
         ...item,
         file: item.filename || item.title || item._id,
-        src: imageUrl(item.url, 1200, 72, 1200),
+        src: imageUrl(item.url, 1000, 70, 1000),
         fullSrc: imageUrl(item.url, 1800, 80, 1800)
       }));
   }
