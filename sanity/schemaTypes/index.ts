@@ -1,7 +1,7 @@
 import {siteCopy} from './siteCopy'
 import {siteNavigation} from './siteNavigation'
+import {tag} from './tag'
 import {portfolioPhoto} from './portfolioPhoto'
-import {contentEntry} from './contentEntry'
 import {
   workGalleryBlock,
   workGalleryImage,
@@ -15,8 +15,8 @@ import {homePage} from './homePage'
 export const schemaTypes = [
   siteCopy,
   siteNavigation,
+  tag,
   portfolioPhoto,
-  contentEntry,
   workVideoBlock,
   workTextBlock,
   workGalleryImage,
