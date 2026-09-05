@@ -150,13 +150,9 @@
     if (title) title.textContent = work.title || '';
 
     if (meta) {
-      let lines = Array.isArray(work.metaLines) ? [...work.metaLines] : [];
-      if (work.mediaType === 'photoCollection' && Number.isFinite(currentPhotoPoolTotal)) {
-        const total = currentPhotoPoolTotal;
-        const count = Math.min(Number(work.photoCount) || 12, total);
-        lines = [`${count} / ${total} IMAGES`, ...lines];
-      }
-      meta.innerHTML = lines.map((line) => String(line)).join('<br>');
+      const period = typeof work.period === 'string' ? work.period.trim() : '';
+      meta.textContent = period;
+      meta.hidden = !period;
     }
   }
 
@@ -447,11 +443,11 @@
     const title = document.createElement('span');
     title.textContent = work.title || '';
 
-    const year = document.createElement('span');
-    year.className = 'year';
-    year.textContent = work.yearLabel || '';
+    const period = document.createElement('span');
+    period.className = 'year';
+    period.textContent = work.period || '';
 
-    link.append(num, title, year);
+    link.append(num, title, period);
     return link;
   }
 
