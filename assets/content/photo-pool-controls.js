@@ -19,6 +19,7 @@
     style.id = 'photo-pool-offline-styles';
     style.textContent = `
       .photo-pool-offline{min-height:120px;display:grid;place-items:center;border:1px solid var(--line);color:var(--muted);font-size:10px;letter-spacing:.04em;text-transform:uppercase}
+      .photo-actions{justify-content:center!important}
     `;
     document.head.appendChild(style);
   }
