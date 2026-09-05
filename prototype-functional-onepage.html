@@ -15,6 +15,12 @@
       --muted:#6a6a66;
       --line:#bdbdb7;
       --panel:#d8d8d1;
+      --accent-blue:#2458d3;
+      --accent-blue-deep:#173f9f;
+      --accent-blue-soft:#edf3ff;
+      --accent-green:#2f855a;
+      --accent-green-deep:#20683f;
+      --accent-green-soft:#edf8f1;
       --content:680px;
       --wide:1080px;
       --video:900px;
@@ -68,16 +74,19 @@
     .photo-cell img{width:100%;height:100%;object-fit:cover;display:block}
     .photo-cell:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
     .photo-actions{display:flex;justify-content:flex-end;gap:var(--m);align-items:center;margin-top:var(--m)}
-    #shuffle-photos{padding:8px 11px 7px;border-color:var(--fg);background:var(--fg);color:var(--bg);font-size:11px;font-weight:600;letter-spacing:.04em}
-    #shuffle-photos:hover,#shuffle-photos:focus-visible{background:transparent;color:var(--fg)}
+    #shuffle-photos{padding:8px 11px 7px;border-color:var(--accent-blue);background:var(--accent-blue);color:#fff;font-size:11px;font-weight:600;letter-spacing:.04em}
+    #shuffle-photos:hover,#shuffle-photos:focus-visible{border-color:var(--accent-blue-deep);background:var(--accent-blue-deep);color:#fff}
+    #shuffle-photos:focus-visible{outline:2px solid var(--accent-blue-soft);outline-offset:2px}
     #shuffle-photos:disabled{opacity:.45;cursor:wait}
 
     .lightbox{position:fixed;inset:0;z-index:100;display:none;place-items:center;padding:12px;background:#fff;cursor:default;touch-action:pan-y}
     .lightbox.is-open{display:grid}
     .lightbox img{display:block;max-width:calc(100vw - 24px);max-height:calc(100svh - 24px);width:auto;height:auto;object-fit:contain;cursor:grab;user-select:none;-webkit-user-drag:none}
     .lightbox-close{position:fixed;top:10px;right:10px;z-index:101;appearance:none;border:1px solid rgba(17,17,17,.72);background:rgba(255,255,255,.9);color:#111;padding:6px 8px 5px;font-size:10px;text-transform:uppercase;cursor:pointer}
-    .lightbox-status{position:fixed;left:50%;bottom:18px;z-index:102;transform:translate(-50%,8px);opacity:0;pointer-events:none;border:1px solid rgba(17,17,17,.45);background:rgba(255,255,255,.94);color:#111;padding:7px 9px 6px;font-size:10px;line-height:1.35;text-align:center;text-transform:uppercase;letter-spacing:.03em;white-space:pre-line;transition:opacity .16s ease,transform .16s ease}
+    .lightbox-status{position:fixed;left:50%;bottom:18px;z-index:102;transform:translate(-50%,8px);opacity:0;pointer-events:none;border:1px solid rgba(17,17,17,.45);background:rgba(255,255,255,.94);color:#111;padding:7px 9px 6px;font-size:10px;line-height:1.35;text-align:center;text-transform:uppercase;letter-spacing:.03em;white-space:pre-line;transition:opacity .16s ease,transform .16s ease,background-color .16s ease,border-color .16s ease,color .16s ease}
     .lightbox-status.is-visible{opacity:1;transform:translate(-50%,0)}
+    .lightbox-status.is-info{border-color:var(--accent-blue);background:var(--accent-blue-soft);color:var(--accent-blue-deep)}
+    .lightbox-status.is-success{border-color:var(--accent-green);background:var(--accent-green-soft);color:var(--accent-green-deep)}
 
     .live-breakout{width:min(calc(100vw - 24px),var(--wide));margin-left:50%;transform:translateX(-50%)}
     .live-stage{width:100%;height:clamp(420px,70vh,720px);position:relative;overflow:hidden;background:#111;border:1px solid var(--line);touch-action:pan-y}
@@ -321,10 +330,13 @@
       });
     }
 
-    function showLightboxMessage(message,duration=1500){
+    function showLightboxMessage(message,duration=1500,tone='neutral'){
       if(!lightboxStatus) return;
       clearTimeout(lightboxStatusTimer);
       lightboxStatus.textContent=message;
+      lightboxStatus.classList.remove('is-info','is-success');
+      if(tone==='info') lightboxStatus.classList.add('is-info');
+      if(tone==='success') lightboxStatus.classList.add('is-success');
       lightboxStatus.classList.add('is-visible');
       lightboxStatusTimer=setTimeout(()=>{
         lightboxStatus.classList.remove('is-visible');
@@ -335,7 +347,7 @@
       clearTimeout(lightboxStatusTimer);
       lightboxStatusTimer=null;
       if(!lightboxStatus) return;
-      lightboxStatus.classList.remove('is-visible');
+      lightboxStatus.classList.remove('is-visible','is-info','is-success');
       lightboxStatus.textContent='';
     }
 
@@ -467,7 +479,7 @@
       photoShuffleInProgress=true;
       shufflePhotos.disabled=true;
       const anchorTop=photoGrid.getBoundingClientRect().top;
-      showLightboxMessage('Last image\nShuffling selection…',2200);
+      showLightboxMessage('Last image\nShuffling selection…',2200,'info');
 
       try{
         const candidateFiles=photoFiles.filter(file=>file!==current.file);
@@ -486,7 +498,7 @@
         if(lightbox.classList.contains('is-open')){
           lightboxIndex=0;
           showLightboxIndex(0);
-          showLightboxMessage(`Last image\nSelection shuffled · 1 / ${photos.length}`,1800);
+          showLightboxMessage(`Last image\nSelection shuffled · 1 / ${photos.length}`,1800,'success');
         }else{
           lightboxIndex=-1;
         }
