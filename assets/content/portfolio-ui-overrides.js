@@ -6,7 +6,7 @@
   - After playback starts, use the standard YouTube controls and fullscreen button.
   - Keep consecutive YouTube blocks visually close without merging them.
   - Keep Portfolio Item gallery image backgrounds unchanged in-page.
-  - Use a translucent backdrop only for the Portfolio Item gallery lightbox so the page remains faintly visible behind enlarged reference images.
+  - Use a theme-aware translucent backdrop for the Portfolio Item gallery lightbox.
   - Remove the work-gallery Close button. Desktop gallery lightboxes close with Esc;
     touch devices keep backdrop closing because they do not have an Escape key.
 */
@@ -24,7 +24,10 @@
         background:var(--panel) !important;
       }
       #work-gallery-lightbox{
-        background:rgba(255,255,255,.88) !important;
+        background:rgba(255,255,255,.80) !important;
+      }
+      :root[data-site-theme="black"] #work-gallery-lightbox{
+        background:rgba(0,0,0,.80) !important;
       }
       .sanity-content-block[data-block-type="workVideoBlock"] +
       .sanity-content-block[data-block-type="workVideoBlock"]{
