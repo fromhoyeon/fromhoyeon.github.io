@@ -8,7 +8,9 @@ export const portfolioPhoto = defineType({
     defineField({name: 'title', title: 'Internal title', type: 'string'}),
     defineField({
       name: 'image',
-      title: 'Image',
+      title: 'Public image',
+      description:
+        'Public website asset. Add new portfolio photographs with scripts/import-portfolio-photos.ps1 so private metadata is archived separately and the uploaded image is sanitized first.',
       type: 'image',
       options: {hotspot: true},
       validation: (rule) => rule.required(),
