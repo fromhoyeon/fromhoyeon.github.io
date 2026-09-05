@@ -224,6 +224,11 @@
     loadScriptOnce('assets/content/presentation-controls.js?v=20260903-2', 'data-presentation-controls');
   }
 
+  function loadPhotoPoolControls(){
+    if (!isEnabled() || config.features?.portfolioPhotos === false) return;
+    loadScriptOnce('assets/content/photo-pool-controls.js?v=20260905-1', 'data-photo-pool-controls');
+  }
+
   function observePhotoGridWidth(){
     if (typeof ResizeObserver !== 'function') return;
     const grid = document.querySelector('#photo-grid');
@@ -266,6 +271,7 @@
     loadGalleryLayout();
     loadYouTubeCustomUi();
     loadPresentationControls();
+    loadPhotoPoolControls();
     observePhotoGridWidth();
   };
 
