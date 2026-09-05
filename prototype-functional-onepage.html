@@ -88,7 +88,7 @@
     .lightbox-status.is-success{border-color:var(--accent-green);background:var(--accent-green-soft);color:var(--accent-green-deep)}
 
     .live-breakout{width:min(calc(100vw - 24px),var(--wide));margin-left:50%;transform:translateX(-50%)}
-    .live-stage{width:100%;height:clamp(420px,70vh,720px);position:relative;overflow:hidden;background:#b9bcc1;border:1px solid #96999e;touch-action:pan-y}
+    .live-stage{width:100%;height:clamp(420px,70vh,720px);position:relative;overflow:hidden;background:transparent;border:0;touch-action:pan-y}
     .live-frame{width:100%;height:100%;display:block;border:0;background:#000}
     .live-gate{position:absolute;inset:8px;display:grid;place-items:center;background:#292d32;color:#fff;pointer-events:none;touch-action:pan-y}
     .live-gate-inner{width:min(calc(100% - 32px),420px);display:grid;gap:18px}
@@ -96,10 +96,7 @@
     .live-gate-title{font-size:clamp(24px,5vw,38px);line-height:1;font-weight:600;letter-spacing:-.035em}
     .live-gate-actions{display:flex;flex-wrap:wrap;gap:8px;pointer-events:auto}
     .live-gate .action{border-color:rgba(255,255,255,.72);color:#fff;background:rgba(0,0,0,.12)}
-    .live-gate .action:hover{background:#fff;color:#111}
-    #dodrei-play-here{border-color:var(--accent-blue);background:var(--accent-blue);color:#fff;font-weight:600}
-    #dodrei-play-here:hover,#dodrei-play-here:focus-visible{border-color:var(--accent-blue-deep);background:var(--accent-blue-deep);color:#fff}
-    #dodrei-play-here:focus-visible{outline:2px solid var(--accent-blue-soft);outline-offset:2px}
+    .live-gate .action:hover,.live-gate .action:focus-visible{background:#fff;color:#111}
 
     .video-breakout{width:min(calc(100vw - 24px),var(--video));margin-left:50%;transform:translateX(-50%)}
     .yt-stage{position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden}
@@ -133,7 +130,7 @@
       .description{grid-template-columns:1fr}
       .description .action{justify-self:start}
       .photo-breakout,.live-breakout,.video-breakout{width:100vw}
-      .live-stage{height:72svh;border-left:0;border-right:0}
+      .live-stage{height:72svh}
       .live-gate{inset:7px}
       .live-gate-inner{width:calc(100% - 28px)}
       .live-gate-actions{display:grid;grid-template-columns:1fr 1fr}
@@ -223,8 +220,8 @@
               <div class="live-gate-label">Interactive browser work / touch to choose playback</div>
               <div class="live-gate-title">DODREI</div>
               <div class="live-gate-actions">
-                <button class="action" id="dodrei-play-here" type="button">여기서 재생</button>
-                <a class="action" href="https://fromhoyeon.github.io/dodrei/web/" target="_blank" rel="noopener">새 창으로 재생 ↗</a>
+                <button class="action" id="dodrei-play-here" type="button">Play here</button>
+                <a class="action" href="https://fromhoyeon.github.io/dodrei/web/" target="_blank" rel="noopener">Open in new window ↗</a>
               </div>
             </div>
           </div>
