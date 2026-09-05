@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Hoyeon Choi — Functional One Page Prototype</title>
-  <meta name="description" content="One-page portfolio layout prototype for Hoyeon Choi.">
+  <title>Hoyeon Choi</title>
+  <meta name="description" content="Portfolio of Hoyeon Choi.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -147,79 +147,67 @@
 <body>
   <header class="topbar">
     <div class="shell">
-      <a class="brand" href="#top">HOYEON CHOI</a>
-      <nav class="nav" aria-label="Primary">
-        <a href="#work">Work</a>
-        <a href="#about">About</a>
-        <a href="#links">Links</a>
-      </nav>
+      <a class="brand" href="#top"></a>
+      <nav class="nav" aria-label="Primary"></nav>
     </div>
   </header>
 
   <main id="top">
     <section class="shell intro">
-      <h1>Selected work across image, sound, performance and code.</h1>
+      <h1></h1>
       <div class="intro-copy">
-        <p>This prototype keeps the information column narrow and lets media expand only when the content benefits from it.</p>
-        <span>SEOUL / 2026<br>SELECTED WORKS</span>
+        <p></p>
       </div>
     </section>
 
-    <nav class="shell index" id="work" aria-label="Work index">
-      <a href="#dual"><span class="num">01</span><span>Dual Conversation</span><span class="year">2023–</span></a>
-      <a href="#photo"><span class="num">02</span><span>Selected Photography</span><span class="year">2024–26</span></a>
-      <a href="#dodrei"><span class="num">03</span><span>DODREI</span><span class="year">2026</span></a>
-      <a href="#moving"><span class="num">04</span><span>Moving Image</span><span class="year">2024–26</span></a>
-    </nav>
+    <nav class="shell index" id="work" aria-label="Work index"></nav>
 
-    <section class="shell work" id="dual">
+    <section class="shell work" id="dual" hidden>
       <header class="work-head">
-        <span class="num">01</span>
-        <h2 class="work-title">Dual Conversation</h2>
-        <div class="work-meta">ONGOING<br>MOVING IMAGE / SOUND</div>
+        <span class="num"></span>
+        <h2 class="work-title"></h2>
+        <div class="work-meta"></div>
       </header>
       <div class="video-breakout">
-        <div class="yt-stage" data-youtube-stage="dual" aria-label="Dual Conversation video"></div>
+        <div class="yt-stage" data-youtube-stage="dual" aria-label="Video"></div>
       </div>
       <div class="description">
-        <p>A long-running audiovisual work built from accumulated moving-image fragments, playback systems and changing relationships between image and sound.</p>
-        <a class="action" data-youtube-action="dual" href="#">View project ↗</a>
+        <p></p>
+        <a class="action" data-youtube-action="dual" href="#" hidden></a>
       </div>
-      <div class="small-strip">
-        <span class="tag">TouchDesigner</span><span class="tag">Archive</span><span class="tag">Performance</span>
-      </div>
+      <div class="small-strip" hidden></div>
     </section>
 
-    <section class="shell work" id="photo">
+    <section class="shell work" id="photo" hidden>
       <header class="work-head">
-        <span class="num">02</span>
-        <h2 class="work-title">Selected Photography</h2>
-        <div class="work-meta">12 / 19 IMAGES<br>NO CROP</div>
+        <span class="num"></span>
+        <h2 class="work-title"></h2>
+        <div class="work-meta"></div>
       </header>
       <div class="photo-breakout">
-        <div class="photo-grid" id="photo-grid" aria-label="Mixed-ratio selected photography"></div>
+        <div class="photo-grid" id="photo-grid" aria-label="Selected photography"></div>
       </div>
       <div class="photo-actions">
         <button class="action" id="shuffle-photos" type="button">Shuffle selection</button>
       </div>
       <div class="description">
-        <p>Twelve images are picked from the sample pool on each shuffle. Their real dimensions determine the justified rows, without cropping the source ratio.</p>
-        <a class="action" href="#">More photographs ↗</a>
+        <p></p>
+        <a class="action" href="#" hidden></a>
       </div>
     </section>
 
-    <section class="shell work" id="dodrei">
+    <section class="shell work" id="dodrei" hidden>
       <header class="work-head">
-        <span class="num">03</span>
-        <h2 class="work-title">DODREI</h2>
-        <div class="work-meta">2026<br>LIVE WEB WORK</div>
+        <span class="num"></span>
+        <h2 class="work-title"></h2>
+        <div class="work-meta"></div>
       </header>
       <div class="live-breakout">
         <div class="live-stage" id="dodrei-stage">
           <div class="live-gate" id="dodrei-gate">
             <div class="live-gate-inner">
               <div class="live-gate-label">Interactive browser work / touch to choose playback</div>
-              <div class="live-gate-title">DODREI</div>
+              <div class="live-gate-title"></div>
               <div class="live-gate-actions">
                 <button class="action" id="dodrei-play-here" type="button">Play here</button>
                 <a class="action" href="https://fromhoyeon.github.io/dodrei/web/" target="_blank" rel="noopener">Open in new window ↗</a>
@@ -229,41 +217,37 @@
         </div>
       </div>
       <div class="description">
-        <p>The actual browser work can be loaded into this page on demand or opened in a separate window.</p>
-        <a class="action" href="https://fromhoyeon.github.io/dodrei/web/" target="_blank" rel="noopener">Open work ↗</a>
+        <p></p>
+        <a class="action" href="#" hidden></a>
       </div>
     </section>
 
-    <section class="shell work" id="moving">
+    <section class="shell work" id="moving" hidden>
       <header class="work-head">
-        <span class="num">04</span>
-        <h2 class="work-title">Moving Image</h2>
-        <div class="work-meta">VIDEO<br>16:9</div>
+        <span class="num"></span>
+        <h2 class="work-title"></h2>
+        <div class="work-meta"></div>
       </header>
       <div class="video-breakout">
-        <div class="yt-stage" data-youtube-stage="moving" aria-label="Moving image video"></div>
+        <div class="yt-stage" data-youtube-stage="moving" aria-label="Video"></div>
       </div>
       <div class="description">
-        <p>The initial view uses the unmodified YouTube thumbnail plus a play control. After playback starts, the official embedded player loads with its standard controls hidden where YouTube currently allows.</p>
-        <a class="action" data-youtube-action="moving" href="#">YouTube ↗</a>
+        <p></p>
+        <a class="action" data-youtube-action="moving" href="#" hidden></a>
       </div>
     </section>
 
     <section class="shell about" id="about">
-      <h2>About</h2>
+      <h2></h2>
       <div class="about-grid">
-        <div><p class="label">Practice</p><p>Jazz guitar, moving image, photography, performance, browser-based work and interactive systems.</p></div>
-        <div><p class="label">Rule</p><p>Use space because the content needs it. Keep the number of visual elements small, then repeat them consistently.</p></div>
+        <div><p class="label"></p><p></p></div>
+        <div><p class="label"></p><p></p></div>
       </div>
     </section>
 
     <section class="shell" id="links">
-      <div class="links">
-        <a href="https://www.instagram.com/hoyeon.choi/" target="_blank" rel="noopener"><span>Instagram / Photography</span><span>↗</span></a>
-        <a href="#"><span>YouTube / Moving Image + Performance</span><span>↗</span></a>
-        <a href="#"><span>GitHub / Web + Code</span><span>↗</span></a>
-      </div>
-      <footer><span>© 2026 Hoyeon Choi</span><span>PROTOTYPE / NOT FINAL</span></footer>
+      <div class="links"></div>
+      <footer><span></span><span></span></footer>
     </section>
   </main>
 
@@ -272,19 +256,10 @@
     <div class="lightbox-status" id="lightbox-status" role="status" aria-live="polite"></div>
   </div>
 
-  <script src="assets/content/site-copy.js"></script>
+  <script src="assets/content/site-copy.js?v=20260905-2"></script>
   <script src="assets/content/sanity-config.js"></script>
-  <script src="assets/content/sanity-runtime.js"></script>
+  <script src="assets/content/sanity-runtime.js?v=20260905-4"></script>
   <script>
-    const photoBase = 'assets/prototypes/photo-samples/';
-    const photoFiles = [
-      'A7C01836.jpg','A7C02050.jpg','A7C02995.jpg','A7C03341.jpg',
-      'A7C07098.jpg','A7C07210.jpg','AC200900.jpg','AC201098.jpg',
-      'AC202959.jpg','AC202986.jpg','AC203108.jpg','AC203565.jpg',
-      'AC203732.jpg','AC203810.jpg','AC207961.jpg','AC208741.jpg',
-      'AC208858.jpg','AC209511.jpg','AC209732.jpg'
-    ];
-
     const photoGrid = document.querySelector('#photo-grid');
     const shufflePhotos = document.querySelector('#shuffle-photos');
     const lightbox = document.querySelector('#photo-lightbox');
@@ -305,15 +280,6 @@
         [copy[i],copy[j]]=[copy[j],copy[i]];
       }
       return copy;
-    }
-
-    function loadPhoto(file){
-      return new Promise((resolve,reject)=>{
-        const img=new Image();
-        img.onload=()=>resolve({file,src:photoBase+file,ratio:img.naturalWidth/img.naturalHeight,width:img.naturalWidth,height:img.naturalHeight});
-        img.onerror=reject;
-        img.src=photoBase+file;
-      });
     }
 
     function restoreGalleryViewport(anchorTop){
@@ -350,24 +316,8 @@
       lightboxStatus.textContent='';
     }
 
-    async function createPhotoSet({preservePosition=false}={}){
-      if(photoShuffleInProgress) return;
-      photoShuffleInProgress=true;
-      shufflePhotos.disabled=true;
-      if(preservePosition) shufflePhotos.blur();
-      const anchorTop=preservePosition?photoGrid.getBoundingClientRect().top:null;
-      try{
-        const selection=shuffled(photoFiles).slice(0,12);
-        const loaded=await Promise.allSettled(selection.map(loadPhoto));
-        photos=loaded.filter(item=>item.status==='fulfilled').map(item=>item.value);
-        lightboxIndex=-1;
-        layoutPhotos();
-        restoreGalleryViewport(anchorTop);
-      }finally{
-        shufflePhotos.disabled=false;
-        photoShuffleInProgress=false;
-      }
-    }
+    // Public photography is populated only by the Sanity photo-pool controller.
+    async function createPhotoSet(){ return false; }
 
     function desiredRowHeight(width){
       if(width<420) return 118;
@@ -430,10 +380,10 @@
           cell.type='button';
           cell.style.width=`${item.ratio*rowHeight}px`;
           cell.style.height=`${rowHeight}px`;
-          cell.setAttribute('aria-label',`Enlarge ${item.file}`);
+          cell.setAttribute('aria-label',`Enlarge ${item.file||item.title||'photograph'}`);
           const img=document.createElement('img');
           img.src=item.src;
-          img.alt='';
+          img.alt=item.alt||'';
           img.loading='lazy';
           img.decoding='async';
           cell.appendChild(img);
@@ -469,42 +419,8 @@
       document.body.classList.add('lightbox-open');
     }
 
-    async function reshuffleFromLightboxEnd(){
-      if(photoShuffleInProgress||!photos.length) return;
-      const current=photos[lightboxIndex];
-      if(!current) return;
-
-      photoShuffleInProgress=true;
-      shufflePhotos.disabled=true;
-      const anchorTop=photoGrid.getBoundingClientRect().top;
-      showLightboxMessage('Last image\nShuffling selection…',2200,'info');
-
-      try{
-        const candidateFiles=photoFiles.filter(file=>file!==current.file);
-        const selection=shuffled(candidateFiles).slice(0,11);
-        const loaded=await Promise.allSettled(selection.map(loadPhoto));
-        const nextPhotos=[current,...loaded.filter(item=>item.status==='fulfilled').map(item=>item.value)];
-        if(nextPhotos.length<2){
-          showLightboxMessage('Last image\nShuffle unavailable',1800);
-          return;
-        }
-
-        photos=nextPhotos;
-        layoutPhotos();
-        restoreGalleryViewport(anchorTop);
-
-        if(lightbox.classList.contains('is-open')){
-          lightboxIndex=0;
-          showLightboxIndex(0);
-          showLightboxMessage(`Last image\nSelection shuffled · 1 / ${photos.length}`,1800,'success');
-        }else{
-          lightboxIndex=-1;
-        }
-      }finally{
-        shufflePhotos.disabled=false;
-        photoShuffleInProgress=false;
-      }
-    }
+    // Replaced by photo-pool-controls.js once the canonical Sanity pool is available.
+    async function reshuffleFromLightboxEnd(){ return false; }
 
     function stepLightbox(direction){
       if(!lightbox.classList.contains('is-open')||!photos.length) return;
@@ -564,111 +480,7 @@
       if(event.key==='ArrowLeft') stepLightbox(-1);
     });
     window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(layoutPhotos,90)});
-    createPhotoSet();
-
-    const dodreiUrl='https://fromhoyeon.github.io/dodrei/web/';
-    const dodreiStage=document.querySelector('#dodrei-stage');
-    const dodreiPlayHere=document.querySelector('#dodrei-play-here');
-    dodreiPlayHere.addEventListener('click',()=>{
-      if(dodreiStage.querySelector('iframe')) return;
-      const iframe=document.createElement('iframe');
-      iframe.className='live-frame';
-      iframe.src=dodreiUrl;
-      iframe.title='DODREI live browser work';
-      iframe.allow='autoplay; fullscreen';
-      iframe.setAttribute('allowfullscreen','');
-      dodreiStage.replaceChildren(iframe);
-    });
-
-    function extractYouTubeId(value){
-      if(!value||typeof value!=='string') return '';
-      try{
-        const url=new URL(value);
-        const host=url.hostname.replace(/^www\./,'');
-        if(host==='youtu.be') return url.pathname.split('/').filter(Boolean)[0]||'';
-        if(host==='youtube.com'||host==='m.youtube.com'||host==='music.youtube.com'){
-          if(url.searchParams.get('v')) return url.searchParams.get('v');
-          const parts=url.pathname.split('/').filter(Boolean);
-          const marker=parts.findIndex(part=>part==='embed'||part==='shorts'||part==='live');
-          if(marker>=0&&parts[marker+1]) return parts[marker+1];
-        }
-      }catch(error){
-        return '';
-      }
-      return '';
-    }
-
-    function renderYouTubeWork(key){
-      const stage=document.querySelector(`[data-youtube-stage="${key}"]`);
-      const action=document.querySelector(`[data-youtube-action="${key}"]`);
-      const work=window.SITE_COPY?.[key]||{};
-      const url=work.youtubeUrl||'';
-      const videoId=extractYouTubeId(url);
-
-      if(action){
-        if(url){
-          action.href=url;
-          action.target='_blank';
-          action.rel='noopener';
-          action.removeAttribute('aria-disabled');
-        }else{
-          action.href='#';
-          action.setAttribute('aria-disabled','true');
-        }
-      }
-
-      if(!stage) return;
-      if(stage.dataset.videoId===videoId&&stage.childElementCount) return;
-      stage.dataset.videoId=videoId;
-      stage.innerHTML='';
-
-      if(!videoId){
-        const empty=document.createElement('div');
-        empty.className='yt-empty';
-        empty.textContent='YouTube URL not set';
-        stage.appendChild(empty);
-        return;
-      }
-
-      const poster=document.createElement('button');
-      poster.className='yt-poster';
-      poster.type='button';
-      poster.setAttribute('aria-label',`Play ${work.title||'video'}`);
-
-      const image=document.createElement('img');
-      image.src=`https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
-      image.alt='YouTube video thumbnail';
-      image.onerror=()=>{
-        image.onerror=null;
-        image.src=`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
-      };
-
-      const play=document.createElement('span');
-      play.className='yt-play';
-      play.setAttribute('aria-hidden','true');
-      play.textContent='▶';
-      poster.append(image,play);
-
-      poster.addEventListener('click',()=>{
-        const iframe=document.createElement('iframe');
-        iframe.title=`${work.title||'YouTube'} video player`;
-        iframe.src=`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&controls=0&rel=0&playsinline=1&iv_load_policy=3&disablekb=1&fs=0`;
-        iframe.allow='autoplay; encrypted-media; picture-in-picture';
-        iframe.referrerPolicy='strict-origin-when-cross-origin';
-        stage.replaceChildren(iframe);
-      });
-
-      stage.appendChild(poster);
-    }
-
-    function syncMediaSources(){
-      renderYouTubeWork('dual');
-      renderYouTubeWork('moving');
-    }
-
-    window.addEventListener('sitecopychange',syncMediaSources);
-    syncMediaSources();
   </script>
-  <script src="assets/content/sanity-prototype-bridge.js"></script>
+  <script src="assets/content/sanity-prototype-bridge.js?v=20260905-2"></script>
 </body>
 </html>
