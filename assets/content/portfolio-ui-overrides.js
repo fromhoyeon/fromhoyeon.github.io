@@ -135,6 +135,7 @@
 
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
+      if (mutation.target instanceof Element) inspect(mutation.target);
       mutation.addedNodes.forEach((node) => {
         if (node instanceof Element) inspect(node);
       });
