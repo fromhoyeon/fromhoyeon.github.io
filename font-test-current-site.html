@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="ko" data-site-theme="black">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Hoyeon Website · Font Test</title>
+  <meta name="description" content="Current-site typography comparison for IBM Plex Sans KR, Wanted Sans, SUIT and Pretendard.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/WantedSansVariable.min.css">
+  <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@main/fonts/variable/woff2/SUIT-Variable.css">
+
+  <style>
+    :root{
+      --bg:#fff;
+      --fg:#111;
+      --muted:#6a6a66;
+      --line:#bdbdb7;
+      --panel:#e6e6e6;
+      --topbar-bg:rgba(255,255,255,.96);
+      --content:680px;
+      --s:8px;
+      --m:16px;
+      --l:32px;
+      --xl:84px;
+    }
+    :root[data-site-theme="black"]{
+      --bg:#0b0b0b;
+      --fg:#f2f2ef;
+      --muted:#9a9a95;
+      --line:#41413f;
+      --panel:#20201f;
+      --topbar-bg:rgba(11,11,11,.96);
+    }
+    :root[data-site-theme="white"]{
+      --bg:#fff;
+      --fg:#111;
+      --muted:#6a6a66;
+      --line:#bdbdb7;
+      --panel:#e6e6e6;
+      --topbar-bg:rgba(255,255,255,.96);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;background:var(--bg)}
+    body{margin:0;background:var(--bg);color:var(--fg);font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.35;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:break-word}
+    a{color:inherit;text-decoration:none}
+    button{font:inherit;color:inherit}
+    p,h1,h2,h3{margin:0}
+    .shell{width:min(calc(100% - 24px),var(--content));margin:0 auto}
+
+    .topbar{position:sticky;top:0;z-index:20;background:var(--topbar-bg);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+    .topbar .shell{min-height:44px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:var(--m)}
+    .brand{font-size:13px;font-weight:700;letter-spacing:-.02em}
+    .controls{display:flex;align-items:center;gap:6px}
+    .controls a,.controls button{appearance:none;border:1px solid var(--line);background:transparent;color:var(--fg);padding:5px 7px 4px;font-size:10px;text-transform:uppercase;cursor:pointer}
+    .controls button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+
+    .intro{padding:var(--l) 0 var(--xl);display:grid;gap:var(--l)}
+    .intro h1{max-width:620px;font-family:Arial,Helvetica,sans-serif;font-size:clamp(32px,5.5vw,50px);line-height:1;letter-spacing:-.05em;font-weight:500}
+    .intro-copy{display:grid;grid-template-columns:1fr auto;gap:var(--m);align-items:end;padding-top:var(--m);border-top:1px solid var(--line)}
+    .intro-copy p{max-width:500px;font-size:13px}
+    .intro-copy span{font-size:10px;color:var(--muted);text-align:right;text-transform:uppercase}
+
+    .font-index{border-top:1px solid var(--fg);margin-bottom:var(--xl)}
+    .font-index a{display:grid;grid-template-columns:32px 1fr auto;gap:var(--m);align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px}
+    .font-index .num,.font-index .meta{font-size:10px;color:var(--muted);text-transform:uppercase}
+
+    .font-sample{padding:0 0 128px;scroll-margin-top:56px}
+    .font-sample.ibm{font-family:'IBM Plex Sans KR',Arial,Helvetica,sans-serif}
+    .font-sample.wanted{font-family:'Wanted Sans Variable','Wanted Sans',Arial,Helvetica,sans-serif}
+    .font-sample.suit{font-family:'SUIT Variable','SUIT',Arial,Helvetica,sans-serif}
+    .font-sample.pretendard{font-family:'Pretendard Variable','Pretendard',Arial,Helvetica,sans-serif}
+
+    .work-head{display:grid;grid-template-columns:32px 1fr auto;gap:var(--m);align-items:start;border-top:1px solid var(--fg);padding:10px 0 var(--m)}
+    .work-head .num{font-size:10px;color:var(--muted);text-transform:uppercase}
+    .work-title{font-size:24px;line-height:1;letter-spacing:-.035em;font-weight:700;white-space:pre-line}
+    .period{text-align:right;font-size:10px;line-height:1.4;color:var(--muted);text-transform:uppercase}
+
+    .mock-intro{padding:var(--l) 0;display:grid;gap:var(--l)}
+    .mock-intro h3{max-width:620px;font-size:clamp(32px,5.5vw,50px);line-height:1;letter-spacing:-.05em;font-weight:500;white-space:pre-line}
+    .mock-intro-row{display:grid;grid-template-columns:1fr auto;gap:var(--m);align-items:end;padding-top:var(--m);border-top:1px solid var(--line)}
+    .mock-intro-row .body15{max-width:500px;font-size:15px}
+    .mock-intro-row .nav11{font-size:11px;color:var(--muted);text-transform:uppercase;text-align:right}
+
+    .mock-index{border-top:1px solid var(--fg);margin:0 0 var(--l)}
+    .mock-index-row{display:grid;grid-template-columns:32px 1fr auto;gap:var(--m);align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px}
+    .mock-index-row .small10{font-size:10px;color:var(--muted)}
+
+    .media-placeholder{height:150px;background:var(--panel);display:grid;place-items:center;font-size:9px;color:var(--muted);letter-spacing:.02em;text-transform:uppercase}
+    .description{display:grid;grid-template-columns:1fr auto;gap:var(--m);align-items:start;padding-top:20px}
+    .description p{max-width:500px;font-size:13px}
+    .action{border:1px solid var(--fg);padding:6px 8px 5px;font-size:10px;text-transform:uppercase;white-space:nowrap;background:transparent}
+    .tags{margin-top:var(--m);display:flex;flex-wrap:wrap;gap:6px}
+    .tag{border:1px solid var(--line);padding:4px 6px 3px;font-size:9px;color:var(--muted);text-transform:uppercase}
+
+    .gate{margin-top:var(--l);min-height:220px;background:#292d32;color:#fff;display:grid;place-items:center;padding:24px}
+    .gate-inner{width:min(100%,420px);display:grid;gap:18px}
+    .gate-label{font-size:10px;line-height:1.4;letter-spacing:.05em;color:rgba(255,255,255,.66);text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.3);padding-bottom:9px}
+    .gate-title{font-size:clamp(24px,5vw,38px);line-height:1;font-weight:600;letter-spacing:-.035em}
+
+    .scale{margin-top:var(--xl);border-top:1px solid var(--fg)}
+    .scale-title{display:flex;justify-content:space-between;gap:var(--m);padding:10px 0;border-bottom:1px solid var(--line)}
+    .scale-title strong{font-size:13px}
+    .scale-title span{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:10px;color:var(--muted)}
+    .scale-row{display:grid;grid-template-columns:74px 1fr;gap:var(--m);padding:12px 0;border-bottom:1px solid var(--line);align-items:start}
+    .spec{font-family:ui-monospace,SFMono-Regular,Consolas,monospace!important;font-size:9px!important;line-height:1.4!important;letter-spacing:0!important;font-weight:400!important;color:var(--muted);text-transform:uppercase;white-space:pre-line}
+    .t50{font-size:50px;line-height:1;letter-spacing:-.05em;font-weight:500}
+    .t38{font-size:38px;line-height:1;letter-spacing:-.035em;font-weight:600}
+    .t24{font-size:24px;line-height:1;letter-spacing:-.035em;font-weight:700}
+    .t15{font-size:15px;line-height:1.35;font-weight:400}
+    .t13{font-size:13px;line-height:1.35;font-weight:400}
+    .t12{font-size:12px;line-height:1.35;font-weight:400}
+    .t11{font-size:11px;line-height:1.35;font-weight:400;text-transform:uppercase}
+    .t10{font-size:10px;line-height:1.4;font-weight:400;text-transform:uppercase}
+    .t9{font-size:9px;line-height:1.35;font-weight:400;text-transform:uppercase}
+    .weight600{font-weight:600}
+    .weight700{font-weight:700}
+
+    .font-note{padding-top:var(--m);font-size:10px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Consolas,monospace!important}
+    footer{border-top:1px solid var(--fg);padding:10px 0 var(--l);display:flex;justify-content:space-between;gap:var(--m);font-size:10px;color:var(--muted)}
+
+    @media (max-width:620px){
+      :root{--l:24px;--xl:60px}
+      .shell{width:calc(100% - 20px)}
+      .topbar .shell{min-height:40px;grid-template-columns:1fr auto}
+      .brand{font-size:12px}
+      .controls a{display:none}
+      .intro{padding-top:24px}
+      .intro h1,.mock-intro h3{font-size:9vw;font-weight:500;line-height:1}
+      .intro-copy,.mock-intro-row{grid-template-columns:1fr}
+      .intro-copy span,.mock-intro-row .nav11{text-align:left}
+      .font-index a,.work-head,.mock-index-row{grid-template-columns:24px 1fr auto;gap:10px}
+      .font-sample{padding-bottom:96px}
+      .work-title{font-size:21px}
+      .description{grid-template-columns:1fr;padding-top:var(--m)}
+      .description .action{justify-self:start}
+      .gate{margin-left:-10px;margin-right:-10px}
+      .scale-row{grid-template-columns:58px 1fr;gap:10px}
+      .t50{font-size:9vw}
+      .t38{font-size:8vw}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell">
+      <div class="brand">Hoyeon Website · Font Test</div>
+      <div class="controls" aria-label="Font test controls">
+        <a href="#fonts">Fonts</a>
+        <button type="button" data-theme="white" aria-pressed="false">White</button>
+        <button type="button" data-theme="black" aria-pressed="true">Black</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="shell intro" id="top">
+      <h1>한글과 English가 같은 화면에서 어떻게 숨 쉬는지.</h1>
+      <div class="intro-copy">
+        <p>현재 홈페이지의 실제 글자 크기와 굵기를 그대로 사용한 비교 페이지. The same content, spacing and hierarchy are repeated for every typeface.</p>
+        <span>Actual site scale · no optical correction</span>
+      </div>
+    </section>
+
+    <nav class="shell font-index" id="fonts" aria-label="Font index">
+      <a href="#ibm"><span class="num">01</span><span>IBM Plex Sans KR</span><span class="meta">Current</span></a>
+      <a href="#wanted"><span class="num">02</span><span>Wanted Sans</span><span class="meta">Candidate</span></a>
+      <a href="#suit"><span class="num">03</span><span>SUIT</span><span class="meta">Candidate</span></a>
+      <a href="#pretendard"><span class="num">04</span><span>Pretendard</span><span class="meta">Candidate</span></a>
+    </nav>
+
+    <section class="shell font-sample ibm" id="ibm">
+      <header class="work-head"><span class="num">01</span><h2 class="work-title">IBM Plex Sans KR<br>현재 사용 폰트</h2><div class="period">CURRENT</div></header>
+      <div class="mock-intro">
+        <h3>Moving image, sound,<br>사진과 움직이는 장면들.</h3>
+        <div class="mock-intro-row"><p class="body15">Music, photography, moving image and media-based work are presented without fixing them into separate professional categories. 음악과 사진, 영상과 미디어 작업을 하나의 고정된 분류보다 작업 자체의 흐름으로 보여준다.</p><div class="nav11">Work · About<br>작업 · 소개</div></div>
+      </div>
+      <div class="mock-index">
+        <div class="mock-index-row"><span class="small10">01</span><span>Dual Observation / 이중 관찰</span><span class="small10">2024~</span></div>
+        <div class="mock-index-row"><span class="small10">02</span><span>Between Blue and Green</span><span class="small10">2025</span></div>
+      </div>
+      <div class="media-placeholder">Moving image / 영상 작업</div>
+      <div class="description"><p>Audiovisual work built from moving-image fragments and changing relationships between image and sound. 이미지와 소리 사이의 관계가 시간에 따라 변화하는 오디오비주얼 작업.</p><button class="action" type="button">Open project ↗</button></div>
+      <div class="tags"><span class="tag">TouchDesigner</span><span class="tag">Performance</span><span class="tag">사진</span><span class="tag">Sound</span></div>
+      <div class="gate"><div class="gate-inner"><div class="gate-label">Interactive browser work / 웹 기반 인터랙티브 작업</div><div class="gate-title">DODREI / 도드리</div></div></div>
+      <div class="scale">
+        <div class="scale-title"><strong>Exact type scale / 실제 사용 크기</strong><span>Desktop values</span></div>
+        <div class="scale-row"><span class="spec">50px<br>500</span><div class="t50">한글과 English<br>Moving Image</div></div>
+        <div class="scale-row"><span class="spec">38px<br>600</span><div class="t38">도드리 DODREI</div></div>
+        <div class="scale-row"><span class="spec">24px<br>700</span><div class="t24">Dual Observation / 이중 관찰</div></div>
+        <div class="scale-row"><span class="spec">15px<br>400</span><div class="t15">사진과 영상, 음악과 소리. Photography, moving image, music and sound.</div></div>
+        <div class="scale-row"><span class="spec">13px<br>400</span><div class="t13">작품 설명에 사용되는 본문 크기입니다. This is the current description and About text size.</div></div>
+        <div class="scale-row"><span class="spec">13px<br>700</span><div class="t13 weight700">Hoyeon Choi 최호연 · Brand weight</div></div>
+        <div class="scale-row"><span class="spec">12px<br>400</span><div class="t12">02 &nbsp; Between Blue and Green &nbsp; 2025 · Index / Links</div></div>
+        <div class="scale-row"><span class="spec">11px<br>400</span><div class="t11">Work · About · 작업 · 소개 / Navigation</div></div>
+        <div class="scale-row"><span class="spec">11px<br>600</span><div class="t11 weight600">Shuffle selection · 사진 다시 섞기</div></div>
+        <div class="scale-row"><span class="spec">10px<br>400</span><div class="t10">2024/04~ONGOING · OPEN PROJECT ↗ · PERIOD / ACTION / FOOTER</div></div>
+        <div class="scale-row"><span class="spec">9px<br>400</span><div class="t9">TOUCHDESIGNER · PERFORMANCE · 사진 · MEDIA LABEL / TAG</div></div>
+      </div>
+      <div class="font-note">font-family: 'IBM Plex Sans KR' · current site baseline</div>
+    </section>
+
+    <section class="shell font-sample wanted" id="wanted">
+      <header class="work-head"><span class="num">02</span><h2 class="work-title">Wanted Sans<br>원티드 산스</h2><div class="period">CANDIDATE</div></header>
+      <div class="mock-intro">
+        <h3>Moving image, sound,<br>사진과 움직이는 장면들.</h3>
+        <div class="mock-intro-row"><p class="body15">Music, photography, moving image and media-based work are presented without fixing them into separate professional categories. 음악과 사진, 영상과 미디어 작업을 하나의 고정된 분류보다 작업 자체의 흐름으로 보여준다.</p><div class="nav11">Work · About<br>작업 · 소개</div></div>
+      </div>
+      <div class="mock-index">
+        <div class="mock-index-row"><span class="small10">01</span><span>Dual Observation / 이중 관찰</span><span class="small10">2024~</span></div>
+        <div class="mock-index-row"><span class="small10">02</span><span>Between Blue and Green</span><span class="small10">2025</span></div>
+      </div>
+      <div class="media-placeholder">Moving image / 영상 작업</div>
+      <div class="description"><p>Audiovisual work built from moving-image fragments and changing relationships between image and sound. 이미지와 소리 사이의 관계가 시간에 따라 변화하는 오디오비주얼 작업.</p><button class="action" type="button">Open project ↗</button></div>
+      <div class="tags"><span class="tag">TouchDesigner</span><span class="tag">Performance</span><span class="tag">사진</span><span class="tag">Sound</span></div>
+      <div class="gate"><div class="gate-inner"><div class="gate-label">Interactive browser work / 웹 기반 인터랙티브 작업</div><div class="gate-title">DODREI / 도드리</div></div></div>
+      <div class="scale">
+        <div class="scale-title"><strong>Exact type scale / 실제 사용 크기</strong><span>Desktop values</span></div>
+        <div class="scale-row"><span class="spec">50px<br>500</span><div class="t50">한글과 English<br>Moving Image</div></div>
+        <div class="scale-row"><span class="spec">38px<br>600</span><div class="t38">도드리 DODREI</div></div>
+        <div class="scale-row"><span class="spec">24px<br>700</span><div class="t24">Dual Observation / 이중 관찰</div></div>
+        <div class="scale-row"><span class="spec">15px<br>400</span><div class="t15">사진과 영상, 음악과 소리. Photography, moving image, music and sound.</div></div>
+        <div class="scale-row"><span class="spec">13px<br>400</span><div class="t13">작품 설명에 사용되는 본문 크기입니다. This is the current description and About text size.</div></div>
+        <div class="scale-row"><span class="spec">13px<br>700</span><div class="t13 weight700">Hoyeon Choi 최호연 · Brand weight</div></div>
+        <div class="scale-row"><span class="spec">12px<br>400</span><div class="t12">02 &nbsp; Between Blue and Green &nbsp; 2025 · Index / Links</div></div>
+        <div class="scale-row"><span class="spec">11px<br>400</span><div class="t11">Work · About · 작업 · 소개 / Navigation</div></div>
+        <div class="scale-row"><span class="spec">11px<br>600</span><div class="t11 weight600">Shuffle selection · 사진 다시 섞기</div></div>
+        <div class="scale-row"><span class="spec">10px<br>400</span><div class="t10">2024/04~ONGOING · OPEN PROJECT ↗ · PERIOD / ACTION / FOOTER</div></div>
+        <div class="scale-row"><span class="spec">9px<br>400</span><div class="t9">TOUCHDESIGNER · PERFORMANCE · 사진 · MEDIA LABEL / TAG</div></div>
+      </div>
+      <div class="font-note">font-family: 'Wanted Sans Variable' · same metrics, no size compensation</div>
+    </section>
+
+    <section class="shell font-sample suit" id="suit">
+      <header class="work-head"><span class="num">03</span><h2 class="work-title">SUIT<br>수트</h2><div class="period">CANDIDATE</div></header>
+      <div class="mock-intro">
+        <h3>Moving image, sound,<br>사진과 움직이는 장면들.</h3>
+        <div class="mock-intro-row"><p class="body15">Music, photography, moving image and media-based work are presented without fixing them into separate professional categories. 음악과 사진, 영상과 미디어 작업을 하나의 고정된 분류보다 작업 자체의 흐름으로 보여준다.</p><div class="nav11">Work · About<br>작업 · 소개</div></div>
+      </div>
+      <div class="mock-index">
+        <div class="mock-index-row"><span class="small10">01</span><span>Dual Observation / 이중 관찰</span><span class="small10">2024~</span></div>
+        <div class="mock-index-row"><span class="small10">02</span><span>Between Blue and Green</span><span class="small10">2025</span></div>
+      </div>
+      <div class="media-placeholder">Moving image / 영상 작업</div>
+      <div class="description"><p>Audiovisual work built from moving-image fragments and changing relationships between image and sound. 이미지와 소리 사이의 관계가 시간에 따라 변화하는 오디오비주얼 작업.</p><button class="action" type="button">Open project ↗</button></div>
+      <div class="tags"><span class="tag">TouchDesigner</span><span class="tag">Performance</span><span class="tag">사진</span><span class="tag">Sound</span></div>
+      <div class="gate"><div class="gate-inner"><div class="gate-label">Interactive browser work / 웹 기반 인터랙티브 작업</div><div class="gate-title">DODREI / 도드리</div></div></div>
+      <div class="scale">
+        <div class="scale-title"><strong>Exact type scale / 실제 사용 크기</strong><span>Desktop values</span></div>
+        <div class="scale-row"><span class="spec">50px<br>500</span><div class="t50">한글과 English<br>Moving Image</div></div>
+        <div class="scale-row"><span class="spec">38px<br>600</span><div class="t38">도드리 DODREI</div></div>
+        <div class="scale-row"><span class="spec">24px<br>700</span><div class="t24">Dual Observation / 이중 관찰</div></div>
+        <div class="scale-row"><span class="spec">15px<br>400</span><div class="t15">사진과 영상, 음악과 소리. Photography, moving image, music and sound.</div></div>
+        <div class="scale-row"><span class="spec">13px<br>400</span><div class="t13">작품 설명에 사용되는 본문 크기입니다. This is the current description and About text size.</div></div>
+        <div class="scale-row"><span class="spec">13px<br>700</span><div class="t13 weight700">Hoyeon Choi 최호연 · Brand weight</div></div>
+        <div class="scale-row"><span class="spec">12px<br>400</span><div class="t12">02 &nbsp; Between Blue and Green &nbsp; 2025 · Index / Links</div></div>
+        <div class="scale-row"><span class="spec">11px<br>400</span><div class="t11">Work · About · 작업 · 소개 / Navigation</div></div>
+        <div class="scale-row"><span class="spec">11px<br>600</span><div class="t11 weight600">Shuffle selection · 사진 다시 섞기</div></div>
+        <div class="scale-row"><span class="spec">10px<br>400</span><div class="t10">2024/04~ONGOING · OPEN PROJECT ↗ · PERIOD / ACTION / FOOTER</div></div>
+        <div class="scale-row"><span class="spec">9px<br>400</span><div class="t9">TOUCHDESIGNER · PERFORMANCE · 사진 · MEDIA LABEL / TAG</div></div>
+      </div>
+      <div class="font-note">font-family: 'SUIT Variable' · same metrics, no size compensation</div>
+    </section>
+
+    <section class="shell font-sample pretendard" id="pretendard">
+      <header class="work-head"><span class="num">04</span><h2 class="work-title">Pretendard<br>프리텐다드</h2><div class="period">CANDIDATE</div></header>
+      <div class="mock-intro">
+        <h3>Moving image, sound,<br>사진과 움직이는 장면들.</h3>
+        <div class="mock-intro-row"><p class="body15">Music, photography, moving image and media-based work are presented without fixing them into separate professional categories. 음악과 사진, 영상과 미디어 작업을 하나의 고정된 분류보다 작업 자체의 흐름으로 보여준다.</p><div class="nav11">Work · About<br>작업 · 소개</div></div>
+      </div>
+      <div class="mock-index">
+        <div class="mock-index-row"><span class="small10">01</span><span>Dual Observation / 이중 관찰</span><span class="small10">2024~</span></div>
+        <div class="mock-index-row"><span class="small10">02</span><span>Between Blue and Green</span><span class="small10">2025</span></div>
+      </div>
+      <div class="media-placeholder">Moving image / 영상 작업</div>
+      <div class="description"><p>Audiovisual work built from moving-image fragments and changing relationships between image and sound. 이미지와 소리 사이의 관계가 시간에 따라 변화하는 오디오비주얼 작업.</p><button class="action" type="button">Open project ↗</button></div>
+      <div class="tags"><span class="tag">TouchDesigner</span><span class="tag">Performance</span><span class="tag">사진</span><span class="tag">Sound</span></div>
+      <div class="gate"><div class="gate-inner"><div class="gate-label">Interactive browser work / 웹 기반 인터랙티브 작업</div><div class="gate-title">DODREI / 도드리</div></div></div>
+      <div class="scale">
+        <div class="scale-title"><strong>Exact type scale / 실제 사용 크기</strong><span>Desktop values</span></div>
+        <div class="scale-row"><span class="spec">50px<br>500</span><div class="t50">한글과 English<br>Moving Image</div></div>
+        <div class="scale-row"><span class="spec">38px<br>600</span><div class="t38">도드리 DODREI</div></div>
+        <div class="scale-row"><span class="spec">24px<br>700</span><div class="t24">Dual Observation / 이중 관찰</div></div>
+        <div class="scale-row"><span class="spec">15px<br>400</span><div class="t15">사진과 영상, 음악과 소리. Photography, moving image, music and sound.</div></div>
+        <div class="scale-row"><span class="spec">13px<br>400</span><div class="t13">작품 설명에 사용되는 본문 크기입니다. This is the current description and About text size.</div></div>
+        <div class="scale-row"><span class="spec">13px<br>700</span><div class="t13 weight700">Hoyeon Choi 최호연 · Brand weight</div></div>
+        <div class="scale-row"><span class="spec">12px<br>400</span><div class="t12">02 &nbsp; Between Blue and Green &nbsp; 2025 · Index / Links</div></div>
+        <div class="scale-row"><span class="spec">11px<br>400</span><div class="t11">Work · About · 작업 · 소개 / Navigation</div></div>
+        <div class="scale-row"><span class="spec">11px<br>600</span><div class="t11 weight600">Shuffle selection · 사진 다시 섞기</div></div>
+        <div class="scale-row"><span class="spec">10px<br>400</span><div class="t10">2024/04~ONGOING · OPEN PROJECT ↗ · PERIOD / ACTION / FOOTER</div></div>
+        <div class="scale-row"><span class="spec">9px<br>400</span><div class="t9">TOUCHDESIGNER · PERFORMANCE · 사진 · MEDIA LABEL / TAG</div></div>
+      </div>
+      <div class="font-note">font-family: 'Pretendard Variable' · same metrics, no size compensation</div>
+    </section>
+
+    <footer class="shell"><span>Font comparison only · 메인 사이트에는 영향 없음</span><span>IBM / Wanted / SUIT / Pretendard</span></footer>
+  </main>
+
+  <script>
+    const root=document.documentElement;
+    document.querySelectorAll('[data-theme]').forEach((button)=>{
+      button.addEventListener('click',()=>{
+        const theme=button.dataset.theme==='white'?'white':'black';
+        root.dataset.siteTheme=theme;
+        document.querySelectorAll('[data-theme]').forEach((item)=>item.setAttribute('aria-pressed',String(item.dataset.theme===theme)));
+      });
+    });
+  </script>
+</body>
+</html>
