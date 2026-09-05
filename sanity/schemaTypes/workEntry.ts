@@ -13,7 +13,7 @@ export const workEntry = defineType({
       description: 'Optional Studio-only name. The public title is separate.',
       type: 'string',
     }),
-    defineField({name: 'title', title: 'Public title', type: 'string', validation: (rule) => rule.required()}),
+    defineField({name: 'title', title: 'Public title', type: 'text', rows: 2, validation: (rule) => rule.required()}),
     defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'title'}, validation: (rule) => rule.required()}),
     defineField({name: 'enabled', title: 'Public', type: 'boolean', initialValue: true}),
     defineField({name: 'yearLabel', title: 'Date / year label', type: 'string'}),
