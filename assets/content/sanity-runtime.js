@@ -217,7 +217,7 @@
   }
 
   function loadPortfolioUiOverrides(){
-    loadScriptOnce('assets/content/portfolio-ui-overrides.js?v=20260905-1', 'data-portfolio-ui-overrides');
+    loadScriptOnce('assets/content/portfolio-ui-overrides.js?v=20260905-2', 'data-portfolio-ui-overrides');
   }
 
   function loadPresentationControls(){
