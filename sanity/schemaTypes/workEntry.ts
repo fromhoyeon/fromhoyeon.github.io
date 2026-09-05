@@ -29,7 +29,7 @@ export const workEntry = defineType({
       title: 'Tags',
       description: 'All tags are equal at this stage. Reuse existing Tag documents whenever possible.',
       type: 'array',
-      of: [defineArrayMember({type: 'reference', to: [{type: 'tag'}]})],
+      of: [defineArrayMember({type: 'reference', to: [{type: 'tag'}], weak: true})],
       validation: (rule) => rule.unique(),
     }),
     defineField({
