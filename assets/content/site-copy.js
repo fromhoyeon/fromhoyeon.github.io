@@ -16,13 +16,16 @@ function applyBasePalette(){
     :root:not([data-site-theme]){--bg:#fff;--panel:#e6e6e6}
     .topbar{background:var(--topbar-bg,rgba(255,255,255,.96))}
     .photo-cell{background:var(--panel)}
-    .email-copy-row{appearance:none;width:100%;border:0;border-bottom:1px solid var(--line);padding:9px 0;background:transparent;color:inherit;display:grid;grid-template-columns:1fr auto;align-items:center;text-align:left;font:inherit;font-size:12px;cursor:pointer}
+    .email-copy-row{appearance:none;width:100%;border:0;border-bottom:1px solid var(--line);padding:9px 0;background:transparent;color:var(--fg);display:flex;align-items:baseline;justify-content:flex-start;gap:.45em;text-align:left;font:inherit;font-size:12px;cursor:pointer}
     .email-copy-row:hover .email-copy-label{text-decoration:underline;text-underline-offset:2px}
     .email-copy-row:focus-visible{outline:1px solid var(--fg);outline-offset:3px}
+    .email-copy-hint{color:var(--muted);font-size:10px;font-weight:400;white-space:nowrap;transition:opacity .14s ease}
+    .email-copy-hint.is-hidden{opacity:0;visibility:hidden}
     .email-followup{display:none;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:10px;color:var(--muted)}
     .email-followup.is-visible{display:flex}
-    .email-followup a{display:inline-block;border:1px solid var(--line);padding:5px 7px 4px;background:#f7f7f4;color:var(--fg);font-size:9px;text-transform:uppercase;white-space:nowrap}
+    .email-followup a{display:inline-block;border:1px solid var(--line);padding:5px 7px 4px;background:transparent;color:var(--fg);font-size:9px;text-transform:uppercase;white-space:nowrap}
     .email-followup a:hover,.email-followup a:focus-visible{border-color:var(--fg);background:var(--fg);color:var(--bg)}
+    .email-followup a:focus-visible{outline:1px solid var(--fg);outline-offset:2px}
     @media (max-width:620px){.email-followup{align-items:flex-start;flex-direction:column}.email-followup a{align-self:flex-start}}
   `;
   document.head.appendChild(style);
@@ -98,9 +101,10 @@ function createEmailContact(){
   label.className = 'email-copy-label';
   label.textContent = `Email: ${CONTACT_EMAIL}`;
 
-  const marker = document.createElement('span');
-  marker.textContent = 'Copy';
-  marker.setAttribute('aria-hidden', 'true');
+  const hint = document.createElement('span');
+  hint.className = 'email-copy-hint';
+  hint.textContent = '(click to copy)';
+  hint.setAttribute('aria-hidden', 'true');
 
   const followup = document.createElement('div');
   followup.className = 'email-followup';
@@ -116,18 +120,19 @@ function createEmailContact(){
   compose.textContent = 'Open mail app ↗';
 
   followup.append(message, compose);
-  copyButton.append(label, marker);
+  copyButton.append(label, hint);
   wrapper.append(copyButton, followup);
 
   copyButton.addEventListener('click', async () => {
     try {
       await copyText(CONTACT_EMAIL);
-      marker.textContent = 'Copied';
+      hint.classList.add('is-hidden');
       followup.classList.add('is-visible');
     } catch (error) {
-      marker.textContent = 'Copy failed';
+      hint.textContent = '(copy failed)';
       message.textContent = 'Could not copy automatically. Open your mail app?';
       followup.classList.add('is-visible');
+      setTimeout(() => hint.classList.add('is-hidden'), 1600);
     }
   });
 
