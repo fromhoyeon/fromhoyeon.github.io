@@ -2,7 +2,8 @@
   Portfolio media interaction overrides
   -------------------------------------
   - Keep YouTube clean before playback: thumbnail + play button only.
-  - After the user starts playback, normalize the iframe to standard YouTube controls.
+  - Never keep a YouTube iframe before an explicit user tap.
+  - After playback starts, use the standard YouTube controls and fullscreen button.
   - Keep consecutive YouTube blocks visually close without merging them.
   - Remove the work-gallery Close button. Desktop gallery lightboxes close with Esc;
     touch devices keep backdrop closing because they do not have an Escape key.
@@ -64,19 +65,76 @@
     return url.toString();
   }
 
+  function createStandardIframe(stage, videoId, autoplay = true){
+    const iframe = document.createElement('iframe');
+    iframe.src = standardEmbedUrl(videoId, autoplay);
+    iframe.title = stage.getAttribute('aria-label') || 'YouTube video player';
+    iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+    iframe.setAttribute('allowfullscreen', '');
+    iframe.dataset.standardYoutubePlayer = 'true';
+    return iframe;
+  }
+
+  function createCleanPoster(stage, videoId){
+    const poster = document.createElement('button');
+    poster.className = 'yt-poster';
+    poster.type = 'button';
+    poster.setAttribute('aria-label', stage.getAttribute('aria-label') || 'Play YouTube video');
+
+    const image = document.createElement('img');
+    image.src = `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
+    image.alt = '';
+    image.draggable = false;
+    image.onerror = () => {
+      image.onerror = null;
+      image.src = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+    };
+
+    const play = document.createElement('span');
+    play.className = 'yt-play';
+    play.setAttribute('aria-hidden', 'true');
+    play.textContent = '▶';
+
+    poster.append(image, play);
+    poster.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      stage.dataset.youtubeStarted = 'true';
+      stage.replaceChildren(createStandardIframe(stage, videoId, true));
+    }, true);
+    return poster;
+  }
+
+  function markRendererPoster(stage){
+    if (stage.dataset.posterStartBound === 'true') return;
+    stage.dataset.posterStartBound = 'true';
+    stage.addEventListener('click', (event) => {
+      if (!event.target.closest?.('.yt-poster')) return;
+      stage.dataset.youtubeStarted = 'true';
+    }, true);
+  }
+
   function normalizeYouTubeStage(stage){
     if (!(stage instanceof Element) || !stage.classList.contains('yt-stage')) return;
 
-    // Before playback, keep the renderer's clean poster shell exactly as-is.
-    // Once the user taps it, the renderer inserts an iframe and the observer below
-    // upgrades only that iframe to the stable native YouTube player controls.
-    if (stage.querySelector(':scope > .yt-poster')) return;
+    const videoId = youtubeIdFromStage(stage);
+    if (!videoId) return;
+
+    const poster = stage.querySelector(':scope > .yt-poster');
+    if (poster) {
+      markRendererPoster(stage);
+      return;
+    }
 
     const currentIframe = stage.querySelector(':scope > iframe');
     if (!currentIframe) return;
 
-    const videoId = youtubeIdFromStage(stage);
-    if (!videoId) return;
+    // Critical rule: an iframe is not allowed to exist before an explicit user tap.
+    if (stage.dataset.youtubeStarted !== 'true') {
+      stage.replaceChildren(createCleanPoster(stage, videoId));
+      return;
+    }
 
     let autoplay = false;
     try {
