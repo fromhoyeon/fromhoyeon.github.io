@@ -42,13 +42,13 @@ Portfolio Item은 음악, 공연, 영상, 미디어아트, 웹 작업 등의 분
 기본 필드:
 
 - `internalTitle` — Studio 관리용 명칭
-- `title` — 공개 제목
+- `title` — 공개 제목. 현재 `text` 타입이며 2-row 입력 UI를 사용해 필요하면 줄바꿈을 입력할 수 있다.
 - `slug`
 - `enabled`
 - `yearLabel`
 - `metaLines`
 - `summary`
-- `tags` — `tag` document reference 배열
+- `tags` — `tag` document weak reference 배열
 - `contentBlocks` — 필요한 미디어 블록의 순서형 배열
 - `externalUrl` / `actionLabel`
 
@@ -69,7 +69,9 @@ Portfolio Item은 음악, 공연, 영상, 미디어아트, 웹 작업 등의 분
 - `Performance`
 - `Batman`
 
-기존 Portfolio Item은 이 Tag document들을 reference한다.
+`Batman`은 기존 테스트 데이터를 보존하기 위해 이관한 값이며 채택된 taxonomy를 의미하지 않는다.
+
+현재 Portfolio Item과 Photograph의 Tag reference는 `weak: true`다. 따라서 Tag를 삭제해도 이를 가리키는 Portfolio Item이나 Photograph 때문에 삭제가 차단되지 않는다. 약한 reference는 target 삭제 뒤 source document 안에 unresolved reference object가 남을 수 있으므로 frontend에서는 dereference 결과가 없는 값을 실제 tag로 취급하지 않는 방향을 따른다.
 
 ### Content blocks
 
@@ -97,7 +99,7 @@ Portfolio Item은 음악, 공연, 영상, 미디어아트, 웹 작업 등의 분
 - alt text
 - public pool 포함 여부
 - selected / featured 여부
-- `tag` document references
+- `tag` document weak references
 
 과거 `series`, `year`, 자유입력 string tags는 실제 production 사진에 값이 없었으므로 현재 active schema에서는 제거했다. 분류가 필요하면 일반 Portfolio Item과 동일한 Tag documents를 사용한다.
 
@@ -106,6 +108,8 @@ Portfolio Item은 음악, 공연, 영상, 미디어아트, 웹 작업 등의 분
 ## 홈페이지 작업과 순서
 
 `homePage` document의 `featuredWorks` 배열이 홈페이지 노출 항목과 순서를 결정한다. Studio에서 reference 배열을 드래그해 순서를 변경하면 GitHub 코드를 수정하지 않아도 다음 페이지 로드부터 반영된다.
+
+`featuredWorks` reference 역시 현재 `weak: true`다. 따라서 test Portfolio Item을 삭제할 때 Homepage reference 때문에 삭제가 막히지 않는다. target이 사라진 weak reference는 frontend에서 유효한 work로 해석하지 않는 방향을 따른다.
 
 작업 데이터가 아직 도착하지 않은 초기 상태 또는 query 실패 상태에서는 과거 하드코딩 작업을 보여주지 않고 Work index에 `OFFLINE`을 표시한다.
 
@@ -117,20 +121,20 @@ Portfolio Item은 음악, 공연, 영상, 미디어아트, 웹 작업 등의 분
 
 primary navigation은 `_id == "primary-navigation"`인 `siteNavigation` singleton의 `items` 배열을 읽는다.
 
-`assets/content/youtube-custom-ui.js`는 YouTube 기본 controls 대신 play/pause, seek timeline, current/duration만 제공하는 최소 control layer를 유지한다.
+YouTube Video block은 현재 **poster-first** 방식이다. 재생 전에는 YouTube iframe을 만들지 않고 thumbnail + play button만 표시하며, 실제 사용자 interaction 뒤에만 native YouTube player를 생성해 기본 seek/fullscreen controls를 사용한다. 과거 `youtube-custom-ui.js` 기반의 custom control bar는 안정성 문제 때문에 제거했다. media UI 보정은 `assets/content/portfolio-ui-overrides.js`에서 처리한다.
 
 ## schema 관리
 
 `schemaTypes/`는 repository 안에서 현재 데이터 구조를 추적하는 source다. 실제 hosted Studio/schema도 Sanity managed workspace에 배포되어 있으므로 schema 변경 시 두 상태를 함께 갱신한다.
 
-2026-09-05 flat Portfolio Item / Tag / Photograph 구조를 repository source와 hosted Studio 양쪽에 반영했다.
+2026-09-05 flat Portfolio Item / Tag / Photograph 구조를 repository source와 hosted Studio 양쪽에 반영했다. 같은 날 Tag와 Homepage reference를 weak reference로 변경하고 기존 production reference objects에도 `_weak: true`를 적용했다. Portfolio Item `Public title`은 multiline 입력을 위해 `text` 타입으로 변경했다.
 
 ## 원칙
 
 - 일반 공개 콘텐츠 → 동등한 Portfolio Item
-- 콘텐츠 사이 관계와 조회 → flat Tag references
+- 콘텐츠 사이 관계와 조회 → flat Tag weak references
 - 사진 pool → 별도 Photograph documents
-- 홈페이지 큐레이션과 순서 → `homePage.featuredWorks`
+- 홈페이지 큐레이션과 순서 → `homePage.featuredWorks` weak references
 - 자주 바뀌는 콘텐츠·메뉴 → Sanity
 - 구조·레이아웃·인터랙션 → GitHub
 - remote 콘텐츠가 없거나 연결되지 않음 → stale local copy 대신 `OFFLINE`
