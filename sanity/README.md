@@ -45,12 +45,13 @@ Portfolio Item은 음악, 공연, 영상, 미디어아트, 웹 작업 등의 분
 - `title` — 공개 제목. 현재 `text` 타입이며 2-row 입력 UI를 사용해 필요하면 줄바꿈을 입력할 수 있다.
 - `slug`
 - `enabled`
-- `yearLabel`
-- `metaLines`
+- `period` — 제목 옆에 표시할 시간/기간 정보. 자유 형식 string이며 `2025`, `~2025`, `2023~`, `2022~2024`, `2024/04`, `Ongoing`처럼 사용한다.
 - `summary`
 - `tags` — `tag` document weak reference 배열
 - `contentBlocks` — 필요한 미디어 블록의 순서형 배열
 - `externalUrl` / `actionLabel`
+
+2026-09-06 기존 `yearLabel` 값은 그대로 `period`로 이관했고 `yearLabel`과 `metaLines`는 production 문서와 active schema에서 제거했다. 제목 옆 짧은 정보 영역은 이제 다른 분류·포맷·상태 정보를 섞지 않고 **Period 하나만** 표시한다. 필요한 부가 정보는 Description이나 Tag를 사용한다.
 
 새 항목은 어떤 분야인지 먼저 선택하는 대신 필요한 `contentBlocks`를 조합하고 tag를 붙인다.
 
@@ -117,7 +118,7 @@ Portfolio Item은 음악, 공연, 영상, 미디어아트, 웹 작업 등의 분
 
 `assets/content/sanity-config.js`의 public 설정을 사용한다. active prototyping 중에는 `useCdn: false`로 published Content Lake를 직접 읽는다.
 
-`assets/content/sanity-runtime.js`는 Portfolio Item tag reference를 label 문자열로 resolve해 기존 frontend tag UI에 전달한다. Photograph 쪽은 label과 slug를 함께 가져와 향후 photography filtering에 사용할 수 있게 준비한다.
+`assets/content/sanity-runtime.js`는 Portfolio Item의 `period`와 tag reference를 읽고, tag reference는 label 문자열로 resolve해 기존 frontend tag UI에 전달한다. Photograph 쪽은 label과 slug를 함께 가져와 향후 photography filtering에 사용할 수 있게 준비한다.
 
 primary navigation은 `_id == "primary-navigation"`인 `siteNavigation` singleton의 `items` 배열을 읽는다.
 
@@ -129,9 +130,12 @@ YouTube Video block은 현재 **poster-first** 방식이다. 재생 전에는 Yo
 
 2026-09-05 flat Portfolio Item / Tag / Photograph 구조를 repository source와 hosted Studio 양쪽에 반영했다. 같은 날 Tag와 Homepage reference를 weak reference로 변경하고 기존 production reference objects에도 `_weak: true`를 적용했다. Portfolio Item `Public title`은 multiline 입력을 위해 `text` 타입으로 변경했다.
 
+2026-09-06 Portfolio Item의 시간 필드를 `Period` 하나로 통일했다. 기존 `yearLabel`은 `period`로 migration 후 제거했고 `metaLines`는 값과 schema를 함께 제거했다. hosted Studio도 같은 구조로 redeploy했다.
+
 ## 원칙
 
 - 일반 공개 콘텐츠 → 동등한 Portfolio Item
+- 제목 옆 시간 정보 → 자유 형식 `Period` 하나
 - 콘텐츠 사이 관계와 조회 → flat Tag weak references
 - 사진 pool → 별도 Photograph documents
 - 홈페이지 큐레이션과 순서 → `homePage.featuredWorks` weak references
