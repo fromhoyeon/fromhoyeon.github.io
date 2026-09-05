@@ -198,8 +198,8 @@
       .map((item) => ({
         ...item,
         file: item.filename || item.title || item._id,
-        src: imageUrl(item.url, 1200, 75),
-        fullSrc: imageUrl(item.url, 2400, 82)
+        src: imageUrl(item.url, 1200, 72),
+        fullSrc: imageUrl(item.url, 1800, 80)
       }));
   }
 
@@ -226,7 +226,7 @@
 
   function loadPhotoPoolControls(){
     if (!isEnabled() || config.features?.portfolioPhotos === false) return;
-    loadScriptOnce('assets/content/photo-pool-controls.js?v=20260905-2', 'data-photo-pool-controls');
+    loadScriptOnce('assets/content/photo-pool-controls.js?v=20260905-3', 'data-photo-pool-controls');
   }
 
   function observePhotoGridWidth(){
