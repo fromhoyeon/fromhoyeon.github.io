@@ -40,7 +40,6 @@ export const siteCopy = defineType({
           description: 'Outer breathing room around enlarged photos on desktop. Mobile uses about 60% of this value.',
           type: 'number',
           initialValue: 24,
-          validation: (rule) => rule.integer().min(8).max(64),
         }),
       ],
     }),
@@ -67,6 +66,6 @@ export const siteCopy = defineType({
     }),
   ],
   preview: {
-    prepare: () => ({title: 'Website text'}),
+    select: {title: 'site.brand'},
   },
 })
