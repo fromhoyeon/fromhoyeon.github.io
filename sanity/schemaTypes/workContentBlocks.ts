@@ -13,14 +13,14 @@ export const workVideoBlock = defineType({
 
 export const workVideoCollectionBlock = defineType({
   name: 'workVideoCollectionBlock',
-  title: 'Video Collection',
+  title: 'Playlist Video Collection · backup',
   type: 'object',
   fields: [
     defineField({name: 'title', title: 'Optional label', type: 'string'}),
     defineField({
       name: 'playlistUrl',
       title: 'YouTube playlist URL',
-      description: 'Paste one YouTube playlist URL. The site uses every video in playlist order.',
+      description: 'Playlist-driven collection kept for reuse. The site automatically reads every video in playlist order.',
       type: 'url',
       validation: (rule) => rule.required(),
     }),
@@ -28,7 +28,66 @@ export const workVideoCollectionBlock = defineType({
   preview: {
     select: {title: 'title', subtitle: 'playlistUrl'},
     prepare({title, subtitle}) {
-      return {title: title || 'Video Collection', subtitle}
+      return {title: title || 'Playlist Video Collection · backup', subtitle}
+    },
+  },
+})
+
+export const workCuratedVideoItem = defineType({
+  name: 'workCuratedVideoItem',
+  title: 'Video',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'youtubeUrl',
+      title: 'YouTube URL',
+      type: 'url',
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'title',
+      title: 'Title',
+      type: 'string',
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'description',
+      title: 'Description',
+      type: 'text',
+      rows: 5,
+    }),
+  ],
+  preview: {
+    select: {title: 'title', subtitle: 'youtubeUrl'},
+    prepare({title, subtitle}) {
+      return {title: title || 'Untitled video', subtitle}
+    },
+  },
+})
+
+export const workCuratedVideoCollectionBlock = defineType({
+  name: 'workCuratedVideoCollectionBlock',
+  title: 'Video Collection',
+  type: 'object',
+  fields: [
+    defineField({name: 'title', title: 'Optional label', type: 'string'}),
+    defineField({
+      name: 'videos',
+      title: 'Videos',
+      description: 'Drag to set display order. The first video is selected initially.',
+      type: 'array',
+      of: [defineArrayMember({type: 'workCuratedVideoItem'})],
+      validation: (rule) => rule.min(1),
+    }),
+  ],
+  preview: {
+    select: {title: 'title', videos: 'videos'},
+    prepare({title, videos}) {
+      const count = Array.isArray(videos) ? videos.length : 0
+      return {
+        title: title || 'Video Collection',
+        subtitle: `${count} video${count === 1 ? '' : 's'}`,
+      }
     },
   },
 })
