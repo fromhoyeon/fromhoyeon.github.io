@@ -1,7 +1,7 @@
 /*
-  Keep Selected Photography on one randomized Sanity-backed deck for a limited session.
-  Only the current 12-photo batch is rendered. Reaching the final image prepares the
-  next batch, so a deck does not repeat photos before it is exhausted.
+  Selected Photography remote deck controller.
+  One randomized Sanity-backed deck is kept for a limited session and rendered
+  12 photographs at a time without repeats until the deck is exhausted.
 */
 
 (function installRemotePhotoPoolControls(){
@@ -23,26 +23,6 @@
   let preparedBatchStart = null;
   let pageStatus = null;
   let recentThumbnailTimer = null;
-
-  function ensureStyles(){
-    if (document.querySelector('#photo-pool-offline-styles')) return;
-    const style = document.createElement('style');
-    style.id = 'photo-pool-offline-styles';
-    style.textContent = `
-      .photo-pool-offline{min-height:120px;display:grid;place-items:center;border:1px solid var(--line);color:var(--muted);font-size:10px;letter-spacing:.04em;text-transform:uppercase}
-      .photo-actions{display:flex!important;flex-direction:column;justify-content:center!important;align-items:center!important;gap:9px!important;margin-top:18px!important}
-      .photo-page-status{font-size:10px;line-height:1;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-variant-numeric:tabular-nums;user-select:none}
-      #shuffle-photos{display:inline-flex!important;align-items:center;justify-content:center;gap:7px;padding:7px 10px 6px!important;border:1px solid var(--fg)!important;background:#fff!important;color:var(--fg)!important;font-size:10px!important;font-weight:500!important;letter-spacing:.06em!important;text-transform:uppercase}
-      #shuffle-photos:hover,#shuffle-photos:focus-visible{border-color:var(--fg)!important;background:var(--fg)!important;color:#fff!important}
-      #shuffle-photos:focus-visible{outline:2px solid var(--accent-blue-soft)!important;outline-offset:2px}
-      #shuffle-photos:disabled{opacity:.4;cursor:wait}
-      .photo-shuffle-icon{width:13px;height:13px;display:inline-flex;flex:0 0 auto}
-      .photo-shuffle-icon svg{width:13px;height:13px;display:block;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-      .photo-cell.photo-recently-viewed::after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;border:0;background:var(--photo-recent-overlay,rgba(255,255,255,1));animation:photoRecentViewed ${RECENT_THUMBNAIL_MS}ms linear forwards}
-      @keyframes photoRecentViewed{0%,9.0909%{opacity:1}100%{opacity:0}}
-    `;
-    document.head.appendChild(style);
-  }
 
   function installInterface(){
     const actions = shufflePhotos?.parentElement;
@@ -218,7 +198,7 @@
     return true;
   }
 
-  function renderBatch(start, {preservePosition=false}={}){
+  function renderBatch(start, {preservePosition = false} = {}){
     if (!deck.length) return false;
 
     const maxStart = Math.max(0, Math.floor((deck.length - 1) / BATCH_SIZE) * BATCH_SIZE);
@@ -237,7 +217,7 @@
     return true;
   }
 
-  async function initializeDeck({preservePosition=false, forceShuffle=false}={}){
+  async function initializeDeck({preservePosition = false, forceShuffle = false} = {}){
     const pool = await remotePool();
     if (!pool.length) {
       showUnavailable();
@@ -260,7 +240,7 @@
     }
   }
 
-  async function shuffleFromBeginning({preservePosition=true}={}){
+  async function shuffleFromBeginning({preservePosition = true} = {}){
     const pool = await remotePool();
     if (!pool.length) {
       showUnavailable();
@@ -311,23 +291,23 @@
     return true;
   }
 
-  const prototypeLayoutPhotos = layoutPhotos;
+  const baseLayoutPhotos = layoutPhotos;
   layoutPhotos = function(){
-    prototypeLayoutPhotos();
+    baseLayoutPhotos();
     annotateThumbnailCells();
   };
 
-  const prototypeShowLightboxIndex = showLightboxIndex;
+  const baseShowLightboxIndex = showLightboxIndex;
   showLightboxIndex = function(index){
     clearRecentThumbnail();
-    prototypeShowLightboxIndex(index);
+    baseShowLightboxIndex(index);
     if (lightboxIndex === photos.length - 1) prepareNextBatch();
   };
 
-  const prototypeCloseLightbox = closeLightbox;
+  const baseCloseLightbox = closeLightbox;
   closeLightbox = function(){
     const closedItem = lightboxIndex >= 0 ? photos[lightboxIndex] : null;
-    prototypeCloseLightbox();
+    baseCloseLightbox();
     if (closedItem) requestAnimationFrame(() => markRecentThumbnail(closedItem));
   };
 
@@ -354,7 +334,7 @@
     }
   };
 
-  createPhotoSet = async function(options={}){
+  createPhotoSet = async function(options = {}){
     try {
       if (options.forceShuffle) return await shuffleFromBeginning(options);
       return await initializeDeck(options);
@@ -373,17 +353,14 @@
     }
   };
 
-  // The prototype and the Sanity bridge both registered click handlers historically.
-  // Capture first so only this explicit deck reset runs once.
+  // Capture first so the base click handler does not perform a second reset.
   shufflePhotos.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopImmediatePropagation();
     createPhotoSet({preservePosition:true, forceShuffle:true});
   }, {capture:true});
 
-  ensureStyles();
   installInterface();
-
   clearLocalSelection();
   shufflePhotos.disabled = true;
 
