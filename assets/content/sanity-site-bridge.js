@@ -156,6 +156,27 @@
     }
   }
 
+  function applyTitleDescription(section, work){
+    const header = section.querySelector(':scope > .work-head');
+    const value = typeof work.titleDescription === 'string' ? work.titleDescription.trim() : '';
+    const hasTitleDescription = Boolean(value);
+    header?.classList.toggle('has-title-description', hasTitleDescription);
+
+    let element = section.querySelector(':scope > .work-title-description');
+    if (!hasTitleDescription) {
+      element?.remove();
+      return;
+    }
+
+    if (!element) {
+      element = document.createElement('p');
+      element.className = 'work-title-description';
+      if (header?.nextSibling) section.insertBefore(element, header.nextSibling);
+      else section.appendChild(element);
+    }
+    element.textContent = value;
+  }
+
   function createWebStage(title, embedUrl, externalUrl){
     const breakout = document.createElement('div');
     breakout.className = 'live-breakout';
@@ -380,7 +401,6 @@
     const description = descriptionBox?.querySelector('p');
     const summary = typeof work.summary === 'string' ? work.summary : '';
     const hasSummary = Boolean(summary.trim());
-    section.querySelector(':scope > .work-head')?.classList.toggle('has-description', hasSummary);
     if (description) {
       description.textContent = hasSummary ? summary : '';
       description.style.whiteSpace = 'pre-line';
@@ -403,17 +423,10 @@
     }
 
     const hasBlocks = renderContentBlocks(section, work);
-    if (hasBlocks) {
-      const hasCuratedVideoCollection = Array.isArray(work.contentBlocks) && work.contentBlocks.some((block) => block?._type === 'workCuratedVideoCollectionBlock');
-      if (descriptionBox) {
-        descriptionBox.classList.toggle('is-section-intro', hasCuratedVideoCollection && hasSummary);
-        const content = section.querySelector(':scope > .sanity-content-blocks');
-        if (hasCuratedVideoCollection && hasSummary && content) section.insertBefore(descriptionBox, content);
-      }
-      return;
-    }
-
+    applyTitleDescription(section, work);
     descriptionBox?.classList.remove('is-section-intro');
+    if (hasBlocks) return;
+
     if (work.mediaType === 'youtube') {
       renderYouTubeStage(section.querySelector('.yt-stage'), work, forceMedia);
     } else if (work.mediaType === 'webEmbed') {

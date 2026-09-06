@@ -49,7 +49,8 @@ Portfolio Item은 음악, 공연, 영상, 미디어아트, 웹 작업 등의 분
 - `slug`
 - `enabled`
 - `period` — 제목 옆 시간/기간 정보. `2025`, `2022~2024`, `Ongoing` 등의 자유 형식 string
-- `summary`
+- `titleDescription` — 제목 바로 아래, content 이전에 표시되는 선택적 부가설명
+- `summary` — 기존 content Description. media/content 뒤의 설명 역할을 유지
 - `tags` — `tag` document weak reference 배열
 - `contentBlocks` — 미디어·텍스트 block의 순서형 배열
 - `externalUrl` / `actionLabel`
@@ -81,7 +82,7 @@ Portfolio Item과 Photograph의 Tag reference는 현재 `weak: true`다. target 
 
 기본 `Video Collection`은 `videos[]` 배열을 사용한다. 각 item의 최소 필드는 `YouTube URL`, `Title`, `Description`이며 Sanity 배열 순서가 기본 표시 순서다. 첫 item이 초기 선택 영상이다. 향후 year, credit, role 등이 실제로 필요할 때 item field를 추가한다.
 
-표시 영역의 높이, description 내부 scroll/fade, thumbnail tray, mobile 이동 속도와 browser-only Shuffle은 frontend 책임이다. Shuffle은 Content Lake의 배열 순서를 변경하지 않는다.
+frontend는 한 번에 thumbnail 4개만 표시하고 page control로 다음 4개를 탐색한다. mobile은 2열 × 2행, desktop은 4열이다. 개별 영상 Description은 현재 전체 길이를 표시하며 내부 scroll/fade를 사용하지 않는다. `Shuffle order`는 browser 안의 순서만 섞고 Content Lake 배열 순서는 변경하지 않는다.
 
 기존 playlist 자동 추출 구현은 `Playlist Video Collection · backup`으로 유지한다. 이 block만 `playlistUrl` 하나를 source로 사용한다.
 

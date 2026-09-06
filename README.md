@@ -90,13 +90,14 @@ Sanity의 published/enabled `portfolioPhoto` 전체 pool을 하나의 random dec
 기본 `Video Collection` content block은 영상마다 Sanity에서 `YouTube URL`, `Title`, `Description`을 개별 관리한다. 배열 순서가 기본 표시 순서이고 첫 영상이 초기 선택이다.
 
 - 선택된 영상은 상단 16:9 player에 표시한다.
-- player 아래 정보 패널은 고정 높이이며 제목, 현재/전체 번호와 description을 표시한다.
-- description이 패널 높이를 넘으면 내부 세로 스크롤을 사용하고, 아래에 내용이 더 남아 있을 때만 하단 fade cue를 표시한다.
-- mobile thumbnail tray는 2열 × 약 2행 높이의 내부 스크롤 viewport다. desktop은 5열과 제한된 높이를 사용한다.
-- thumbnail 선택 시 mobile에서는 native smooth scroll보다 짧은 custom transition으로 player 위치로 빠르게 이동한다.
-- `Shuffle`은 현재 browser session의 영상/thumbnail 순서와 선택 영상만 섞는다. Sanity 배열 순서는 수정하지 않는다.
-- section-level summary가 있는 Video Collection Portfolio Item은 work header 바로 아래에서 intro copy로 표시한다.
+- player 아래에서 선택 영상의 Title과 Description을 표시한다. Description은 현재 접거나 내부 scroll하지 않고 전체 길이를 표시한다.
+- thumbnail은 한 page에 4개만 표시한다. desktop은 4열, mobile은 2열 × 2행이다.
+- thumbnail 아래의 `PAGE 현재 / 전체` 이전·다음 control로 목록 page를 이동한다.
+- thumbnail 선택 시 mobile에서는 짧은 custom transition으로 player 위치로 빠르게 이동한다.
+- 파란색 `Shuffle order`는 browser 안의 영상 순서와 선택 영상만 섞고 page 1로 돌아간다. Sanity 배열 순서는 수정하지 않는다.
 - `Playlist Video Collection · backup`은 playlist URL 하나로 목록을 자동 생성하는 별도 보존 기능이다.
+
+Portfolio Item에는 `Title description`과 기존 `Description`이 별도로 존재한다. `Title description`은 제목 바로 아래, 모든 content 이전에 표시되며 이 값이 있을 때만 제목 하단 divider가 나타난다. 기존 `Description`은 content 설명으로 기존 위치를 유지한다.
 
 ## Sanity 경계
 
