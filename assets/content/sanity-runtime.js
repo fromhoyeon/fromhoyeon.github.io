@@ -223,7 +223,7 @@
   }
 
   function loadPresentationControls(){
-    loadScriptOnce('assets/content/presentation-controls.js?v=20260903-2', 'data-presentation-controls');
+    loadScriptOnce('assets/content/presentation-controls.js?v=20260906-3', 'data-presentation-controls');
   }
 
   function loadPhotoPoolControls(){
@@ -231,7 +231,7 @@
 
     const loadLightboxInteractions = () => {
       loadScriptOnce(
-        'assets/content/photo-lightbox-interactions.js?v=20260906-1',
+        'assets/content/photo-lightbox-interactions.js?v=20260906-2',
         'data-photo-lightbox-interactions'
       );
     };
