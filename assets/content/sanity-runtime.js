@@ -2,6 +2,7 @@
   Sanity content adapter for GitHub Pages.
   Sanity owns editable copy, navigation, portfolio items and homepage curation.
   Missing remote content remains explicitly OFFLINE instead of mirroring stale local copy.
+  Visual styling is owned by site.css.
 */
 
 (function initSanityRuntime(){
@@ -11,12 +12,7 @@
   const config = window.SANITY_CONFIG || {};
 
   function isEnabled(){
-    return Boolean(
-      config.enabled &&
-      config.projectId &&
-      config.dataset &&
-      config.apiVersion
-    );
+    return Boolean(config.enabled && config.projectId && config.dataset && config.apiVersion);
   }
 
   function showInitialWorkOfflineState(){
@@ -26,18 +22,6 @@
     document.querySelectorAll('main > section.work').forEach((section) => {
       section.hidden = true;
     });
-
-    if (!document.querySelector('#sanity-offline-state-styles')) {
-      const style = document.createElement('style');
-      style.id = 'sanity-offline-state-styles';
-      style.textContent = `
-        .sanity-offline-row{display:grid;grid-template-columns:32px 1fr auto;gap:var(--m);align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px}
-        .sanity-offline-row .num{color:var(--muted);font-size:10px}
-        .sanity-offline-row .offline-word{font-weight:500;letter-spacing:.01em}
-        @media (max-width:620px){.sanity-offline-row{grid-template-columns:24px 1fr auto;gap:10px}}
-      `;
-      document.head.appendChild(style);
-    }
 
     const row = document.createElement('div');
     row.className = 'sanity-offline-row';
@@ -75,7 +59,7 @@
       url.searchParams.set(`$${key}`, JSON.stringify(value));
     });
 
-    const response = await fetch(url.toString(), {headers: {Accept: 'application/json'}});
+    const response = await fetch(url.toString(), {headers:{Accept:'application/json'}});
     if (!response.ok) throw new Error(`Sanity query failed: ${response.status}`);
     const payload = await response.json();
     return payload.result;
@@ -110,9 +94,7 @@
       ui
     }`);
 
-    if (copy && typeof window.mergeSiteCopy === 'function') {
-      window.mergeSiteCopy(copy);
-    }
+    if (copy && typeof window.mergeSiteCopy === 'function') window.mergeSiteCopy(copy);
     return copy;
   }
 
@@ -219,11 +201,7 @@
   }
 
   function loadPortfolioUiOverrides(){
-    loadScriptOnce('assets/content/portfolio-ui-overrides.js?v=20260906-1', 'data-portfolio-ui-overrides');
-  }
-
-  function loadPresentationControls(){
-    loadScriptOnce('assets/content/presentation-controls.js?v=20260906-3', 'data-presentation-controls');
+    loadScriptOnce('assets/content/portfolio-ui-overrides.js?v=20260906-2', 'data-portfolio-ui-overrides');
   }
 
   function loadPhotoPoolControls(){
@@ -231,13 +209,13 @@
 
     const loadLightboxInteractions = () => {
       loadScriptOnce(
-        'assets/content/photo-lightbox-interactions.js?v=20260906-2',
+        'assets/content/photo-lightbox-interactions.js?v=20260906-4',
         'data-photo-lightbox-interactions'
       );
     };
 
     const poolScript = loadScriptOnce(
-      'assets/content/photo-pool-controls.js?v=20260906-3',
+      'assets/content/photo-pool-controls.js?v=20260906-4',
       'data-photo-pool-controls'
     );
 
@@ -253,7 +231,7 @@
     let lastWidth = -1;
     const observer = new ResizeObserver((entries) => {
       const width = entries[0]?.contentRect?.width || 0;
-      if (!width || Math.abs(width - lastWidth) < 0.5) return;
+      if (!width || Math.abs(width - lastWidth) < .5) return;
       lastWidth = width;
       if (typeof window.layoutPhotos === 'function') window.layoutPhotos();
     });
@@ -283,14 +261,8 @@
       });
   }
 
-  const loadEnhancements = () => {
-    loadGalleryLayout();
-    loadPortfolioUiOverrides();
-    loadPresentationControls();
-    loadPhotoPoolControls();
-    observePhotoGridWidth();
-  };
-
-  if (document.readyState === 'complete') loadEnhancements();
-  else window.addEventListener('load', loadEnhancements, {once: true});
+  loadGalleryLayout();
+  loadPortfolioUiOverrides();
+  loadPhotoPoolControls();
+  observePhotoGridWidth();
 })();
