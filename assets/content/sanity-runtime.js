@@ -109,6 +109,7 @@
         "slug": slug.current,
         enabled,
         period,
+        titleDescription,
         summary,
         "tags": tags[]->label,
         contentBlocks[]{
