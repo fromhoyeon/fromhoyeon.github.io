@@ -204,11 +204,13 @@
   }
 
   function loadScriptOnce(src, dataAttribute){
-    if (document.querySelector(`script[${dataAttribute}]`)) return;
+    const existing = document.querySelector(`script[${dataAttribute}]`);
+    if (existing) return existing;
     const script = document.createElement('script');
     script.src = src;
     script.setAttribute(dataAttribute, 'true');
     document.head.appendChild(script);
+    return script;
   }
 
   function loadGalleryLayout(){
@@ -226,7 +228,21 @@
 
   function loadPhotoPoolControls(){
     if (!isEnabled() || config.features?.portfolioPhotos === false) return;
-    loadScriptOnce('assets/content/photo-pool-controls.js?v=20260906-2', 'data-photo-pool-controls');
+
+    const loadLightboxInteractions = () => {
+      loadScriptOnce(
+        'assets/content/photo-lightbox-interactions.js?v=20260906-1',
+        'data-photo-lightbox-interactions'
+      );
+    };
+
+    const poolScript = loadScriptOnce(
+      'assets/content/photo-pool-controls.js?v=20260906-3',
+      'data-photo-pool-controls'
+    );
+
+    if (window.__REMOTE_PHOTO_POOL_CONTROLS__) loadLightboxInteractions();
+    else poolScript?.addEventListener('load', loadLightboxInteractions, {once:true});
   }
 
   function observePhotoGridWidth(){
