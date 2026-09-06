@@ -1,17 +1,138 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-site-theme="white">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Portfolio of Hoyeon Choi">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Hoyeon Choi</title>
-  <link rel="canonical" href="https://fromhoyeon.github.io/prototype-functional-onepage.html">
-  <meta http-equiv="refresh" content="0; url=prototype-functional-onepage.html">
+  <meta name="description" content="Portfolio of Hoyeon Choi.">
+  <link rel="canonical" href="https://fromhoyeon.github.io/">
   <script>
-    location.replace('prototype-functional-onepage.html' + location.hash);
+    try {
+      if (localStorage.getItem('hoyeon-site-color-set') === 'black') {
+        document.documentElement.dataset.siteTheme = 'black';
+      }
+    } catch (error) {}
   </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/content/site.css?v=20260906-1">
 </head>
 <body>
-  <p><a href="prototype-functional-onepage.html">Enter Hoyeon Choi portfolio</a></p>
+  <header class="topbar">
+    <div class="shell">
+      <a class="brand" href="#top"></a>
+      <nav class="nav" aria-label="Primary"></nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="shell intro">
+      <h1></h1>
+      <div class="intro-copy"><p></p></div>
+    </section>
+
+    <nav class="shell index" id="work" aria-label="Work index"></nav>
+
+    <section class="shell work" id="dual" hidden>
+      <header class="work-head">
+        <span class="num"></span>
+        <h2 class="work-title"></h2>
+        <div class="work-meta"></div>
+      </header>
+      <div class="video-breakout">
+        <div class="yt-stage" data-youtube-stage="dual" aria-label="Video"></div>
+      </div>
+      <div class="description">
+        <p></p>
+        <a class="action" data-youtube-action="dual" href="#" hidden></a>
+      </div>
+      <div class="small-strip" hidden></div>
+    </section>
+
+    <section class="shell work" id="photo" hidden>
+      <header class="work-head">
+        <span class="num"></span>
+        <h2 class="work-title"></h2>
+        <div class="work-meta"></div>
+      </header>
+      <div class="photo-breakout">
+        <div class="photo-grid" id="photo-grid" aria-label="Selected photography"></div>
+      </div>
+      <div class="photo-actions">
+        <button class="action" id="shuffle-photos" type="button">Shuffle order</button>
+      </div>
+      <div class="description">
+        <p></p>
+        <a class="action" href="#" hidden></a>
+      </div>
+    </section>
+
+    <section class="shell work" id="dodrei" hidden>
+      <header class="work-head">
+        <span class="num"></span>
+        <h2 class="work-title"></h2>
+        <div class="work-meta"></div>
+      </header>
+      <div class="live-breakout">
+        <div class="live-stage" id="dodrei-stage">
+          <div class="live-gate" id="dodrei-gate">
+            <div class="live-gate-inner">
+              <div class="live-gate-label">Interactive browser work / touch to choose playback</div>
+              <div class="live-gate-title"></div>
+              <div class="live-gate-actions">
+                <button class="action" id="dodrei-play-here" type="button">Play here</button>
+                <a class="action" href="https://fromhoyeon.github.io/dodrei/web/" target="_blank" rel="noopener">Open in new window ↗</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="description">
+        <p></p>
+        <a class="action" href="#" hidden></a>
+      </div>
+    </section>
+
+    <section class="shell work" id="moving" hidden>
+      <header class="work-head">
+        <span class="num"></span>
+        <h2 class="work-title"></h2>
+        <div class="work-meta"></div>
+      </header>
+      <div class="video-breakout">
+        <div class="yt-stage" data-youtube-stage="moving" aria-label="Video"></div>
+      </div>
+      <div class="description">
+        <p></p>
+        <a class="action" data-youtube-action="moving" href="#" hidden></a>
+      </div>
+    </section>
+
+    <section class="shell about" id="about">
+      <h2></h2>
+      <div class="about-grid">
+        <div><p class="label"></p><p></p></div>
+        <div><p class="label"></p><p></p></div>
+      </div>
+    </section>
+
+    <section class="shell" id="links">
+      <div class="links"></div>
+      <footer><span></span><span></span></footer>
+    </section>
+  </main>
+
+  <div class="lightbox" id="photo-lightbox" role="dialog" aria-modal="true" aria-label="Expanded photograph" aria-hidden="true">
+    <img id="lightbox-image" alt="" draggable="false">
+    <div class="lightbox-status" id="lightbox-status" role="status" aria-live="polite"></div>
+  </div>
+
+  <script src="assets/content/site-copy.js?v=20260905-2"></script>
+  <script src="assets/content/sanity-config.js"></script>
+  <script src="assets/content/photo-gallery-core.js?v=20260906-1"></script>
+  <script src="assets/content/presentation-controls.js?v=20260906-4"></script>
+  <script src="assets/content/sanity-runtime.js?v=20260906-2"></script>
+  <script src="assets/content/sanity-prototype-bridge.js?v=20260906-1"></script>
 </body>
 </html>
