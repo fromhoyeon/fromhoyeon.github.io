@@ -111,11 +111,11 @@
       }
       .photo-cell.photo-recently-viewed::after{
         border:0!important;
-        background:rgba(255,255,255,.58)!important;
-        animation:photoRecentWhiteFade 2600ms ease-out forwards!important;
+        background:rgba(255,255,255,.80)!important;
+        animation:photoRecentWhiteFade 1300ms linear forwards!important;
       }
       @keyframes photoRecentWhiteFade{
-        0%,48%{opacity:1}
+        0%,23.0769%{opacity:1}
         100%{opacity:0}
       }
       .photo-lightbox-close{
