@@ -1,9 +1,8 @@
 /*
-  Lightweight presentation controls
-  ---------------------------------
-  White/black color-set switch lives in the footer area.
-  Enlarged-image spacing is read from Sanity Site Copy > Presentation.
-  Desktop lightboxes gain side click zones and mouse swipe navigation.
+  Presentation controls
+  ---------------------
+  Theme state, lightbox spacing and desktop lightbox navigation live here.
+  All visual colors and component styling live in site.css.
 */
 
 (function initPresentationControls(){
@@ -15,66 +14,6 @@
 
   function clamp(value, min, max){
     return Math.max(min, Math.min(max, value));
-  }
-
-  function ensureStyles(){
-    if (document.querySelector('#presentation-controls-styles')) return;
-    const style = document.createElement('style');
-    style.id = 'presentation-controls-styles';
-    style.textContent = `
-      :root{
-        --xl:84px;
-        --lightbox-pad:24px;
-        --lightbox-pad-double:48px;
-      }
-      :root[data-site-theme="white"]{
-        --bg:#fff;
-        --fg:#111;
-        --muted:#6a6a66;
-        --line:#bdbdb7;
-        --panel:#e6e6e6;
-        --topbar-bg:rgba(255,255,255,.96);
-      }
-      :root[data-site-theme="black"]{
-        --bg:#0b0b0b;
-        --fg:#f2f2ef;
-        --muted:#9a9a95;
-        --line:#41413f;
-        --panel:#20201f;
-        --topbar-bg:rgba(11,11,11,.96);
-      }
-      .topbar{background:var(--topbar-bg)!important}
-      .photo-cell{background:var(--panel)!important}
-      .lightbox{background:var(--bg)!important;color:var(--fg)!important;padding:var(--lightbox-pad)!important}
-      .lightbox img{max-width:calc(100vw - var(--lightbox-pad-double))!important;max-height:calc(100svh - var(--lightbox-pad-double))!important}
-      .lightbox-close{background:var(--bg)!important;color:var(--fg)!important;border-color:var(--fg)!important}
-      .theme-compare{padding:10px 0 var(--m);display:flex;justify-content:space-between;align-items:center;gap:var(--m);border-top:1px solid var(--line);font-size:10px;color:var(--muted);text-transform:uppercase}
-      .theme-compare-actions{display:flex;gap:7px}
-      .theme-compare button{appearance:none;padding:5px 8px 4px;cursor:pointer;font:inherit;text-transform:uppercase;border:1px solid transparent;transition:outline-color .12s ease,transform .12s ease}
-      .theme-compare button[data-site-theme-choice="white"]{background:#fff;color:#111;border-color:#9b9b97}
-      .theme-compare button[data-site-theme-choice="black"]{background:#111;color:#fff;border-color:#6b6b68}
-      .theme-compare button[aria-pressed="true"]{outline:2px solid var(--fg);outline-offset:2px}
-      .theme-compare button:hover{transform:translateY(-1px)}
-      .theme-compare button:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
-      .sanity-content-blocks{gap:40px!important}
-      .description{padding-top:20px}
-      .lightbox-nav-zone{display:none;position:absolute;top:0;bottom:0;width:28%;z-index:100;appearance:none;border:0;background:transparent;color:var(--fg);padding:0;cursor:pointer}
-      .lightbox-nav-zone[data-direction="prev"]{left:0;cursor:w-resize}
-      .lightbox-nav-zone[data-direction="next"]{right:0;cursor:e-resize}
-      .lightbox-nav-zone::after{position:absolute;top:50%;transform:translateY(-50%);font-size:22px;font-weight:300;opacity:0;transition:opacity .12s ease}
-      .lightbox-nav-zone[data-direction="prev"]::after{content:'‹';left:18px}
-      .lightbox-nav-zone[data-direction="next"]::after{content:'›';right:18px}
-      .lightbox-nav-zone:hover::after,.lightbox-nav-zone:focus-visible::after{opacity:.55}
-      .lightbox-nav-zone:focus-visible{outline:1px solid var(--line);outline-offset:-1px}
-      @media (min-width:800px){.lightbox-nav-zone{display:block}}
-      @media (max-width:620px){
-        :root{--xl:60px}
-        .theme-compare{padding-bottom:12px}
-        .sanity-content-blocks{gap:30px!important}
-        .description{padding-top:var(--m)}
-      }
-    `;
-    document.head.appendChild(style);
   }
 
   function setTheme(theme, persist = true){
@@ -129,12 +68,12 @@
 
   function dispatchLightboxStep(direction){
     const key = direction < 0 ? 'ArrowLeft' : 'ArrowRight';
-    document.dispatchEvent(new KeyboardEvent('keydown', {key, bubbles: true}));
+    document.dispatchEvent(new KeyboardEvent('keydown', {key, bubbles:true}));
   }
 
-  function enhanceLightbox(lightbox){
-    if (!lightbox || lightbox.dataset.desktopNavEnhanced === 'true') return;
-    lightbox.dataset.desktopNavEnhanced = 'true';
+  function enhanceLightbox(target){
+    if (!target || target.dataset.desktopNavEnhanced === 'true') return;
+    target.dataset.desktopNavEnhanced = 'true';
 
     ['prev', 'next'].forEach((direction) => {
       const button = document.createElement('button');
@@ -146,20 +85,20 @@
         event.stopPropagation();
         dispatchLightboxStep(direction === 'prev' ? -1 : 1);
       });
-      lightbox.appendChild(button);
+      target.appendChild(button);
     });
 
     let pointerStartX = null;
     let pointerStartY = null;
     let suppressClick = false;
 
-    lightbox.addEventListener('pointerdown', (event) => {
+    target.addEventListener('pointerdown', (event) => {
       if (event.pointerType !== 'mouse' || event.button !== 0) return;
       pointerStartX = event.clientX;
       pointerStartY = event.clientY;
     }, true);
 
-    lightbox.addEventListener('pointerup', (event) => {
+    target.addEventListener('pointerup', (event) => {
       if (event.pointerType !== 'mouse' || pointerStartX === null || pointerStartY === null) return;
       const dx = event.clientX - pointerStartX;
       const dy = event.clientY - pointerStartY;
@@ -171,7 +110,7 @@
       setTimeout(() => { suppressClick = false; }, 0);
     }, true);
 
-    lightbox.addEventListener('click', (event) => {
+    target.addEventListener('click', (event) => {
       if (!suppressClick) return;
       event.preventDefault();
       event.stopImmediatePropagation();
@@ -183,7 +122,6 @@
     document.querySelectorAll('.lightbox').forEach(enhanceLightbox);
   }
 
-  ensureStyles();
   makeThemeControls();
   applyLightboxPadding();
   enhanceKnownLightboxes();
@@ -198,5 +136,5 @@
   const lightboxObserver = new MutationObserver((mutations) => {
     if (mutations.some((mutation) => mutation.addedNodes.length)) enhanceKnownLightboxes();
   });
-  lightboxObserver.observe(document.body, {childList: true, subtree: true});
+  lightboxObserver.observe(document.body, {childList:true, subtree:true});
 })();
