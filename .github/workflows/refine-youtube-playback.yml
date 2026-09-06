@@ -1,0 +1,55 @@
+name: Refine YouTube playback
+
+on:
+  push:
+    paths:
+      - '.github/workflows/refine-youtube-playback.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply playback settings
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          js_path = Path('assets/content/video-collection.js')
+          js = js_path.read_text()
+          old = "iframe.src = `https://www.youtube-nocookie.com/embed/${item.videoId}?autoplay=1&controls=1&rel=0&playsinline=1&iv_load_policy=3`;"
+          new = "iframe.src = `https://www.youtube-nocookie.com/embed/${item.videoId}?autoplay=1&controls=0&rel=0&playsinline=1&iv_load_policy=3&cc_load_policy=0`;"
+          if old not in js:
+              raise SystemExit('YouTube iframe source pattern not found')
+          js = js.replace(old, new, 1)
+          js_path.write_text(js)
+
+          index_path = Path('index.html')
+          index = index_path.read_text()
+          index, count = re.subn(r'assets/content/video-collection\.js\?v=20260907-\d+', 'assets/content/video-collection.js?v=20260907-6', index, count=1)
+          if count != 1:
+              raise SystemExit('video collection cache version not found')
+          index_path.write_text(index)
+
+          readme_path = Path('README.md')
+          readme = readme_path.read_text()
+          marker = '- 선택된 영상은 상단 16:9 player에 표시한다.\n'
+          addition = '- 선택된 영상은 상단 16:9 player에 표시한다. poster를 누르면 autoplay로 전환하며 YouTube native controls는 표시하지 않는다. 자막은 강제 활성화하지 않으며 player 요청에서도 비활성 방향으로 둔다.\n'
+          if marker not in readme:
+              raise SystemExit('README player behavior marker not found')
+          readme = readme.replace(marker, addition, 1)
+          readme_path.write_text(readme)
+          PY
+      - name: Validate JavaScript
+        run: node --check assets/content/video-collection.js
+      - name: Commit changes
+        run: |
+          git config user.name "fromhoyeon"
+          git config user.email "fromhoyeon@gmail.com"
+          git add assets/content/video-collection.js index.html README.md
+          git commit -m "Refine YouTube playback UI"
+          git push
