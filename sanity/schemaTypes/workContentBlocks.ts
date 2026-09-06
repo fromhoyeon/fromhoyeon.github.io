@@ -11,6 +11,28 @@ export const workVideoBlock = defineType({
   preview: {select: {title: 'title', subtitle: 'youtubeUrl'}},
 })
 
+export const workVideoCollectionBlock = defineType({
+  name: 'workVideoCollectionBlock',
+  title: 'Video Collection',
+  type: 'object',
+  fields: [
+    defineField({name: 'title', title: 'Optional label', type: 'string'}),
+    defineField({
+      name: 'playlistUrl',
+      title: 'YouTube playlist URL',
+      description: 'Paste one YouTube playlist URL. The site uses every video in playlist order.',
+      type: 'url',
+      validation: (rule) => rule.required(),
+    }),
+  ],
+  preview: {
+    select: {title: 'title', subtitle: 'playlistUrl'},
+    prepare({title, subtitle}) {
+      return {title: title || 'Video Collection', subtitle}
+    },
+  },
+})
+
 export const workTextBlock = defineType({
   name: 'workTextBlock',
   title: 'Text',
