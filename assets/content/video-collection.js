@@ -54,14 +54,11 @@
     }
 
     const stage = document.createElement('div');
-    stage.className = 'video-collection-stage';
+    stage.className = 'video-collection-stage yt-stage';
     stage.tabIndex = -1;
 
-    const info = document.createElement('div');
-    info.className = 'video-collection-info';
-
-    const infoHead = document.createElement('div');
-    infoHead.className = 'video-collection-meta';
+    const meta = document.createElement('div');
+    meta.className = 'video-collection-meta';
 
     const currentTitle = document.createElement('div');
     currentTitle.className = 'video-collection-current-title';
@@ -70,10 +67,9 @@
     status.className = 'video-collection-status';
 
     const currentDescription = document.createElement('div');
-    currentDescription.className = 'video-collection-description';
+    currentDescription.className = 'sanity-text-block video-collection-description';
 
-    infoHead.append(currentTitle, status);
-    info.append(infoHead, currentDescription);
+    meta.append(currentTitle, status);
 
     const grid = document.createElement('div');
     grid.className = 'video-collection-grid';
@@ -89,7 +85,7 @@
 
       stage.replaceChildren();
       const poster = document.createElement('button');
-      poster.className = 'video-collection-poster';
+      poster.className = 'yt-poster';
       poster.type = 'button';
       poster.setAttribute('aria-label', `Play ${item.title || 'video'}`);
 
@@ -155,7 +151,7 @@
       grid.appendChild(button);
     });
 
-    collection.append(stage, info, grid);
+    collection.append(stage, meta, currentDescription, grid);
     renderStage(0);
     return breakout;
   }
