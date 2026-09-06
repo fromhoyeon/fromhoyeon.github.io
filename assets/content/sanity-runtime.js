@@ -117,6 +117,7 @@
           title,
           text,
           youtubeUrl,
+          playlistUrl,
           embedUrl,
           externalUrl,
           rowCount,
