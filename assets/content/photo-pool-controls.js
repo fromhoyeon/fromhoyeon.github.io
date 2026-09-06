@@ -1,7 +1,7 @@
 /*
-  Keep every photography shuffle path on the active Sanity photo pool.
-  The local sample list remains only inside the old prototype source for layout testing;
-  it is never used as a public fallback.
+  Keep Selected Photography on one randomized Sanity-backed deck for a limited session.
+  Only the current 12-photo batch is rendered. Reaching the final image prepares the
+  next batch, so a deck does not repeat photos before it is exhausted.
 */
 
 (function installRemotePhotoPoolControls(){
@@ -11,7 +11,15 @@
   if (!window.SANITY_CONTENT?.isEnabled?.() || typeof window.SANITY_CONTENT.fetchPortfolioPhotos !== 'function') return;
   if (typeof createPhotoSet !== 'function' || typeof reshuffleFromLightboxEnd !== 'function') return;
 
+  const BATCH_SIZE = 12;
+  const SESSION_KEY = 'hoyeon-selected-photography-deck-v1';
+  const SESSION_TTL_MS = 2 * 60 * 60 * 1000;
+  const FULL_PRELOAD_COUNT = 3;
+
   let remotePoolPromise = null;
+  let deck = [];
+  let currentBatchStart = 0;
+  let preparedBatchStart = null;
 
   function ensureStyles(){
     if (document.querySelector('#photo-pool-offline-styles')) return;
@@ -29,42 +37,16 @@
     return item._id || item.file || item.src || '';
   }
 
-  function resolvePhotoDimensions(item){
-    if (item?.ratio && item?.width && item?.height) return Promise.resolve(item);
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve({
-        ...item,
-        width: img.naturalWidth,
-        height: img.naturalHeight,
-        ratio: img.naturalWidth / img.naturalHeight
-      });
-      img.onerror = reject;
-      img.src = item?.src || '';
-    });
-  }
-
   async function remotePool(){
     if (!remotePoolPromise) {
       remotePoolPromise = window.SANITY_CONTENT.fetchPortfolioPhotos()
-        .then(async (items) => {
-          const loaded = await Promise.allSettled((items || []).map(resolvePhotoDimensions));
-          return loaded
-            .filter((result) => result.status === 'fulfilled')
-            .map((result) => result.value)
-            .filter((item) => item?.src && item?.ratio);
-        })
+        .then((items) => (items || []).filter((item) => item?.src && item?.ratio))
         .catch((error) => {
           remotePoolPromise = null;
           throw error;
         });
     }
     return remotePoolPromise;
-  }
-
-  function requestedCount(poolLength){
-    const currentCount = Array.isArray(photos) && photos.length ? photos.length : 12;
-    return Math.max(1, Math.min(currentCount, poolLength));
   }
 
   function clearLocalSelection(){
@@ -85,7 +67,85 @@
     photoGrid.dataset.photoPoolState = 'offline';
   }
 
-  async function renderRemoteSelection({preservePosition=false}={}){
+  function readSavedState(pool){
+    try {
+      const raw = localStorage.getItem(SESSION_KEY);
+      if (!raw) return null;
+      const saved = JSON.parse(raw);
+      if (!saved?.savedAt || Date.now() - saved.savedAt > SESSION_TTL_MS) {
+        localStorage.removeItem(SESSION_KEY);
+        return null;
+      }
+
+      const poolById = new Map(pool.map((item) => [identity(item), item]));
+      const orderedIds = Array.isArray(saved.order) ? saved.order : [];
+      if (orderedIds.length !== pool.length) return null;
+
+      const restoredDeck = orderedIds.map((id) => poolById.get(id));
+      if (restoredDeck.some((item) => !item)) return null;
+
+      const maxStart = Math.max(0, Math.floor((restoredDeck.length - 1) / BATCH_SIZE) * BATCH_SIZE);
+      const batchStart = Math.max(0, Math.min(Number(saved.batchStart) || 0, maxStart));
+      return {deck: restoredDeck, batchStart};
+    } catch (error) {
+      console.warn('[Photography] Could not restore saved deck.', error);
+      return null;
+    }
+  }
+
+  function saveState(){
+    if (!deck.length) return;
+    try {
+      localStorage.setItem(SESSION_KEY, JSON.stringify({
+        savedAt: Date.now(),
+        order: deck.map(identity),
+        batchStart: currentBatchStart
+      }));
+    } catch (error) {
+      console.warn('[Photography] Could not save deck state.', error);
+    }
+  }
+
+  function preloadImage(src){
+    if (!src) return;
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = src;
+  }
+
+  function prepareNextBatch(){
+    const nextStart = currentBatchStart + BATCH_SIZE;
+    if (nextStart >= deck.length) {
+      preparedBatchStart = null;
+      return false;
+    }
+    if (preparedBatchStart === nextStart) return true;
+
+    const nextBatch = deck.slice(nextStart, nextStart + BATCH_SIZE);
+    nextBatch.forEach((item) => preloadImage(item.src));
+    nextBatch.slice(0, FULL_PRELOAD_COUNT).forEach((item) => preloadImage(item.fullSrc || item.src));
+    preparedBatchStart = nextStart;
+    return true;
+  }
+
+  function renderBatch(start, {preservePosition=false}={}){
+    if (!deck.length) return false;
+
+    const maxStart = Math.max(0, Math.floor((deck.length - 1) / BATCH_SIZE) * BATCH_SIZE);
+    currentBatchStart = Math.max(0, Math.min(start, maxStart));
+    photos = deck.slice(currentBatchStart, currentBatchStart + BATCH_SIZE);
+    preparedBatchStart = null;
+    lightboxIndex = -1;
+
+    const anchorTop = preservePosition ? photoGrid.getBoundingClientRect().top : null;
+    delete photoGrid.dataset.photoPoolState;
+    layoutPhotos();
+    restoreGalleryViewport(anchorTop);
+    saveState();
+    return true;
+  }
+
+  async function initializeDeck({preservePosition=false, forceShuffle=false}={}){
     const pool = await remotePool();
     if (!pool.length) {
       showUnavailable();
@@ -96,98 +156,107 @@
     photoShuffleInProgress = true;
     shufflePhotos.disabled = true;
     if (preservePosition) shufflePhotos.blur();
-    const anchorTop = preservePosition ? photoGrid.getBoundingClientRect().top : null;
 
     try {
-      const count = requestedCount(pool.length);
-      photos = shuffled(pool).slice(0, count);
-      lightboxIndex = -1;
-      delete photoGrid.dataset.photoPoolState;
-      layoutPhotos();
-      restoreGalleryViewport(anchorTop);
-      return true;
+      const restored = forceShuffle ? null : readSavedState(pool);
+      deck = restored?.deck || shuffled(pool);
+      currentBatchStart = restored?.batchStart || 0;
+      return renderBatch(currentBatchStart, {preservePosition});
     } finally {
       shufflePhotos.disabled = false;
       photoShuffleInProgress = false;
     }
   }
 
-  createPhotoSet = async function(options={}){
-    try {
-      await renderRemoteSelection(options);
-    } catch (error) {
-      console.warn('[Photography] Remote photo pool unavailable.', error);
-      showUnavailable();
-    }
-  };
-
-  reshuffleFromLightboxEnd = async function(){
-    if (photoShuffleInProgress || !photos.length) return;
-    const current = photos[lightboxIndex];
-    if (!current) return;
-
-    let pool;
-    try {
-      pool = await remotePool();
-    } catch (error) {
-      console.warn('[Photography] Remote end shuffle unavailable.', error);
-      showUnavailable();
-      return;
-    }
+  async function shuffleFromBeginning({preservePosition=true}={}){
+    const pool = await remotePool();
     if (!pool.length) {
       showUnavailable();
-      return;
+      return false;
     }
+    if (photoShuffleInProgress) return true;
 
     photoShuffleInProgress = true;
     shufflePhotos.disabled = true;
-    const anchorTop = photoGrid.getBoundingClientRect().top;
-    showLightboxMessage('Last image\nShuffling selection…', 2200, 'info');
+    shufflePhotos.blur();
 
     try {
-      const count = requestedCount(pool.length);
-      const currentId = identity(current);
-      const candidates = pool.filter((item) => identity(item) !== currentId);
-      const nextPhotos = [current, ...shuffled(candidates).slice(0, Math.max(0, count - 1))];
-
-      if (nextPhotos.length < 2) {
-        showLightboxMessage('Last image\nShuffle unavailable', 1800);
-        return;
-      }
-
-      photos = nextPhotos;
-      layoutPhotos();
-      restoreGalleryViewport(anchorTop);
-
-      if (lightbox.classList.contains('is-open')) {
-        lightboxIndex = 0;
-        showLightboxIndex(0);
-        showLightboxMessage(`Last image\nSelection shuffled · 1 / ${photos.length}`, 1800, 'success');
-      } else {
-        lightboxIndex = -1;
-      }
+      deck = shuffled(pool);
+      currentBatchStart = 0;
+      return renderBatch(0, {preservePosition});
     } finally {
       shufflePhotos.disabled = false;
       photoShuffleInProgress = false;
     }
+  }
+
+  function advanceFromLightboxEnd(){
+    if (!photos.length || lightboxIndex < photos.length - 1) return false;
+
+    const nextStart = currentBatchStart + BATCH_SIZE;
+    if (nextStart >= deck.length) {
+      showLightboxMessage('Last image', 1400);
+      return false;
+    }
+
+    // The inline lightbox calls this once when the final image is first shown and
+    // again when the viewer moves forward. The first call only prepares assets.
+    if (preparedBatchStart !== nextStart) {
+      prepareNextBatch();
+      return true;
+    }
+
+    const anchorTop = photoGrid.getBoundingClientRect().top;
+    currentBatchStart = nextStart;
+    photos = deck.slice(currentBatchStart, currentBatchStart + BATCH_SIZE);
+    preparedBatchStart = null;
+    layoutPhotos();
+    restoreGalleryViewport(anchorTop);
+    saveState();
+
+    if (lightbox.classList.contains('is-open')) {
+      lightboxIndex = 0;
+      showLightboxIndex(0);
+    } else {
+      lightboxIndex = -1;
+    }
+    return true;
+  }
+
+  createPhotoSet = async function(options={}){
+    try {
+      if (options.forceShuffle) return await shuffleFromBeginning(options);
+      return await initializeDeck(options);
+    } catch (error) {
+      console.warn('[Photography] Remote photo pool unavailable.', error);
+      showUnavailable();
+      return false;
+    }
+  };
+
+  reshuffleFromLightboxEnd = async function(){
+    try {
+      advanceFromLightboxEnd();
+    } catch (error) {
+      console.warn('[Photography] Could not advance photo deck.', error);
+    }
   };
 
   // The prototype and the Sanity bridge both registered click handlers historically.
-  // Capture the click first so only the remote-pool path runs once.
+  // Capture first so only this explicit deck reset runs once.
   shufflePhotos.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopImmediatePropagation();
-    createPhotoSet({preservePosition:true});
+    createPhotoSet({preservePosition:true, forceShuffle:true});
   }, {capture:true});
 
   ensureStyles();
+  shufflePhotos.textContent = 'Shuffle';
 
-  // Erase any local sample selection created by the legacy inline prototype before
-  // attempting the canonical Sanity pool.
   clearLocalSelection();
   shufflePhotos.disabled = true;
 
-  renderRemoteSelection().catch((error) => {
+  initializeDeck().catch((error) => {
     console.warn('[Photography] Could not load remote photo pool.', error);
     showUnavailable();
   });
