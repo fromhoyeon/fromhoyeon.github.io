@@ -14,7 +14,7 @@
   const BATCH_SIZE = 12;
   const SESSION_KEY = 'hoyeon-selected-photography-deck-v1';
   const SESSION_TTL_MS = 2 * 60 * 60 * 1000;
-  const FULL_PRELOAD_COUNT = 3;
+  const FULL_PRELOAD_COUNT = 1;
   const RECENT_THUMBNAIL_MS = 2600;
 
   let remotePoolPromise = null;
