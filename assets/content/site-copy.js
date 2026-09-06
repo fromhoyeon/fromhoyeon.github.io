@@ -44,8 +44,7 @@ clearStructuralShellContent();
 
 const CONTACT_EMAIL = 'fromhoyeon@gmail.com';
 const STATIC_EXTERNAL_LINKS = [
-  {label:'Instagram', href:'https://www.instagram.com/hoyeon.choi/'},
-  {label:'GitHub', href:'https://github.com/fromhoyeon'}
+  {label:'Instagram', href:'https://www.instagram.com/hoyeon.choi/'}
 ];
 
 async function copyText(value){
@@ -116,6 +115,33 @@ function createEmailContact(){
   return wrapper;
 }
 
+function createUnavailableYouTube(){
+  const button = document.createElement('button');
+  button.className = 'email-copy-row';
+  button.type = 'button';
+  button.setAttribute('aria-label', 'YouTube, temporarily unavailable');
+
+  const label = document.createElement('span');
+  label.className = 'email-copy-label';
+  label.textContent = 'YouTube';
+
+  const status = document.createElement('span');
+  status.className = 'email-copy-hint is-hidden';
+  status.textContent = 'Temporarily unavailable';
+  status.setAttribute('role', 'status');
+  status.setAttribute('aria-live', 'polite');
+
+  let hideTimer = 0;
+  button.append(label, status);
+  button.addEventListener('click', () => {
+    window.clearTimeout(hideTimer);
+    status.classList.remove('is-hidden');
+    hideTimer = window.setTimeout(() => status.classList.add('is-hidden'), 1800);
+  });
+
+  return button;
+}
+
 function applyStaticExternalLinks(){
   const links = document.querySelector('#links .links');
   if (!links) return;
@@ -134,8 +160,9 @@ function applyStaticExternalLinks(){
     link.append(label, arrow);
     return link;
   });
+  const youtube = createUnavailableYouTube();
 
-  links.replaceChildren(email, ...externalLinks);
+  links.replaceChildren(email, ...externalLinks, youtube);
 }
 
 applyStaticExternalLinks();
