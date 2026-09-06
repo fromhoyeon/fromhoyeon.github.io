@@ -2,11 +2,24 @@
   Hoyeon website v1 visual system
   ------------------------------
   This file is the canonical source for site color tokens and core layout styles.
-  Theme-aware UI must consume semantic variables from here instead of hardcoding
+  Theme-aware UI consumes semantic variables from here instead of hardcoding
   white/black values in JavaScript.
 */
 
 :root{
+  /* Canonical palette. Change theme colors here, once. */
+  --palette-white-bg:#fff;
+  --palette-white-fg:#111;
+  --palette-white-muted:#6a6a66;
+  --palette-white-line:#bdbdb7;
+  --palette-white-panel:#e6e6e6;
+
+  --palette-black-bg:#0b0b0b;
+  --palette-black-fg:#f2f2ef;
+  --palette-black-muted:#9a9a95;
+  --palette-black-line:#41413f;
+  --palette-black-panel:#20201f;
+
   /* Structural scale */
   --content:680px;
   --wide:1080px;
@@ -16,6 +29,7 @@
   --l:32px;
   --xl:84px;
   --work-gap:128px;
+  --content-block-gap:40px;
   --lightbox-pad:24px;
   --lightbox-pad-double:48px;
 
@@ -32,31 +46,23 @@
   --media-white:#fff;
   --embed-gate-bg:#292d32;
   --embed-gate-fg:#fff;
-
-  /* Theme preview swatches. Keep these in sync with the theme definitions below. */
-  --theme-white-swatch-bg:#fff;
-  --theme-white-swatch-fg:#111;
-  --theme-white-swatch-line:#9b9b97;
-  --theme-black-swatch-bg:#0b0b0b;
-  --theme-black-swatch-fg:#f2f2ef;
-  --theme-black-swatch-line:#6b6b68;
 }
 
 :root,
 :root[data-site-theme="white"]{
-  --bg:#fff;
-  --fg:#111;
-  --muted:#6a6a66;
-  --line:#bdbdb7;
-  --panel:#e6e6e6;
+  --bg:var(--palette-white-bg);
+  --fg:var(--palette-white-fg);
+  --muted:var(--palette-white-muted);
+  --line:var(--palette-white-line);
+  --panel:var(--palette-white-panel);
 }
 
 :root[data-site-theme="black"]{
-  --bg:#0b0b0b;
-  --fg:#f2f2ef;
-  --muted:#9a9a95;
-  --line:#41413f;
-  --panel:#20201f;
+  --bg:var(--palette-black-bg);
+  --fg:var(--palette-black-fg);
+  --muted:var(--palette-black-muted);
+  --line:var(--palette-black-line);
+  --panel:var(--palette-black-panel);
 }
 
 :root{
@@ -111,7 +117,7 @@ button.action{background:transparent;cursor:pointer}
 .small-strip{margin-top:var(--m);display:flex;flex-wrap:wrap;gap:6px}
 .tag{border:1px solid var(--line);padding:4px 6px 3px;font-size:9px;color:var(--muted);text-transform:uppercase}
 
-.sanity-content-blocks{display:grid;gap:40px}
+.sanity-content-blocks{display:grid;gap:var(--content-block-gap)!important}
 .sanity-content-block{min-width:0}
 .sanity-block-label{margin:0 0 8px;font-size:9px;line-height:1.3;color:var(--muted);text-transform:uppercase;letter-spacing:.02em}
 .sanity-text-block{max-width:560px;font-size:13px;white-space:pre-line}
@@ -120,7 +126,7 @@ button.action{background:transparent;cursor:pointer}
 .sanity-gallery-item{margin:0;min-width:0}
 .sanity-gallery-item img{display:block;width:100%;height:auto;background:var(--panel)}
 .sanity-gallery-item figcaption{padding-top:5px;font-size:9px;color:var(--muted)}
-.sanity-content-block[data-block-type="workVideoBlock"] + .sanity-content-block[data-block-type="workVideoBlock"]{margin-top:calc(10px - 40px)}
+.sanity-content-block[data-block-type="workVideoBlock"] + .sanity-content-block[data-block-type="workVideoBlock"]{margin-top:calc(10px - var(--content-block-gap))}
 
 .photo-breakout{width:min(calc(100vw - 24px),var(--wide));margin-left:50%;transform:translateX(-50%)}
 .photo-grid{width:100%;min-height:180px}
@@ -202,8 +208,8 @@ footer{border-top:1px solid var(--fg);padding:10px 0 var(--l);display:flex;justi
 .theme-compare{padding:10px 0 var(--m);display:flex;justify-content:space-between;align-items:center;gap:var(--m);border-top:1px solid var(--line);font-size:10px;color:var(--muted);text-transform:uppercase}
 .theme-compare-actions{display:flex;gap:7px}
 .theme-compare button{appearance:none;padding:5px 8px 4px;cursor:pointer;font:inherit;text-transform:uppercase;border:1px solid transparent;transition:outline-color .12s ease,transform .12s ease}
-.theme-compare button[data-site-theme-choice="white"]{background:var(--theme-white-swatch-bg);color:var(--theme-white-swatch-fg);border-color:var(--theme-white-swatch-line)}
-.theme-compare button[data-site-theme-choice="black"]{background:var(--theme-black-swatch-bg);color:var(--theme-black-swatch-fg);border-color:var(--theme-black-swatch-line)}
+.theme-compare button[data-site-theme-choice="white"]{background:var(--palette-white-bg);color:var(--palette-white-fg);border-color:var(--palette-white-line)}
+.theme-compare button[data-site-theme-choice="black"]{background:var(--palette-black-bg);color:var(--palette-black-fg);border-color:var(--palette-black-line)}
 .theme-compare button[aria-pressed="true"],.theme-compare button:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
 .theme-compare button:hover{transform:translateY(-1px)}
 
@@ -211,7 +217,7 @@ footer{border-top:1px solid var(--fg);padding:10px 0 var(--l);display:flex;justi
 @media (min-width:800px){.lightbox-nav-zone{display:block}}
 
 @media (max-width:620px){
-  :root{--l:24px;--xl:60px;--s:5px;--work-gap:96px}
+  :root{--l:24px;--xl:60px;--s:5px;--work-gap:96px;--content-block-gap:30px}
   .shell{width:calc(100% - 20px)}
   .topbar .shell{min-height:40px}
   .nav{gap:12px}
@@ -232,8 +238,7 @@ footer{border-top:1px solid var(--fg);padding:10px 0 var(--l);display:flex;justi
   .live-gate .action{text-align:center;padding:9px 8px 8px}
   .about-grid{grid-template-columns:1fr}
   .lightbox-status{bottom:12px}
-  .sanity-content-blocks{gap:30px}
-  .sanity-content-block[data-block-type="workVideoBlock"] + .sanity-content-block[data-block-type="workVideoBlock"]{margin-top:calc(8px - 30px)}
+  .sanity-content-block[data-block-type="workVideoBlock"] + .sanity-content-block[data-block-type="workVideoBlock"]{margin-top:calc(8px - var(--content-block-gap))}
   #lightbox-image{touch-action:none;transform-origin:center center;will-change:transform}
   #photo-lightbox.is-zoomed #lightbox-image{cursor:grabbing}
   .theme-compare{padding-bottom:12px}
