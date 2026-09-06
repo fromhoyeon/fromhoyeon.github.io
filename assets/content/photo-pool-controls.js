@@ -199,13 +199,6 @@
       return false;
     }
 
-    // The inline lightbox calls this once when the final image is first shown and
-    // again when the viewer moves forward. The first call only prepares assets.
-    if (preparedBatchStart !== nextStart) {
-      prepareNextBatch();
-      return true;
-    }
-
     const anchorTop = photoGrid.getBoundingClientRect().top;
     currentBatchStart = nextStart;
     photos = deck.slice(currentBatchStart, currentBatchStart + BATCH_SIZE);
@@ -222,6 +215,35 @@
     }
     return true;
   }
+
+  const prototypeShowLightboxIndex = showLightboxIndex;
+  showLightboxIndex = function(index){
+    prototypeShowLightboxIndex(index);
+    if (lightboxIndex === photos.length - 1) prepareNextBatch();
+  };
+
+  stepLightbox = function(direction){
+    if (!lightbox.classList.contains('is-open') || !photos.length) return;
+
+    if (direction < 0) {
+      if (lightboxIndex <= 0) {
+        showLightboxMessage(`First image · 1 / ${photos.length}`);
+        return;
+      }
+      const nextIndex = lightboxIndex - 1;
+      showLightboxIndex(nextIndex);
+      if (nextIndex === 0) showLightboxMessage(`First image · 1 / ${photos.length}`);
+      return;
+    }
+
+    if (direction > 0) {
+      if (lightboxIndex >= photos.length - 1) {
+        advanceFromLightboxEnd();
+        return;
+      }
+      showLightboxIndex(lightboxIndex + 1);
+    }
+  };
 
   createPhotoSet = async function(options={}){
     try {
