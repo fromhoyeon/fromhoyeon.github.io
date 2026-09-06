@@ -181,7 +181,7 @@
       poster.addEventListener('click', () => {
         const iframe = document.createElement('iframe');
         iframe.title = `${item.title || 'YouTube'} video player`;
-        iframe.src = `https://www.youtube-nocookie.com/embed/${item.videoId}?autoplay=1&controls=1&rel=0&playsinline=1&iv_load_policy=3`;
+        iframe.src = `https://www.youtube-nocookie.com/embed/${item.videoId}?autoplay=1&controls=0&rel=0&playsinline=1&iv_load_policy=3&cc_load_policy=0`;
         iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
         iframe.referrerPolicy = 'strict-origin-when-cross-origin';
         iframe.setAttribute('allowfullscreen', '');

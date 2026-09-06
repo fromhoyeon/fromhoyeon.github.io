@@ -89,7 +89,7 @@ Sanity의 published/enabled `portfolioPhoto` 전체 pool을 하나의 random dec
 
 기본 `Video Collection` content block은 영상마다 Sanity에서 `YouTube URL`, `Title`, `Description`을 개별 관리한다. Sanity 배열은 source order로만 보존한다. 페이지를 열 때는 `Jihye Lee Orchestra - We Are All From The Same Stream`을 첫 영상으로 고정하고 나머지 영상 순서만 browser에서 셔플한다.
 
-- 선택된 영상은 상단 16:9 player에 표시한다.
+- 선택된 영상은 상단 16:9 player에 표시한다. poster를 누르면 autoplay로 전환하며 YouTube native controls는 표시하지 않는다. 자막은 강제 활성화하지 않으며 player 요청에서도 비활성 방향으로 둔다.
 - player 아래에서 선택 영상의 Title과 Description을 표시한다. Description은 현재 접거나 내부 scroll하지 않고 전체 길이를 표시한다.
 - thumbnail은 한 page에 4개만 표시한다. desktop은 4열, mobile은 2열 × 2행이다. 각 thumbnail 하단에는 영상 Title을 한 줄로 표시하고 넘치는 글자는 ellipsis로 생략한다.
 - thumbnail 아래의 `PAGE 현재 / 전체` 이전·다음 control로 목록 page를 이동한다.
