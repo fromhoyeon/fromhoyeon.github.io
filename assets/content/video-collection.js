@@ -9,6 +9,7 @@
 
   const PAGE_SIZE = 4;
   const INITIAL_VIDEO_ID = 'VvSIj9rhanA';
+  const YOUTUBE_THUMBNAIL_VERSION = '20260907-1';
 
   function extractYouTubeId(value){
     if (!value || typeof value !== 'string') return '';
@@ -29,7 +30,7 @@
   }
 
   function thumbnailUrl(videoId){
-    return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+    return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg?v=${YOUTUBE_THUMBNAIL_VERSION}`;
   }
 
   function shuffled(items){
