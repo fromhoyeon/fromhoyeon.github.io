@@ -27,6 +27,55 @@ export const siteCopy = defineType({
       fields: [
         textField('title', 'Title', 2),
         textField('body', 'Body', 4),
+        defineField({
+          name: 'accentImage',
+          title: 'Accent image',
+          type: 'image',
+          options: {hotspot: true},
+        }),
+        textField('accentImageAlt', 'Accent image alt text', 1),
+        defineField({
+          name: 'accentImageEnabled',
+          title: 'Show accent image',
+          type: 'boolean',
+          initialValue: true,
+        }),
+        defineField({
+          name: 'accentImagePosition',
+          title: 'Accent image position',
+          type: 'string',
+          initialValue: 'beforeTitle',
+          options: {
+            list: [
+              {title: 'Before title', value: 'beforeTitle'},
+              {title: 'Between title and description', value: 'afterTitle'},
+              {title: 'After description', value: 'afterBody'},
+            ],
+            layout: 'radio',
+          },
+        }),
+        defineField({
+          name: 'accentImageWidth',
+          title: 'Accent image width (px)',
+          description: 'Base rendered width on the site. Choose a value from 32 to 320 px.',
+          type: 'number',
+          initialValue: 96,
+          validation: (rule) => rule.integer().min(32).max(320),
+        }),
+        defineField({
+          name: 'accentImageAlign',
+          title: 'Accent image alignment',
+          type: 'string',
+          initialValue: 'center',
+          options: {
+            list: [
+              {title: 'Left', value: 'left'},
+              {title: 'Center', value: 'center'},
+              {title: 'Right', value: 'right'},
+            ],
+            layout: 'radio',
+          },
+        }),
       ],
     }),
     defineField({
