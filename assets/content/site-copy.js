@@ -2,40 +2,13 @@
   Sanity-bound site text bridge
   ----------------------------
   Sanity is the source of truth for editable site text and navigation.
-  Local prototype copy is never used as public fallback content.
-  Any bound text that has not arrived from Sanity renders as OFFLINE.
+  Local structural shells are never used as public copy fallbacks.
+  Visual styling is owned by site.css; runtime/module boot is owned by index.html.
 */
 
 window.SITE_COPY = {};
 
-function applyBasePalette(){
-  if (document.querySelector('#site-palette-overrides')) return;
-  const style = document.createElement('style');
-  style.id = 'site-palette-overrides';
-  style.textContent = `
-    :root:not([data-site-theme]){--bg:#fff;--panel:#e6e6e6}
-    .topbar{background:var(--topbar-bg,rgba(255,255,255,.96))}
-    .photo-cell{background:var(--panel)}
-    .email-copy-row{appearance:none;width:100%;border:0;border-bottom:1px solid var(--line);padding:9px 0;background:transparent;color:var(--fg);display:flex;align-items:baseline;justify-content:flex-start;gap:.45em;text-align:left;font:inherit;font-size:12px;cursor:pointer}
-    .email-copy-row:hover .email-copy-label{text-decoration:underline;text-underline-offset:2px}
-    .email-copy-row:focus-visible{outline:1px solid var(--fg);outline-offset:3px}
-    .email-copy-hint{color:var(--muted);font-size:10px;font-weight:400;white-space:nowrap;transition:opacity .14s ease}
-    .email-copy-hint.is-hidden{opacity:0;visibility:hidden}
-    .email-followup{display:none;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:10px;color:var(--muted)}
-    .email-followup.is-visible{display:flex}
-    .email-followup a{display:inline-block;border:1px solid var(--line);padding:5px 7px 4px;background:transparent;color:var(--fg);font-size:9px;text-transform:uppercase;white-space:nowrap}
-    .email-followup a:hover,.email-followup a:focus-visible{border-color:var(--fg);background:var(--fg);color:var(--bg)}
-    .email-followup a:focus-visible{outline:1px solid var(--fg);outline-offset:2px}
-    @media (max-width:620px){.email-followup{align-items:flex-start;flex-direction:column}.email-followup a{align-self:flex-start}}
-  `;
-  document.head.appendChild(style);
-}
-
-applyBasePalette();
-
-function scrubLegacyPrototypeContent(){
-  // Keep the old HTML only as a structural shell. None of its sample copy is
-  // allowed to survive as public fallback when a Sanity field is empty.
+function clearStructuralShellContent(){
   document.querySelector('.intro-copy span')?.remove();
 
   const index = document.querySelector('#work');
@@ -67,9 +40,13 @@ function scrubLegacyPrototypeContent(){
   });
 }
 
-scrubLegacyPrototypeContent();
+clearStructuralShellContent();
 
 const CONTACT_EMAIL = 'fromhoyeon@gmail.com';
+const STATIC_EXTERNAL_LINKS = [
+  {label:'Instagram', href:'https://www.instagram.com/hoyeon.choi/'},
+  {label:'GitHub', href:'https://github.com/fromhoyeon'}
+];
 
 async function copyText(value){
   if (navigator.clipboard?.writeText) {
@@ -143,20 +120,12 @@ function applyStaticExternalLinks(){
   const links = document.querySelector('#links .links');
   if (!links) return;
 
-  const items = [
-    {label: 'Instagram', href: 'https://www.instagram.com/hoyeon.choi/', external: true},
-    {label: 'YouTube', href: '#'},
-    {label: 'GitHub', href: '#'}
-  ];
-
   const email = createEmailContact();
-  const externalLinks = items.map((item) => {
+  const externalLinks = STATIC_EXTERNAL_LINKS.map((item) => {
     const link = document.createElement('a');
     link.href = item.href;
-    if (item.external) {
-      link.target = '_blank';
-      link.rel = 'noopener';
-    }
+    link.target = '_blank';
+    link.rel = 'noopener';
 
     const label = document.createElement('span');
     label.textContent = item.label;
@@ -212,7 +181,7 @@ window.applySiteCopy = function applySiteCopy(source = window.SITE_COPY){
   const brand = getCopyValue(source, 'site.brand');
   document.title = typeof brand === 'string' && brand ? brand : 'OFFLINE';
 
-  SITE_COPY_BINDINGS.forEach(([path, selector, allowHtml]) => {
+  SITE_COPY_BINDINGS.forEach(([path, selector]) => {
     const element = document.querySelector(selector);
     if (!element) return;
 
@@ -220,8 +189,7 @@ window.applySiteCopy = function applySiteCopy(source = window.SITE_COPY){
     const value = typeof remoteValue === 'string' && remoteValue.length ? remoteValue : 'OFFLINE';
 
     if (MULTILINE_COPY_PATHS.has(path)) element.style.whiteSpace = 'pre-line';
-    if (allowHtml) element.innerHTML = value;
-    else element.textContent = value;
+    element.textContent = value;
   });
 };
 
@@ -256,32 +224,8 @@ window.applySiteNavigation = function applySiteNavigation(items){
 window.mergeSiteCopy = function mergeSiteCopy(patch){
   deepMerge(window.SITE_COPY, patch);
   window.applySiteCopy(window.SITE_COPY);
-  window.dispatchEvent(new CustomEvent('sitecopychange', {detail: window.SITE_COPY}));
+  window.dispatchEvent(new CustomEvent('sitecopychange', {detail:window.SITE_COPY}));
 };
 
 window.applySiteCopy(window.SITE_COPY);
 window.applySiteNavigation([]);
-
-function loadSiteScript(src){
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = src;
-    script.onload = resolve;
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
-}
-
-async function bootOptionalSanityLayer(){
-  try {
-    await loadSiteScript('assets/content/sanity-config.js');
-    await loadSiteScript('assets/content/sanity-runtime.js');
-    await loadSiteScript('assets/content/intro-accent.js');
-    await loadSiteScript('assets/content/sanity-prototype-bridge.js');
-  } catch (error) {
-    console.warn('[Sanity] Content layer did not load. OFFLINE state remains active.', error);
-  }
-}
-
-if (document.readyState === 'complete') bootOptionalSanityLayer();
-else window.addEventListener('load', bootOptionalSanityLayer, {once: true});
