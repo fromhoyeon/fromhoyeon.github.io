@@ -2,7 +2,7 @@
   Selected Photography lightbox interaction layer.
   - Desktop: provide an explicit close control without changing photo navigation.
   - Mobile: keep backdrop tap-to-close, add pinch zoom and free panning while zoomed.
-  - Keep the recently closed thumbnail cue as a white translucent fade.
+  - Keep the recently closed thumbnail cue as a theme-matched fade.
 */
 
 (function installPhotoLightboxInteractions(){
@@ -95,6 +95,9 @@
     const style = document.createElement('style');
     style.id = 'photo-lightbox-interaction-styles';
     style.textContent = `
+      :root{--photo-recent-overlay:rgba(255,255,255,1)}
+      :root[data-site-theme="white"]{--photo-recent-overlay:rgba(255,255,255,1)}
+      :root[data-site-theme="black"]{--photo-recent-overlay:rgba(0,0,0,1)}
       #shuffle-photos{
         border-color:var(--fg)!important;
         background:var(--bg)!important;
@@ -111,11 +114,11 @@
       }
       .photo-cell.photo-recently-viewed::after{
         border:0!important;
-        background:rgba(255,255,255,.80)!important;
-        animation:photoRecentWhiteFade 1300ms linear forwards!important;
+        background:var(--photo-recent-overlay)!important;
+        animation:photoRecentThemeFade 1100ms linear forwards!important;
       }
-      @keyframes photoRecentWhiteFade{
-        0%,23.0769%{opacity:1}
+      @keyframes photoRecentThemeFade{
+        0%,9.0909%{opacity:1}
         100%{opacity:0}
       }
       .photo-lightbox-close{
