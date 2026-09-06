@@ -1,6 +1,7 @@
 /*
   Sanity-curated Video Collection.
   Each video is managed independently in Sanity with a YouTube URL, title and description.
+  Playlist-driven legacy blocks delegate to the archived playlist renderer.
 */
 
 (function initVideoCollection(){
@@ -29,6 +30,10 @@
   }
 
   function render(block, work){
+    if (block?.playlistUrl && window.HOYEON_PLAYLIST_VIDEO_COLLECTION?.render) {
+      return window.HOYEON_PLAYLIST_VIDEO_COLLECTION.render(block, work);
+    }
+
     const videos = (Array.isArray(block.videos) ? block.videos : [])
       .map((item) => ({...item, videoId: extractYouTubeId(item?.youtubeUrl || '')}))
       .filter((item) => item.videoId);
