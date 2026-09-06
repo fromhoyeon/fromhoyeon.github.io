@@ -424,7 +424,6 @@
 
     const hasBlocks = renderContentBlocks(section, work);
     applyTitleDescription(section, work);
-    descriptionBox?.classList.remove('is-section-intro');
     if (hasBlocks) return;
 
     if (work.mediaType === 'youtube') {

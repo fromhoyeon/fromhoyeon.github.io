@@ -280,7 +280,6 @@ footer{border-top:1px solid var(--fg);padding:10px 0 var(--l);display:flex;justi
   .live-gate-inner{width:calc(100% - 28px)}
   .live-gate-actions{display:grid;grid-template-columns:1fr 1fr}
   .live-gate .action{text-align:center;padding:9px 8px 8px}
-  .work-head.has-description{margin-bottom:14px}
   .work-title-description{padding:9px 0 18px;font-size:11px;line-height:1.5}
   .video-collection-info{padding:12px 12px 13px}
   .video-collection-meta{gap:10px;padding-bottom:8px}
