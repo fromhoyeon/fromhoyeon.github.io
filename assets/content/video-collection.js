@@ -1,71 +1,38 @@
 /*
-  Playlist-driven Video Collection.
-  Sanity stores one YouTube playlist URL; the browser resolves the playlist items
-  through the YouTube IFrame API and renders the selectable thumbnail grid.
+  Sanity-curated Video Collection.
+  Each video is managed independently in Sanity with a YouTube URL, title and description.
 */
 
 (function initVideoCollection(){
   if (window.HOYEON_VIDEO_COLLECTION) return;
 
-  let apiPromise = null;
-  let instanceCount = 0;
-
-  function extractPlaylistId(value){
+  function extractYouTubeId(value){
     if (!value || typeof value !== 'string') return '';
     try {
       const url = new URL(value);
       const host = url.hostname.replace(/^www\./, '');
-      if (host !== 'youtube.com' && host !== 'm.youtube.com' && host !== 'music.youtube.com' && host !== 'youtu.be') return '';
-      return url.searchParams.get('list') || '';
+      if (host === 'youtu.be') return url.pathname.split('/').filter(Boolean)[0] || '';
+      if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com') {
+        if (url.searchParams.get('v')) return url.searchParams.get('v') || '';
+        const parts = url.pathname.split('/').filter(Boolean);
+        const marker = parts.findIndex((part) => part === 'embed' || part === 'shorts' || part === 'live');
+        if (marker >= 0 && parts[marker + 1]) return parts[marker + 1];
+      }
     } catch (error) {
       return '';
     }
+    return '';
   }
 
-  function loadYouTubeApi(){
-    if (window.YT?.Player) return Promise.resolve(window.YT);
-    if (apiPromise) return apiPromise;
-
-    apiPromise = new Promise((resolve, reject) => {
-      const previousReady = window.onYouTubeIframeAPIReady;
-      let timeout = null;
-
-      window.onYouTubeIframeAPIReady = () => {
-        if (typeof previousReady === 'function') previousReady();
-        if (timeout) window.clearTimeout(timeout);
-        if (window.YT?.Player) resolve(window.YT);
-        else reject(new Error('YouTube IFrame API loaded without Player.'));
-      };
-
-      const existing = document.querySelector('script[data-youtube-iframe-api]');
-      if (!existing) {
-        const script = document.createElement('script');
-        script.src = 'https://www.youtube.com/iframe_api';
-        script.async = true;
-        script.dataset.youtubeIframeApi = 'true';
-        script.onerror = () => reject(new Error('YouTube IFrame API failed to load.'));
-        document.head.appendChild(script);
-      }
-
-      timeout = window.setTimeout(() => reject(new Error('YouTube IFrame API timed out.')), 12000);
-    });
-
-    return apiPromise;
-  }
-
-  function createMessage(text, href){
-    const message = document.createElement(href ? 'a' : 'div');
-    message.className = 'video-collection-message';
-    message.textContent = text;
-    if (href) {
-      message.href = href;
-      message.target = '_blank';
-      message.rel = 'noopener';
-    }
-    return message;
+  function thumbnailUrl(videoId){
+    return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
   }
 
   function render(block, work){
+    const videos = (Array.isArray(block.videos) ? block.videos : [])
+      .map((item) => ({...item, videoId: extractYouTubeId(item?.youtubeUrl || '')}))
+      .filter((item) => item.videoId);
+
     const breakout = document.createElement('div');
     breakout.className = 'video-collection-breakout';
 
@@ -73,10 +40,11 @@
     collection.className = 'video-collection';
     breakout.appendChild(collection);
 
-    const playlistUrl = block.playlistUrl || '';
-    const playlistId = extractPlaylistId(playlistUrl);
-    if (!playlistId) {
-      collection.appendChild(createMessage('YouTube playlist URL not set'));
+    if (!videos.length) {
+      const empty = document.createElement('div');
+      empty.className = 'video-collection-message';
+      empty.textContent = 'Video collection is empty';
+      collection.appendChild(empty);
       return breakout;
     }
 
@@ -84,123 +52,108 @@
     stage.className = 'video-collection-stage';
     stage.tabIndex = -1;
 
-    const playerTarget = document.createElement('div');
-    playerTarget.id = `video-collection-player-${++instanceCount}`;
-    stage.appendChild(playerTarget);
+    const info = document.createElement('div');
+    info.className = 'video-collection-info';
 
-    const meta = document.createElement('div');
-    meta.className = 'video-collection-meta';
+    const infoHead = document.createElement('div');
+    infoHead.className = 'video-collection-meta';
 
     const currentTitle = document.createElement('div');
     currentTitle.className = 'video-collection-current-title';
-    currentTitle.textContent = 'Loading playlist…';
 
     const status = document.createElement('div');
     status.className = 'video-collection-status';
 
-    meta.append(currentTitle, status);
+    const currentDescription = document.createElement('div');
+    currentDescription.className = 'video-collection-description';
+
+    infoHead.append(currentTitle, status);
+    info.append(infoHead, currentDescription);
 
     const grid = document.createElement('div');
     grid.className = 'video-collection-grid';
-    grid.setAttribute('aria-label', `${block.title || work.title || 'Video'} playlist`);
+    grid.setAttribute('aria-label', `${block.title || work.title || 'Video'} collection`);
 
-    collection.append(stage, meta, grid);
+    const buttons = [];
+    let activeIndex = 0;
 
-    loadYouTubeApi().then((YT) => {
-      let videoIds = [];
-      let buttons = [];
-      let activeIndex = 0;
+    function renderStage(index){
+      const item = videos[index];
+      if (!item) return;
+      activeIndex = index;
 
-      function syncActive(index){
-        if (!Number.isInteger(index) || index < 0) return;
-        activeIndex = index;
-        buttons.forEach((button, buttonIndex) => {
-          const active = buttonIndex === activeIndex;
-          button.classList.toggle('is-active', active);
-          button.setAttribute('aria-current', active ? 'true' : 'false');
-        });
-        if (videoIds.length) status.textContent = `${activeIndex + 1} / ${videoIds.length}`;
-      }
+      stage.replaceChildren();
+      const poster = document.createElement('button');
+      poster.className = 'video-collection-poster';
+      poster.type = 'button';
+      poster.setAttribute('aria-label', `Play ${item.title || 'video'}`);
 
-      function syncTitle(player){
-        const data = player?.getVideoData?.() || {};
-        currentTitle.textContent = data.title || work.title || block.title || 'Video';
-      }
+      const image = document.createElement('img');
+      image.src = thumbnailUrl(item.videoId);
+      image.alt = '';
 
-      const player = new YT.Player(playerTarget.id, {
-        width: '100%',
-        height: '100%',
-        playerVars: {
-          listType: 'playlist',
-          list: playlistId,
-          autoplay: 0,
-          controls: 1,
-          rel: 0,
-          playsinline: 1,
-          modestbranding: 1
-        },
-        events: {
-          onReady(event){
-            videoIds = (event.target.getPlaylist?.() || []).filter(Boolean);
-            if (!videoIds.length) {
-              currentTitle.textContent = 'Playlist unavailable';
-              grid.replaceChildren(createMessage('Open playlist ↗', playlistUrl));
-              return;
-            }
+      const play = document.createElement('span');
+      play.className = 'yt-play';
+      play.setAttribute('aria-hidden', 'true');
+      play.textContent = '▶';
 
-            buttons = videoIds.map((videoId, index) => {
-              const button = document.createElement('button');
-              button.className = 'video-collection-thumb';
-              button.type = 'button';
-              button.dataset.videoId = videoId;
-              button.setAttribute('aria-label', `Play video ${index + 1} of ${videoIds.length}`);
+      poster.append(image, play);
+      poster.addEventListener('click', () => {
+        const iframe = document.createElement('iframe');
+        iframe.title = `${item.title || 'YouTube'} video player`;
+        iframe.src = `https://www.youtube-nocookie.com/embed/${item.videoId}?autoplay=1&controls=1&rel=0&playsinline=1&iv_load_policy=3`;
+        iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+        iframe.setAttribute('allowfullscreen', '');
+        stage.replaceChildren(iframe);
+      });
+      stage.appendChild(poster);
 
-              const image = document.createElement('img');
-              image.src = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
-              image.alt = '';
-              image.loading = 'lazy';
-              image.decoding = 'async';
+      currentTitle.textContent = item.title || 'Untitled video';
+      currentDescription.textContent = item.description || '';
+      currentDescription.hidden = !String(item.description || '').trim();
+      status.textContent = `${index + 1} / ${videos.length}`;
 
-              const number = document.createElement('span');
-              number.className = 'video-collection-thumb-number';
-              number.textContent = String(index + 1).padStart(2, '0');
+      buttons.forEach((button, buttonIndex) => {
+        const active = buttonIndex === index;
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-current', active ? 'true' : 'false');
+      });
+    }
 
-              button.append(image, number);
-              button.addEventListener('click', () => {
-                event.target.playVideoAt(index);
-                syncActive(index);
-                if (window.matchMedia('(max-width:620px)').matches) {
-                  stage.scrollIntoView({behavior:'smooth', block:'start'});
-                }
-              });
-              return button;
-            });
+    videos.forEach((item, index) => {
+      const button = document.createElement('button');
+      button.className = 'video-collection-thumb';
+      button.type = 'button';
+      button.setAttribute('aria-label', `Select ${item.title || `video ${index + 1}`}`);
 
-            grid.replaceChildren(...buttons);
-            const initialIndex = Math.max(0, event.target.getPlaylistIndex?.() || 0);
-            syncActive(initialIndex);
-            window.setTimeout(() => syncTitle(event.target), 0);
-          },
-          onStateChange(event){
-            const index = event.target.getPlaylistIndex?.();
-            if (Number.isInteger(index) && index >= 0) syncActive(index);
-            syncTitle(event.target);
-          },
-          onError(){
-            currentTitle.textContent = 'Playlist unavailable';
-            grid.replaceChildren(createMessage('Open playlist ↗', playlistUrl));
-          }
+      const image = document.createElement('img');
+      image.src = thumbnailUrl(item.videoId);
+      image.alt = '';
+      image.loading = 'lazy';
+      image.decoding = 'async';
+
+      const number = document.createElement('span');
+      number.className = 'video-collection-thumb-number';
+      number.textContent = String(index + 1).padStart(2, '0');
+
+      button.append(image, number);
+      button.addEventListener('click', () => {
+        if (index === activeIndex && stage.querySelector('iframe')) return;
+        renderStage(index);
+        if (window.matchMedia('(max-width:620px)').matches) {
+          stage.scrollIntoView({behavior:'smooth', block:'start'});
         }
       });
-    }).catch((error) => {
-      console.warn('[Video Collection] YouTube playlist unavailable.', error);
-      currentTitle.textContent = 'Playlist unavailable';
-      status.textContent = '';
-      grid.replaceChildren(createMessage('Open playlist ↗', playlistUrl));
+
+      buttons.push(button);
+      grid.appendChild(button);
     });
 
+    collection.append(stage, info, grid);
+    renderStage(0);
     return breakout;
   }
 
-  window.HOYEON_VIDEO_COLLECTION = {render, extractPlaylistId};
+  window.HOYEON_VIDEO_COLLECTION = {render, extractYouTubeId};
 })();
