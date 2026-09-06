@@ -22,6 +22,13 @@ export const workEntry = defineType({
       description: 'When the work happened or remains active. Examples: 2025, ~2025, 2023~, 2022~2024, 2024/04, Ongoing.',
       type: 'string',
     }),
+    defineField({
+      name: 'titleDescription',
+      title: 'Title description',
+      description: 'Optional introduction shown directly below the Portfolio Item title and before its content.',
+      type: 'text',
+      rows: 4,
+    }),
     defineField({name: 'summary', title: 'Description', type: 'text', rows: 6}),
     defineField({
       name: 'tags',
