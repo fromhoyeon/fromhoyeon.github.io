@@ -1,9 +1,8 @@
 /*
   Selected Photography lightbox interaction layer.
-  - Desktop: provide an explicit close control without changing photo navigation.
-  - Mobile: keep backdrop tap-to-close, add pinch zoom and free panning while zoomed.
-  - Keep the recently closed thumbnail cue as a theme-matched fade.
-  - Show minimal loading text only while thumbnail or enlarged image requests are pending.
+  - Desktop: explicit close control without changing photo navigation.
+  - Mobile: backdrop tap-to-close, pinch zoom and free panning while zoomed.
+  - Thumbnail return cue and loading states are styled only by site.css.
 */
 
 (function installPhotoLightboxInteractions(){
@@ -89,131 +88,6 @@
     panStartTouchY = touch.clientY;
     panStartX = zoomX;
     panStartY = zoomY;
-  }
-
-  function ensureStyles(){
-    if (document.querySelector('#photo-lightbox-interaction-styles')) return;
-    const style = document.createElement('style');
-    style.id = 'photo-lightbox-interaction-styles';
-    style.textContent = `
-      :root{--photo-recent-overlay:rgba(255,255,255,1)}
-      :root[data-site-theme="white"]{--photo-recent-overlay:rgba(255,255,255,1)}
-      :root[data-site-theme="black"]{--photo-recent-overlay:rgba(0,0,0,1)}
-      #shuffle-photos{
-        border-color:var(--fg)!important;
-        background:var(--bg)!important;
-        color:var(--fg)!important;
-      }
-      #shuffle-photos:hover,#shuffle-photos:focus-visible{
-        border-color:var(--fg)!important;
-        background:var(--fg)!important;
-        color:var(--bg)!important;
-      }
-      #shuffle-photos:focus-visible{
-        outline:2px solid var(--line)!important;
-        outline-offset:2px;
-      }
-      .photo-cell.photo-recently-viewed::after{
-        border:0!important;
-        background:var(--photo-recent-overlay)!important;
-        animation:photoRecentThemeFade 1100ms linear forwards!important;
-      }
-      @keyframes photoRecentThemeFade{
-        0%,9.0909%{opacity:1}
-        100%{opacity:0}
-      }
-      .photo-cell.is-image-loading::before{
-        content:'loading';
-        position:absolute;
-        inset:0;
-        z-index:0;
-        display:grid;
-        place-items:center;
-        color:var(--muted);
-        font-size:9px;
-        font-weight:400;
-        letter-spacing:.08em;
-        text-transform:lowercase;
-        pointer-events:none;
-        opacity:0;
-        animation:photoLoadingReveal .15s .15s linear forwards;
-      }
-      .photo-cell img{
-        position:relative;
-        z-index:1;
-        transition:opacity .12s ease;
-      }
-      .photo-cell.is-image-loading img{opacity:0}
-      #photo-lightbox.is-image-loading::before{
-        content:'loading';
-        position:fixed;
-        left:50%;
-        top:50%;
-        z-index:99;
-        transform:translate(-50%,-50%);
-        color:var(--muted);
-        font-size:9px;
-        font-weight:400;
-        letter-spacing:.09em;
-        text-transform:lowercase;
-        pointer-events:none;
-        opacity:0;
-        animation:photoLoadingReveal .15s .15s linear forwards;
-      }
-      #photo-lightbox #lightbox-image{transition:opacity .12s ease}
-      #photo-lightbox.is-image-loading #lightbox-image{opacity:0}
-      @keyframes photoLoadingReveal{to{opacity:.68}}
-      .photo-lightbox-close{
-        position:fixed;
-        top:18px;
-        right:18px;
-        z-index:106;
-        width:42px;
-        height:42px;
-        display:none;
-        place-items:center;
-        appearance:none;
-        border:1px solid var(--fg);
-        border-radius:999px;
-        padding:0;
-        background:var(--bg);
-        color:var(--fg);
-        cursor:pointer;
-        backdrop-filter:blur(6px);
-        -webkit-backdrop-filter:blur(6px);
-      }
-      .photo-lightbox-close:hover,
-      .photo-lightbox-close:focus-visible{
-        border-color:var(--fg);
-        background:var(--fg);
-        color:var(--bg);
-      }
-      .photo-lightbox-close:focus-visible{
-        outline:2px solid var(--line);
-        outline-offset:3px;
-      }
-      .photo-lightbox-close svg{
-        width:17px;
-        height:17px;
-        display:block;
-        fill:none;
-        stroke:currentColor;
-        stroke-width:1.5;
-        stroke-linecap:round;
-      }
-      @media (min-width:621px){
-        .photo-lightbox-close{display:grid}
-      }
-      @media (max-width:620px){
-        #lightbox-image{
-          touch-action:none;
-          transform-origin:center center;
-          will-change:transform;
-        }
-        #photo-lightbox.is-zoomed #lightbox-image{cursor:grabbing}
-      }
-    `;
-    document.head.appendChild(style);
   }
 
   function installCloseButton(){
@@ -370,21 +244,21 @@
     touchMode = null;
   }, {passive:false});
 
-  const previousShowLightboxIndex = showLightboxIndex;
+  const baseShowLightboxIndex = showLightboxIndex;
   showLightboxIndex = function(index){
     resetZoom();
     lightbox.classList.add('is-image-loading');
-    previousShowLightboxIndex(index);
+    baseShowLightboxIndex(index);
     if (lightboxImage.complete && lightboxImage.naturalWidth > 0) {
       requestAnimationFrame(finishLightboxLoading);
     }
   };
 
-  const previousCloseLightbox = closeLightbox;
+  const baseCloseLightbox = closeLightbox;
   closeLightbox = function(){
     resetZoom();
     finishLightboxLoading();
-    previousCloseLightbox();
+    baseCloseLightbox();
   };
 
   window.addEventListener('resize', () => {
@@ -402,7 +276,6 @@
     });
   });
 
-  ensureStyles();
   installCloseButton();
   bindThumbnailLoading(document);
   if (typeof photoGrid !== 'undefined' && photoGrid) {
