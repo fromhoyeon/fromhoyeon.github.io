@@ -11,19 +11,23 @@ jobs:
     steps:
       - name: Install yt-dlp
         run: python3 -m pip install --quiet yt-dlp
-      - name: Extract playlist items
+      - name: Extract playlist items and descriptions
         env:
           PLAYLIST_URL: 'https://youtube.com/playlist?list=PLRqFciRyz-lRY1F4P54rSJMI7_WCZ_-AZ'
         run: |
-          yt-dlp --flat-playlist --dump-single-json "$PLAYLIST_URL" > /tmp/playlist.json
+          yt-dlp --ignore-errors --skip-download --dump-single-json "$PLAYLIST_URL" > /tmp/playlist.json
           python3 - <<'PY'
-          import json
+          import base64, json
           with open('/tmp/playlist.json', encoding='utf-8') as f:
               data = json.load(f)
           entries = data.get('entries') or []
           print(f'PLAYLIST_COUNT|{len(entries)}')
           for i, item in enumerate(entries, 1):
+              if not item:
+                  continue
               video_id = item.get('id') or ''
               title = (item.get('title') or '').replace('\n', ' ').replace('|', '¦')
-              print(f'PLAYLIST_ITEM|{i}|{video_id}|{title}')
+              description = item.get('description') or ''
+              encoded = base64.b64encode(description.encode('utf-8')).decode('ascii')
+              print(f'PLAYLIST_ITEM|{i}|{video_id}|{title}|{encoded}')
           PY
