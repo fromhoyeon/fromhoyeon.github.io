@@ -9,7 +9,7 @@
 
   const PAGE_SIZE = 4;
   const INITIAL_VIDEO_ID = 'VvSIj9rhanA';
-  const YOUTUBE_THUMBNAIL_VERSION = '20260907-2';
+  const YOUTUBE_THUMBNAIL_VERSION = '20260907-3';
 
   function extractYouTubeId(value){
     if (!value || typeof value !== 'string') return '';
