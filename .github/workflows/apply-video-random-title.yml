@@ -20,34 +20,27 @@ jobs:
 
           js_path = Path('assets/content/video-collection.js')
           js = js_path.read_text()
-          old = """    let videos = (Array.isArray(block.videos) ? block.videos : [])
-              .map((item) => ({...item, videoId: extractYouTubeId(item?.youtubeUrl || '')}))
-              .filter((item) => item.videoId);
-          """
-          new = """    let videos = (Array.isArray(block.videos) ? block.videos : [])
-              .map((item) => ({...item, videoId: extractYouTubeId(item?.youtubeUrl || '')}))
-              .filter((item) => item.videoId);
-            videos = shuffled(videos);
-          """
+
+          marker = "      .filter((item) => item.videoId);\n"
+          if marker not in js:
+              raise SystemExit('video initialization marker not found')
+          js = js.replace(marker, marker + "    videos = shuffled(videos);\n", 1)
+
+          old = (
+              "        const number = document.createElement('span');\n"
+              "        number.className = 'video-collection-thumb-number';\n"
+              "        number.textContent = String(index + 1).padStart(2, '0');\n\n"
+              "        button.append(image, number);"
+          )
+          new = (
+              "        const thumbTitle = document.createElement('span');\n"
+              "        thumbTitle.className = 'video-collection-thumb-title';\n"
+              "        thumbTitle.textContent = item.title || 'Untitled video';\n"
+              "        thumbTitle.title = item.title || 'Untitled video';\n\n"
+              "        button.append(image, thumbTitle);"
+          )
           if old not in js:
-              raise SystemExit('video initialization pattern not found')
-          js = js.replace(old, new, 1)
-
-          old = """        const number = document.createElement('span');
-                  number.className = 'video-collection-thumb-number';
-                  number.textContent = String(index + 1).padStart(2, '0');
-
-                  button.append(image, number);
-          """
-          new = """        const thumbTitle = document.createElement('span');
-                  thumbTitle.className = 'video-collection-thumb-title';
-                  thumbTitle.textContent = item.title || 'Untitled video';
-                  thumbTitle.title = item.title || 'Untitled video';
-
-                  button.append(image, thumbTitle);
-          """
-          if old not in js:
-              raise SystemExit('thumbnail label pattern not found')
+              raise SystemExit('thumbnail label block not found')
           js = js.replace(old, new, 1)
           js_path.write_text(js)
 
