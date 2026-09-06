@@ -1,0 +1,35 @@
+name: Clean obsolete description styling hooks
+
+on:
+  push:
+    paths:
+      - '.github/workflows/cleanup-title-description.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove obsolete hooks
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          css_path = Path('assets/content/site.css')
+          css = css_path.read_text().replace('  .work-head.has-description{margin-bottom:14px}\n', '')
+          css_path.write_text(css)
+
+          bridge_path = Path('assets/content/sanity-site-bridge.js')
+          bridge = bridge_path.read_text().replace("    descriptionBox?.classList.remove('is-section-intro');\n", '')
+          bridge_path.write_text(bridge)
+          PY
+          node --check assets/content/sanity-site-bridge.js
+      - name: Commit cleanup
+        run: |
+          git config user.name "fromhoyeon"
+          git config user.email "fromhoyeon@gmail.com"
+          git add assets/content/site.css assets/content/sanity-site-bridge.js
+          git commit -m "Clean obsolete description styling hooks"
+          git push
