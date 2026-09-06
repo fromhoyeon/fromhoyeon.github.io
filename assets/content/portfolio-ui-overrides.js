@@ -1,48 +1,13 @@
 /*
-  Portfolio media interaction overrides
-  -------------------------------------
-  - Keep YouTube clean before playback: thumbnail + play button only.
-  - Never keep a YouTube iframe before an explicit user tap.
-  - After playback starts, use the standard YouTube controls and fullscreen button.
-  - Keep consecutive YouTube blocks visually close without merging them.
-  - Keep Portfolio Item gallery image backgrounds unchanged in-page.
-  - Use a theme-aware translucent backdrop for the Portfolio Item gallery lightbox.
-  - Remove the work-gallery Close button. Desktop gallery lightboxes close with Esc;
-    touch devices keep backdrop closing because they do not have an Escape key.
+  Portfolio media interaction layer
+  ---------------------------------
+  Visual styling lives in site.css. This module owns only media behavior:
+  poster-first YouTube playback and gallery lightbox desktop closing rules.
 */
 
 (function initPortfolioUiOverrides(){
   if (window.__PORTFOLIO_UI_OVERRIDES_LOADED__) return;
   window.__PORTFOLIO_UI_OVERRIDES_LOADED__ = true;
-
-  function ensureStyles(){
-    if (document.querySelector('#portfolio-ui-overrides-styles')) return;
-    const style = document.createElement('style');
-    style.id = 'portfolio-ui-overrides-styles';
-    style.textContent = `
-      .sanity-content-block[data-block-type="workGalleryBlock"] .sanity-gallery-item img{
-        background:var(--panel) !important;
-      }
-      #work-gallery-lightbox{
-        background:rgba(255,255,255,.80) !important;
-      }
-      :root[data-site-theme="black"] #work-gallery-lightbox{
-        background:rgba(0,0,0,.80) !important;
-      }
-      .sanity-content-block[data-block-type="workVideoBlock"] +
-      .sanity-content-block[data-block-type="workVideoBlock"]{
-        margin-top:calc(10px - var(--l));
-      }
-      #work-gallery-lightbox .lightbox-close{display:none !important}
-      @media (max-width:620px){
-        .sanity-content-block[data-block-type="workVideoBlock"] +
-        .sanity-content-block[data-block-type="workVideoBlock"]{
-          margin-top:calc(8px - var(--l));
-        }
-      }
-    `;
-    document.head.appendChild(style);
-  }
 
   function youtubeIdFromStage(stage){
     const direct = stage?.dataset?.sanityVideoId || stage?.dataset?.videoId || '';
@@ -55,9 +20,7 @@
         const parts = url.pathname.split('/').filter(Boolean);
         const embedIndex = parts.indexOf('embed');
         if (embedIndex >= 0 && parts[embedIndex + 1]) return parts[embedIndex + 1];
-      } catch (error) {
-        // Fall through to the poster URL.
-      }
+      } catch (error) {}
     }
 
     const poster = stage?.querySelector('.yt-poster img, img[src*="i.ytimg.com/vi/"]');
@@ -141,7 +104,6 @@
     const currentIframe = stage.querySelector(':scope > iframe');
     if (!currentIframe) return;
 
-    // Critical rule: an iframe is not allowed to exist before an explicit user tap.
     if (stage.dataset.youtubeStarted !== 'true') {
       stage.replaceChildren(createCleanPoster(stage, videoId));
       return;
@@ -150,9 +112,7 @@
     let autoplay = false;
     try {
       autoplay = new URL(currentIframe.src, window.location.href).searchParams.get('autoplay') === '1';
-    } catch (error) {
-      autoplay = false;
-    }
+    } catch (error) {}
 
     const desiredSrc = standardEmbedUrl(videoId, autoplay);
     if (currentIframe.src !== desiredSrc) currentIframe.src = desiredSrc;
@@ -163,16 +123,16 @@
     currentIframe.dataset.standardYoutubePlayer = 'true';
   }
 
-  function tuneGalleryLightbox(lightbox){
-    if (!(lightbox instanceof Element) || lightbox.id !== 'work-gallery-lightbox') return;
+  function tuneGalleryLightbox(target){
+    if (!(target instanceof Element) || target.id !== 'work-gallery-lightbox') return;
 
-    lightbox.querySelector('.lightbox-close')?.remove();
-    if (lightbox.dataset.desktopEscOnlyBound === 'true') return;
-    lightbox.dataset.desktopEscOnlyBound = 'true';
+    target.querySelector('.lightbox-close')?.remove();
+    if (target.dataset.desktopEscOnlyBound === 'true') return;
+    target.dataset.desktopEscOnlyBound = 'true';
 
-    lightbox.addEventListener('click', (event) => {
+    target.addEventListener('click', (event) => {
       const desktopPointer = window.matchMedia('(pointer:fine)').matches;
-      if (desktopPointer && event.target === lightbox) {
+      if (desktopPointer && event.target === target) {
         event.preventDefault();
         event.stopImmediatePropagation();
       }
@@ -182,18 +142,13 @@
   function inspect(root){
     if (!(root instanceof Element) && root !== document) return;
 
-    if (root instanceof Element && root.classList.contains('yt-stage')) {
-      normalizeYouTubeStage(root);
-    }
+    if (root instanceof Element && root.classList.contains('yt-stage')) normalizeYouTubeStage(root);
     root.querySelectorAll?.('.yt-stage').forEach(normalizeYouTubeStage);
 
-    if (root instanceof Element && root.id === 'work-gallery-lightbox') {
-      tuneGalleryLightbox(root);
-    }
+    if (root instanceof Element && root.id === 'work-gallery-lightbox') tuneGalleryLightbox(root);
     root.querySelectorAll?.('#work-gallery-lightbox').forEach(tuneGalleryLightbox);
   }
 
-  ensureStyles();
   inspect(document);
 
   const observer = new MutationObserver((mutations) => {
