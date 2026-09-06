@@ -1,0 +1,56 @@
+name: Pin initial video
+
+on:
+  push:
+    paths:
+      - '.github/workflows/pin-video-first.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply initial video pin
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          js_path = Path('assets/content/video-collection.js')
+          js = js_path.read_text()
+          js = js.replace("  const PAGE_SIZE = 4;\n", "  const PAGE_SIZE = 4;\n  const INITIAL_VIDEO_ID = 'VvSIj9rhanA';\n", 1)
+
+          old = """    videos = shuffled(videos);\n"""
+          new = """    const initialVideo = videos.find((item) => item.videoId === INITIAL_VIDEO_ID);\n    const remainingVideos = videos.filter((item) => item.videoId !== INITIAL_VIDEO_ID);\n    videos = initialVideo ? [initialVideo, ...shuffled(remainingVideos)] : shuffled(videos);\n"""
+          if old not in js:
+              raise SystemExit('initial shuffle pattern not found')
+          js = js.replace(old, new, 1)
+          js_path.write_text(js)
+
+          index_path = Path('index.html')
+          index = index_path.read_text()
+          if 'assets/content/video-collection.js?v=20260907-3' not in index:
+              raise SystemExit('video cache version not found')
+          index = index.replace('assets/content/video-collection.js?v=20260907-3', 'assets/content/video-collection.js?v=20260907-4', 1)
+          index_path.write_text(index)
+
+          readme_path = Path('README.md')
+          readme = readme_path.read_text()
+          old = '기본 `Video Collection` content block은 영상마다 Sanity에서 `YouTube URL`, `Title`, `Description`을 개별 관리한다. Sanity 배열은 source order로만 보존하며, 페이지를 열 때마다 browser에서 전체 영상을 한 번 셔플하고 그 첫 영상을 초기 선택한다.'
+          new = '기본 `Video Collection` content block은 영상마다 Sanity에서 `YouTube URL`, `Title`, `Description`을 개별 관리한다. Sanity 배열은 source order로만 보존한다. 페이지를 열 때는 `Jihye Lee Orchestra - We Are All From The Same Stream`을 첫 영상으로 고정하고 나머지 영상 순서만 browser에서 셔플한다.'
+          if old not in readme:
+              raise SystemExit('README video behavior text not found')
+          readme = readme.replace(old, new, 1)
+          readme_path.write_text(readme)
+          PY
+      - name: Validate JavaScript
+        run: node --check assets/content/video-collection.js
+      - name: Commit changes
+        run: |
+          git config user.name "fromhoyeon"
+          git config user.email "fromhoyeon@gmail.com"
+          git add assets/content/video-collection.js index.html README.md
+          git commit -m "Pin featured video on initial load"
+          git push
