@@ -49,9 +49,13 @@
       .lightbox img{max-width:calc(100vw - var(--lightbox-pad-double))!important;max-height:calc(100svh - var(--lightbox-pad-double))!important}
       .lightbox-close{background:var(--bg)!important;color:var(--fg)!important;border-color:var(--fg)!important}
       .theme-compare{padding:10px 0 var(--m);display:flex;justify-content:space-between;align-items:center;gap:var(--m);border-top:1px solid var(--line);font-size:10px;color:var(--muted);text-transform:uppercase}
-      .theme-compare-actions{display:flex;gap:6px}
-      .theme-compare button{appearance:none;border:1px solid var(--line);background:transparent;color:var(--fg);padding:5px 7px 4px;cursor:pointer;font:inherit;text-transform:uppercase}
-      .theme-compare button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+      .theme-compare-actions{display:flex;gap:7px}
+      .theme-compare button{appearance:none;padding:5px 8px 4px;cursor:pointer;font:inherit;text-transform:uppercase;border:1px solid transparent;transition:outline-color .12s ease,transform .12s ease}
+      .theme-compare button[data-site-theme-choice="white"]{background:#fff;color:#111;border-color:#9b9b97}
+      .theme-compare button[data-site-theme-choice="black"]{background:#111;color:#fff;border-color:#6b6b68}
+      .theme-compare button[aria-pressed="true"]{outline:2px solid var(--fg);outline-offset:2px}
+      .theme-compare button:hover{transform:translateY(-1px)}
+      .theme-compare button:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
       .sanity-content-blocks{gap:40px!important}
       .description{padding-top:20px}
       .lightbox-nav-zone{display:none;position:absolute;top:0;bottom:0;width:28%;z-index:100;appearance:none;border:0;background:transparent;color:var(--fg);padding:0;cursor:pointer}
@@ -184,8 +188,8 @@
   applyLightboxPadding();
   enhanceKnownLightboxes();
 
-  let savedTheme = 'black';
-  try { savedTheme = localStorage.getItem(STORAGE_KEY) || 'black'; } catch (error) {}
+  let savedTheme = 'white';
+  try { savedTheme = localStorage.getItem(STORAGE_KEY) || 'white'; } catch (error) {}
   setTheme(savedTheme, false);
 
   window.addEventListener('sitecopychange', (event) => applyLightboxPadding(event.detail || window.SITE_COPY));
