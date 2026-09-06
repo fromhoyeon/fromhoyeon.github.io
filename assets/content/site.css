@@ -216,7 +216,7 @@ button.action{background:transparent;cursor:pointer}
 .video-collection-thumb:hover img,.video-collection-thumb:focus-visible img{opacity:.82}
 .video-collection-thumb.is-active::after{border-color:var(--fg)}
 .video-collection-thumb:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
-.video-collection-thumb-number{position:absolute;right:5px;bottom:4px;padding:2px 3px 1px;background:color-mix(in srgb,var(--media-black) 64%,transparent);color:var(--media-white);font-size:8px;line-height:1;font-variant-numeric:tabular-nums}
+.video-collection-thumb-title{position:absolute;left:5px;right:5px;bottom:4px;min-width:0;padding:3px 4px 2px;background:color-mix(in srgb,var(--media-black) 68%,transparent);color:var(--media-white);font-size:8px;line-height:1.2;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
 .video-collection-pagination{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px}
 .video-collection-page-button{appearance:none;width:28px;height:28px;border:0;padding:0;background:transparent;color:var(--fg);display:grid;place-items:center;font-size:18px;line-height:1;cursor:pointer}
 .video-collection-page-button:hover,.video-collection-page-button:focus-visible{background:var(--panel)}

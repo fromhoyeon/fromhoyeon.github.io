@@ -58,7 +58,7 @@ YouTube player 배경이나 embedded media처럼 **사이트 테마와 무관하
 - `sanity-config.js` — public Sanity 연결 설정.
 - `sanity-runtime.js` — Sanity query, image URL 생성과 필요한 enhancement module loading.
 - `sanity-site-bridge.js` — Homepage / Portfolio Item / About / Links 데이터를 실제 페이지 구조에 연결한다.
-- `video-collection.js` — Sanity에서 개별 관리되는 Video Collection의 selected player, 고정 높이 정보 패널, scrollable thumbnail tray와 browser-only Shuffle을 담당한다.
+- `video-collection.js` — Sanity에서 개별 관리되는 Video Collection의 selected player, 4개 단위 thumbnail pagination, page-load randomization과 browser-only Shuffle을 담당한다.
 - `playlist-video-collection.js` — YouTube playlist URL 하나로 전체 목록을 자동 구성하는 보존용 playlist renderer.
 - `portfolio-ui-overrides.js` — poster-first YouTube와 Portfolio Item gallery lightbox의 동작 보정. 시각 스타일은 소유하지 않는다.
 - `sanity-gallery-layout.js` — Portfolio Item Image Gallery의 ratio-preserving row 계산과 확대 보기.
@@ -87,11 +87,11 @@ Sanity의 published/enabled `portfolioPhoto` 전체 pool을 하나의 random dec
 
 ## Video Collection
 
-기본 `Video Collection` content block은 영상마다 Sanity에서 `YouTube URL`, `Title`, `Description`을 개별 관리한다. 배열 순서가 기본 표시 순서이고 첫 영상이 초기 선택이다.
+기본 `Video Collection` content block은 영상마다 Sanity에서 `YouTube URL`, `Title`, `Description`을 개별 관리한다. Sanity 배열은 source order로만 보존하며, 페이지를 열 때마다 browser에서 전체 영상을 한 번 셔플하고 그 첫 영상을 초기 선택한다.
 
 - 선택된 영상은 상단 16:9 player에 표시한다.
 - player 아래에서 선택 영상의 Title과 Description을 표시한다. Description은 현재 접거나 내부 scroll하지 않고 전체 길이를 표시한다.
-- thumbnail은 한 page에 4개만 표시한다. desktop은 4열, mobile은 2열 × 2행이다.
+- thumbnail은 한 page에 4개만 표시한다. desktop은 4열, mobile은 2열 × 2행이다. 각 thumbnail 하단에는 영상 Title을 한 줄로 표시하고 넘치는 글자는 ellipsis로 생략한다.
 - thumbnail 아래의 `PAGE 현재 / 전체` 이전·다음 control로 목록 page를 이동한다.
 - thumbnail 선택 시 mobile에서는 짧은 custom transition으로 player 위치로 빠르게 이동한다.
 - 파란색 `Shuffle order`는 browser 안의 영상 순서와 선택 영상만 섞고 page 1로 돌아간다. Sanity 배열 순서는 수정하지 않는다.

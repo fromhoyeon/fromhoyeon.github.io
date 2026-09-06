@@ -69,6 +69,7 @@
     let videos = (Array.isArray(block.videos) ? block.videos : [])
       .map((item) => ({...item, videoId: extractYouTubeId(item?.youtubeUrl || '')}))
       .filter((item) => item.videoId);
+    videos = shuffled(videos);
 
     const breakout = document.createElement('div');
     breakout.className = 'video-collection-breakout';
@@ -211,11 +212,12 @@
         image.loading = 'lazy';
         image.decoding = 'async';
 
-        const number = document.createElement('span');
-        number.className = 'video-collection-thumb-number';
-        number.textContent = String(index + 1).padStart(2, '0');
+        const thumbTitle = document.createElement('span');
+        thumbTitle.className = 'video-collection-thumb-title';
+        thumbTitle.textContent = item.title || 'Untitled video';
+        thumbTitle.title = item.title || 'Untitled video';
 
-        button.append(image, number);
+        button.append(image, thumbTitle);
         const active = index === activeIndex;
         button.classList.toggle('is-active', active);
         button.setAttribute('aria-current', active ? 'true' : 'false');
