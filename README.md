@@ -58,7 +58,8 @@ YouTube player 배경이나 embedded media처럼 **사이트 테마와 무관하
 - `sanity-config.js` — public Sanity 연결 설정.
 - `sanity-runtime.js` — Sanity query, image URL 생성과 필요한 enhancement module loading.
 - `sanity-site-bridge.js` — Homepage / Portfolio Item / About / Links 데이터를 실제 페이지 구조에 연결한다.
-- `video-collection.js` — YouTube playlist URL 하나를 받아 playlist 전체를 선택형 player + thumbnail grid로 표시한다.
+- `video-collection.js` — Sanity에서 개별 관리되는 Video Collection의 selected player, 고정 높이 정보 패널, scrollable thumbnail tray와 browser-only Shuffle을 담당한다.
+- `playlist-video-collection.js` — YouTube playlist URL 하나로 전체 목록을 자동 구성하는 보존용 playlist renderer.
 - `portfolio-ui-overrides.js` — poster-first YouTube와 Portfolio Item gallery lightbox의 동작 보정. 시각 스타일은 소유하지 않는다.
 - `sanity-gallery-layout.js` — Portfolio Item Image Gallery의 ratio-preserving row 계산과 확대 보기.
 - `photo-gallery-core.js` — Selected Photography의 기본 row layout, lightbox와 keyboard/touch navigation.
@@ -86,14 +87,16 @@ Sanity의 published/enabled `portfolioPhoto` 전체 pool을 하나의 random dec
 
 ## Video Collection
 
-Portfolio Item의 `Video Collection` content block은 Sanity에 YouTube playlist URL 하나만 저장한다.
+기본 `Video Collection` content block은 영상마다 Sanity에서 `YouTube URL`, `Title`, `Description`을 개별 관리한다. 배열 순서가 기본 표시 순서이고 첫 영상이 초기 선택이다.
 
-- playlist 순서를 그대로 사용한다.
-- 선택된 영상은 상단 player에 표시하고 전체 영상은 thumbnail grid로 노출한다.
-- desktop은 4열, mobile은 2열 grid를 기본으로 한다.
-- mobile에서 thumbnail을 선택하면 player 위치로 smooth scroll한다.
-- playlist 해석, thumbnail 생성, player 상태와 선택 동작은 `video-collection.js`가 담당한다.
-- grid 열 수나 scroll 동작 같은 presentation 옵션은 Sanity에 저장하지 않는다.
+- 선택된 영상은 상단 16:9 player에 표시한다.
+- player 아래 정보 패널은 고정 높이이며 제목, 현재/전체 번호와 description을 표시한다.
+- description이 패널 높이를 넘으면 내부 세로 스크롤을 사용하고, 아래에 내용이 더 남아 있을 때만 하단 fade cue를 표시한다.
+- mobile thumbnail tray는 2열 × 약 2행 높이의 내부 스크롤 viewport다. desktop은 5열과 제한된 높이를 사용한다.
+- thumbnail 선택 시 mobile에서는 native smooth scroll보다 짧은 custom transition으로 player 위치로 빠르게 이동한다.
+- `Shuffle`은 현재 browser session의 영상/thumbnail 순서와 선택 영상만 섞는다. Sanity 배열 순서는 수정하지 않는다.
+- section-level summary가 있는 Video Collection Portfolio Item은 work header 바로 아래에서 intro copy로 표시한다.
+- `Playlist Video Collection · backup`은 playlist URL 하나로 목록을 자동 생성하는 별도 보존 기능이다.
 
 ## Sanity 경계
 

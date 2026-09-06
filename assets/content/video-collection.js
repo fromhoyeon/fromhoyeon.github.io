@@ -29,12 +29,42 @@
     return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
   }
 
+  function shuffled(items){
+    const output = items.slice();
+    for (let i = output.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [output[i], output[j]] = [output[j], output[i]];
+    }
+    return output;
+  }
+
+  function fastScrollTo(element, duration = 180){
+    if (!element) return;
+    const headerOffset = window.matchMedia('(max-width:620px)').matches ? 44 : 50;
+    const startY = window.scrollY;
+    const targetY = Math.max(0, startY + element.getBoundingClientRect().top - headerOffset);
+    const distance = targetY - startY;
+    if (Math.abs(distance) < 2) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      window.scrollTo(0, targetY);
+      return;
+    }
+    const startedAt = performance.now();
+    const step = (now) => {
+      const progress = Math.min(1, (now - startedAt) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      window.scrollTo(0, startY + distance * eased);
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
   function render(block, work){
     if (block?.playlistUrl && window.HOYEON_PLAYLIST_VIDEO_COLLECTION?.render) {
       return window.HOYEON_PLAYLIST_VIDEO_COLLECTION.render(block, work);
     }
 
-    const videos = (Array.isArray(block.videos) ? block.videos : [])
+    let videos = (Array.isArray(block.videos) ? block.videos : [])
       .map((item) => ({...item, videoId: extractYouTubeId(item?.youtubeUrl || '')}))
       .filter((item) => item.videoId);
 
@@ -57,6 +87,9 @@
     stage.className = 'video-collection-stage yt-stage';
     stage.tabIndex = -1;
 
+    const info = document.createElement('div');
+    info.className = 'video-collection-info';
+
     const meta = document.createElement('div');
     meta.className = 'video-collection-meta';
 
@@ -66,17 +99,58 @@
     const status = document.createElement('div');
     status.className = 'video-collection-status';
 
+    const descriptionShell = document.createElement('div');
+    descriptionShell.className = 'video-collection-description-shell';
+
     const currentDescription = document.createElement('div');
-    currentDescription.className = 'sanity-text-block video-collection-description';
+    currentDescription.className = 'video-collection-description';
+    currentDescription.tabIndex = 0;
+    currentDescription.setAttribute('aria-label', 'Selected video description');
 
     meta.append(currentTitle, status);
+    descriptionShell.appendChild(currentDescription);
+    info.append(meta, descriptionShell);
+
+    const tray = document.createElement('div');
+    tray.className = 'video-collection-tray';
+
+    const trayHead = document.createElement('div');
+    trayHead.className = 'video-collection-tray-head';
+
+    const trayCount = document.createElement('span');
+    trayCount.className = 'video-collection-tray-count';
+
+    const shuffleButton = document.createElement('button');
+    shuffleButton.className = 'video-collection-shuffle';
+    shuffleButton.type = 'button';
+    shuffleButton.textContent = 'Shuffle ↝';
+
+    trayHead.append(trayCount, shuffleButton);
+
+    const gridViewport = document.createElement('div');
+    gridViewport.className = 'video-collection-grid-viewport';
 
     const grid = document.createElement('div');
     grid.className = 'video-collection-grid';
     grid.setAttribute('aria-label', `${block.title || work.title || 'Video'} collection`);
+    gridViewport.appendChild(grid);
+    tray.append(trayHead, gridViewport);
 
-    const buttons = [];
     let activeIndex = 0;
+    let buttons = [];
+
+    function updateDescriptionFade(){
+      const remaining = currentDescription.scrollHeight - currentDescription.scrollTop - currentDescription.clientHeight;
+      descriptionShell.classList.toggle('has-more', remaining > 3);
+    }
+
+    function syncActive(){
+      buttons.forEach((button, buttonIndex) => {
+        const active = buttonIndex === activeIndex;
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-current', active ? 'true' : 'false');
+      });
+    }
 
     function renderStage(index){
       const item = videos[index];
@@ -112,46 +186,64 @@
 
       currentTitle.textContent = item.title || 'Untitled video';
       currentDescription.textContent = item.description || '';
-      currentDescription.hidden = !String(item.description || '').trim();
+      currentDescription.scrollTop = 0;
       status.textContent = `${index + 1} / ${videos.length}`;
-
-      buttons.forEach((button, buttonIndex) => {
-        const active = buttonIndex === index;
-        button.classList.toggle('is-active', active);
-        button.setAttribute('aria-current', active ? 'true' : 'false');
-      });
+      syncActive();
+      requestAnimationFrame(updateDescriptionFade);
     }
 
-    videos.forEach((item, index) => {
-      const button = document.createElement('button');
-      button.className = 'video-collection-thumb';
-      button.type = 'button';
-      button.setAttribute('aria-label', `Select ${item.title || `video ${index + 1}`}`);
+    function renderGrid(){
+      grid.replaceChildren();
+      buttons = videos.map((item, index) => {
+        const button = document.createElement('button');
+        button.className = 'video-collection-thumb';
+        button.type = 'button';
+        button.setAttribute('aria-label', `Select ${item.title || `video ${index + 1}`}`);
 
-      const image = document.createElement('img');
-      image.src = thumbnailUrl(item.videoId);
-      image.alt = '';
-      image.loading = 'lazy';
-      image.decoding = 'async';
+        const image = document.createElement('img');
+        image.src = thumbnailUrl(item.videoId);
+        image.alt = '';
+        image.loading = 'lazy';
+        image.decoding = 'async';
 
-      const number = document.createElement('span');
-      number.className = 'video-collection-thumb-number';
-      number.textContent = String(index + 1).padStart(2, '0');
+        const number = document.createElement('span');
+        number.className = 'video-collection-thumb-number';
+        number.textContent = String(index + 1).padStart(2, '0');
 
-      button.append(image, number);
-      button.addEventListener('click', () => {
-        if (index === activeIndex && stage.querySelector('iframe')) return;
-        renderStage(index);
-        if (window.matchMedia('(max-width:620px)').matches) {
-          stage.scrollIntoView({behavior:'smooth', block:'start'});
-        }
+        button.append(image, number);
+        button.addEventListener('click', () => {
+          renderStage(index);
+          if (window.matchMedia('(max-width:620px)').matches) fastScrollTo(stage);
+        });
+        grid.appendChild(button);
+        return button;
       });
+      trayCount.textContent = `${videos.length} videos`;
+      syncActive();
+    }
 
-      buttons.push(button);
-      grid.appendChild(button);
+    shuffleButton.addEventListener('click', () => {
+      const previousFirstId = videos[0]?.videoId;
+      videos = shuffled(videos);
+      if (videos.length > 1 && videos[0]?.videoId === previousFirstId) {
+        const swapIndex = 1 + Math.floor(Math.random() * (videos.length - 1));
+        [videos[0], videos[swapIndex]] = [videos[swapIndex], videos[0]];
+      }
+      activeIndex = 0;
+      gridViewport.scrollTop = 0;
+      renderGrid();
+      renderStage(0);
+      if (window.matchMedia('(max-width:620px)').matches) fastScrollTo(stage);
     });
 
-    collection.append(stage, meta, currentDescription, grid);
+    currentDescription.addEventListener('scroll', updateDescriptionFade, {passive:true});
+    if (typeof ResizeObserver === 'function') {
+      const observer = new ResizeObserver(updateDescriptionFade);
+      observer.observe(currentDescription);
+    }
+
+    collection.append(stage, info, tray);
+    renderGrid();
     renderStage(0);
     return breakout;
   }

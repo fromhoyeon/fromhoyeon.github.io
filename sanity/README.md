@@ -30,7 +30,8 @@
 - `siteCopy` — Site brand, Intro, About, Footer 등 공통 문구와 제한된 presentation setting.
 - `siteNavigation` — 상단 primary navigation.
 - `workVideoBlock` — 단일 YouTube video block.
-- `workVideoCollectionBlock` — YouTube playlist 기반 video collection block.
+- `workCuratedVideoCollectionBlock` / `workCuratedVideoItem` — 기본 Video Collection. 각 영상의 YouTube URL, Title, Description을 Sanity에서 개별 관리한다.
+- `workVideoCollectionBlock` — `Playlist Video Collection · backup`. YouTube playlist 기반 자동 collection block.
 - `workTextBlock` — text block.
 - `workGalleryBlock` / `workGalleryImage` — image gallery block.
 - `workWebEmbedBlock` — interactive web embed block.
@@ -73,13 +74,16 @@ Portfolio Item과 Photograph의 Tag reference는 현재 `weak: true`다. target 
 
 - `YouTube Video`
 - `Video Collection`
+- `Playlist Video Collection · backup`
 - `Text`
 - `Image Gallery`
 - `Web Embed`
 
-`Video Collection`은 초기 운용 편의성을 우선해 `playlistUrl` 하나를 필수값으로 둔다. playlist 안의 영상 순서와 포함 여부는 YouTube playlist 자체를 source로 사용하며 Sanity에 개별 영상 document를 중복 생성하지 않는다. 같은 block을 여러 Portfolio Item에서 사용할 수 있으므로 `Videography`, `Music Video`, `Film`, `Performance` 등 공개 제목은 Portfolio Item이 결정한다.
+기본 `Video Collection`은 `videos[]` 배열을 사용한다. 각 item의 최소 필드는 `YouTube URL`, `Title`, `Description`이며 Sanity 배열 순서가 기본 표시 순서다. 첫 item이 초기 선택 영상이다. 향후 year, credit, role 등이 실제로 필요할 때 item field를 추가한다.
 
-player, thumbnail grid, desktop/mobile 열 수, 선택 후 scroll 같은 표시 동작은 GitHub frontend가 담당한다. 개별 영상별 custom description이나 metadata override가 실제로 필요해질 때만 schema 확장을 검토한다.
+표시 영역의 높이, description 내부 scroll/fade, thumbnail tray, mobile 이동 속도와 browser-only Shuffle은 frontend 책임이다. Shuffle은 Content Lake의 배열 순서를 변경하지 않는다.
+
+기존 playlist 자동 추출 구현은 `Playlist Video Collection · backup`으로 유지한다. 이 block만 `playlistUrl` 하나를 source로 사용한다.
 
 기존 Portfolio Item 가운데 아직 이관되지 않은 항목을 위해 `mediaType`, `youtubeUrl`, `embedUrl`, `photoCount`는 compatibility field로 잠시 유지한다.
 
@@ -117,7 +121,8 @@ thumbnail/enlarged image의 실제 loading, preload, mobile zoom/pan 등 표시 
 - `assets/content/sanity-config.js` — public Sanity 연결 설정
 - `assets/content/sanity-runtime.js` — query, image URL과 module loading
 - `assets/content/sanity-site-bridge.js` — Sanity document를 실제 `index.html` 구조에 연결
-- `assets/content/video-collection.js` — YouTube playlist를 selected player + thumbnail grid로 표시
+- `assets/content/video-collection.js` — curated Video Collection의 selected player, info panel, scrollable tray와 Shuffle
+- `assets/content/playlist-video-collection.js` — 보존용 YouTube playlist 자동 collection renderer
 - `assets/content/portfolio-ui-overrides.js` — poster-first YouTube와 gallery lightbox behavior
 - `assets/content/sanity-gallery-layout.js` — Image Gallery ratio-preserving layout
 

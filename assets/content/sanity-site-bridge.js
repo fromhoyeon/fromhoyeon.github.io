@@ -402,8 +402,17 @@
     }
 
     const hasBlocks = renderContentBlocks(section, work);
-    if (hasBlocks) return;
+    if (hasBlocks) {
+      const hasCuratedVideoCollection = Array.isArray(work.contentBlocks) && work.contentBlocks.some((block) => block?._type === 'workCuratedVideoCollectionBlock');
+      if (descriptionBox) {
+        descriptionBox.classList.toggle('is-section-intro', hasCuratedVideoCollection && hasSummary);
+        const content = section.querySelector(':scope > .sanity-content-blocks');
+        if (hasCuratedVideoCollection && hasSummary && content) section.insertBefore(descriptionBox, content);
+      }
+      return;
+    }
 
+    descriptionBox?.classList.remove('is-section-intro');
     if (work.mediaType === 'youtube') {
       renderYouTubeStage(section.querySelector('.yt-stage'), work, forceMedia);
     } else if (work.mediaType === 'webEmbed') {
