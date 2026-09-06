@@ -81,17 +81,10 @@
 
     const copy = await query(`*[_type == "siteCopy"][0]{
       site,
-      intro,
-      presentation,
-      index,
-      dual,
-      photo,
-      dodrei,
-      moving,
+      intro{title,body},
+      presentation{lightboxPadding},
       about,
-      links,
-      footer,
-      ui
+      footer
     }`);
 
     if (copy && typeof window.mergeSiteCopy === 'function') window.mergeSiteCopy(copy);
