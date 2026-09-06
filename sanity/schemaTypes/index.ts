@@ -3,6 +3,8 @@ import {siteNavigation} from './siteNavigation'
 import {tag} from './tag'
 import {portfolioPhoto} from './portfolioPhoto'
 import {
+  workCuratedVideoCollectionBlock,
+  workCuratedVideoItem,
   workGalleryBlock,
   workGalleryImage,
   workTextBlock,
@@ -20,6 +22,8 @@ export const schemaTypes = [
   portfolioPhoto,
   workVideoBlock,
   workVideoCollectionBlock,
+  workCuratedVideoItem,
+  workCuratedVideoCollectionBlock,
   workTextBlock,
   workGalleryImage,
   workGalleryBlock,
