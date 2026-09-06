@@ -7,6 +7,8 @@
 (function initVideoCollection(){
   if (window.HOYEON_VIDEO_COLLECTION) return;
 
+  const PAGE_SIZE = 4;
+
   function extractYouTubeId(value){
     if (!value || typeof value !== 'string') return '';
     try {
@@ -99,57 +101,55 @@
     const status = document.createElement('div');
     status.className = 'video-collection-status';
 
-    const descriptionShell = document.createElement('div');
-    descriptionShell.className = 'video-collection-description-shell';
-
     const currentDescription = document.createElement('div');
     currentDescription.className = 'video-collection-description';
-    currentDescription.tabIndex = 0;
-    currentDescription.setAttribute('aria-label', 'Selected video description');
 
     meta.append(currentTitle, status);
-    descriptionShell.appendChild(currentDescription);
-    info.append(meta, descriptionShell);
+    info.append(meta, currentDescription);
 
     const tray = document.createElement('div');
     tray.className = 'video-collection-tray';
 
-    const trayHead = document.createElement('div');
-    trayHead.className = 'video-collection-tray-head';
+    const grid = document.createElement('div');
+    grid.className = 'video-collection-grid';
+    grid.setAttribute('aria-label', `${block.title || work.title || 'Video'} collection`);
 
-    const trayCount = document.createElement('span');
-    trayCount.className = 'video-collection-tray-count';
+    const pagination = document.createElement('div');
+    pagination.className = 'video-collection-pagination';
+
+    const previousPage = document.createElement('button');
+    previousPage.className = 'video-collection-page-button';
+    previousPage.type = 'button';
+    previousPage.textContent = '‹';
+    previousPage.setAttribute('aria-label', 'Previous video page');
+
+    const pageStatus = document.createElement('span');
+    pageStatus.className = 'video-collection-page-status';
+
+    const nextPage = document.createElement('button');
+    nextPage.className = 'video-collection-page-button';
+    nextPage.type = 'button';
+    nextPage.textContent = '›';
+    nextPage.setAttribute('aria-label', 'Next video page');
+
+    pagination.append(previousPage, pageStatus, nextPage);
+
+    const actions = document.createElement('div');
+    actions.className = 'video-collection-actions';
 
     const shuffleButton = document.createElement('button');
     shuffleButton.className = 'video-collection-shuffle';
     shuffleButton.type = 'button';
-    shuffleButton.textContent = 'Shuffle ↝';
+    shuffleButton.textContent = 'Shuffle order';
+    actions.appendChild(shuffleButton);
 
-    trayHead.append(trayCount, shuffleButton);
-
-    const gridViewport = document.createElement('div');
-    gridViewport.className = 'video-collection-grid-viewport';
-
-    const grid = document.createElement('div');
-    grid.className = 'video-collection-grid';
-    grid.setAttribute('aria-label', `${block.title || work.title || 'Video'} collection`);
-    gridViewport.appendChild(grid);
-    tray.append(trayHead, gridViewport);
+    tray.append(grid, pagination, actions);
 
     let activeIndex = 0;
-    let buttons = [];
+    let currentPage = 0;
 
-    function updateDescriptionFade(){
-      const remaining = currentDescription.scrollHeight - currentDescription.scrollTop - currentDescription.clientHeight;
-      descriptionShell.classList.toggle('has-more', remaining > 3);
-    }
-
-    function syncActive(){
-      buttons.forEach((button, buttonIndex) => {
-        const active = buttonIndex === activeIndex;
-        button.classList.toggle('is-active', active);
-        button.setAttribute('aria-current', active ? 'true' : 'false');
-      });
+    function pageCount(){
+      return Math.max(1, Math.ceil(videos.length / PAGE_SIZE));
     }
 
     function renderStage(index){
@@ -186,15 +186,20 @@
 
       currentTitle.textContent = item.title || 'Untitled video';
       currentDescription.textContent = item.description || '';
-      currentDescription.scrollTop = 0;
+      currentDescription.hidden = !String(item.description || '').trim();
       status.textContent = `${index + 1} / ${videos.length}`;
-      syncActive();
-      requestAnimationFrame(updateDescriptionFade);
+      renderGrid();
     }
 
     function renderGrid(){
+      const totalPages = pageCount();
+      currentPage = Math.min(Math.max(0, currentPage), totalPages - 1);
+      const start = currentPage * PAGE_SIZE;
+      const pageItems = videos.slice(start, start + PAGE_SIZE);
+
       grid.replaceChildren();
-      buttons = videos.map((item, index) => {
+      pageItems.forEach((item, pageIndex) => {
+        const index = start + pageIndex;
         const button = document.createElement('button');
         button.className = 'video-collection-thumb';
         button.type = 'button';
@@ -211,16 +216,33 @@
         number.textContent = String(index + 1).padStart(2, '0');
 
         button.append(image, number);
+        const active = index === activeIndex;
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-current', active ? 'true' : 'false');
+
         button.addEventListener('click', () => {
           renderStage(index);
           if (window.matchMedia('(max-width:620px)').matches) fastScrollTo(stage);
         });
         grid.appendChild(button);
-        return button;
       });
-      trayCount.textContent = `${videos.length} videos`;
-      syncActive();
+
+      pageStatus.textContent = `PAGE ${currentPage + 1} / ${totalPages}`;
+      previousPage.disabled = currentPage === 0;
+      nextPage.disabled = currentPage >= totalPages - 1;
     }
+
+    previousPage.addEventListener('click', () => {
+      if (currentPage <= 0) return;
+      currentPage -= 1;
+      renderGrid();
+    });
+
+    nextPage.addEventListener('click', () => {
+      if (currentPage >= pageCount() - 1) return;
+      currentPage += 1;
+      renderGrid();
+    });
 
     shuffleButton.addEventListener('click', () => {
       const previousFirstId = videos[0]?.videoId;
@@ -230,20 +252,12 @@
         [videos[0], videos[swapIndex]] = [videos[swapIndex], videos[0]];
       }
       activeIndex = 0;
-      gridViewport.scrollTop = 0;
-      renderGrid();
+      currentPage = 0;
       renderStage(0);
       if (window.matchMedia('(max-width:620px)').matches) fastScrollTo(stage);
     });
 
-    currentDescription.addEventListener('scroll', updateDescriptionFade, {passive:true});
-    if (typeof ResizeObserver === 'function') {
-      const observer = new ResizeObserver(updateDescriptionFade);
-      observer.observe(currentDescription);
-    }
-
     collection.append(stage, info, tray);
-    renderGrid();
     renderStage(0);
     return breakout;
   }
