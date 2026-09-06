@@ -2,7 +2,7 @@
   Selected Photography lightbox interaction layer.
   - Desktop: provide an explicit close control without changing photo navigation.
   - Mobile: keep backdrop tap-to-close, add pinch zoom and free panning while zoomed.
-  - Keep the recently closed thumbnail cue neutral rather than accent-colored.
+  - Keep the recently closed thumbnail cue as a white translucent fade.
 */
 
 (function installPhotoLightboxInteractions(){
@@ -95,9 +95,28 @@
     const style = document.createElement('style');
     style.id = 'photo-lightbox-interaction-styles';
     style.textContent = `
+      #shuffle-photos{
+        border-color:var(--fg)!important;
+        background:var(--bg)!important;
+        color:var(--fg)!important;
+      }
+      #shuffle-photos:hover,#shuffle-photos:focus-visible{
+        border-color:var(--fg)!important;
+        background:var(--fg)!important;
+        color:var(--bg)!important;
+      }
+      #shuffle-photos:focus-visible{
+        outline:2px solid var(--line)!important;
+        outline-offset:2px;
+      }
       .photo-cell.photo-recently-viewed::after{
-        border-color:rgba(17,17,17,.58)!important;
-        background:rgba(17,17,17,.055)!important;
+        border:0!important;
+        background:rgba(255,255,255,.58)!important;
+        animation:photoRecentWhiteFade 2600ms ease-out forwards!important;
+      }
+      @keyframes photoRecentWhiteFade{
+        0%,48%{opacity:1}
+        100%{opacity:0}
       }
       .photo-lightbox-close{
         position:fixed;
@@ -109,23 +128,23 @@
         display:none;
         place-items:center;
         appearance:none;
-        border:1px solid rgba(17,17,17,.62);
+        border:1px solid var(--fg);
         border-radius:999px;
         padding:0;
-        background:rgba(255,255,255,.92);
-        color:#111;
+        background:var(--bg);
+        color:var(--fg);
         cursor:pointer;
         backdrop-filter:blur(6px);
         -webkit-backdrop-filter:blur(6px);
       }
       .photo-lightbox-close:hover,
       .photo-lightbox-close:focus-visible{
-        border-color:#111;
-        background:#111;
-        color:#fff;
+        border-color:var(--fg);
+        background:var(--fg);
+        color:var(--bg);
       }
       .photo-lightbox-close:focus-visible{
-        outline:2px solid rgba(17,17,17,.18);
+        outline:2px solid var(--line);
         outline-offset:3px;
       }
       .photo-lightbox-close svg{
