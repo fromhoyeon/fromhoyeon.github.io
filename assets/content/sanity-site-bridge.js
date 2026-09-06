@@ -380,6 +380,7 @@
     const description = descriptionBox?.querySelector('p');
     const summary = typeof work.summary === 'string' ? work.summary : '';
     const hasSummary = Boolean(summary.trim());
+    section.querySelector(':scope > .work-head')?.classList.toggle('has-description', hasSummary);
     if (description) {
       description.textContent = hasSummary ? summary : '';
       description.style.whiteSpace = 'pre-line';

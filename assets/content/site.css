@@ -102,7 +102,8 @@ button{font:inherit;color:inherit}
 .sanity-offline-row .offline-word{font-weight:500;letter-spacing:.01em}
 
 .work{padding:0 0 var(--work-gap)}
-.work-head{display:grid;grid-template-columns:32px 1fr auto;gap:var(--m);align-items:start;border-top:1px solid var(--fg);border-bottom:1px solid var(--line);padding:10px 0 11px;margin-bottom:18px}
+.work-head{display:grid;grid-template-columns:32px 1fr auto;gap:var(--m);align-items:start;border-top:1px solid var(--fg);padding:10px 0 var(--m)}
+.work-head.has-description{border-bottom:1px solid var(--line);padding-bottom:11px;margin-bottom:18px}
 .num,.meta{font-size:10px;color:var(--muted);text-transform:uppercase}
 .work-title{font-size:24px;line-height:1;letter-spacing:-.035em;font-weight:700}
 .work-meta{text-align:right;font-size:10px;line-height:1.4;color:var(--muted);text-transform:uppercase}
@@ -278,7 +279,7 @@ footer{border-top:1px solid var(--fg);padding:10px 0 var(--l);display:flex;justi
   .live-gate-inner{width:calc(100% - 28px)}
   .live-gate-actions{display:grid;grid-template-columns:1fr 1fr}
   .live-gate .action{text-align:center;padding:9px 8px 8px}
-  .work-head{margin-bottom:14px}
+  .work-head.has-description{margin-bottom:14px}
   .description.is-section-intro{padding:0 0 18px}
   .video-collection-info{height:126px;padding:12px 12px 10px}
   .video-collection-meta{gap:10px;padding-bottom:8px}
