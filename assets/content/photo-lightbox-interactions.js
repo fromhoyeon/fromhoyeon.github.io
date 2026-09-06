@@ -9,7 +9,7 @@
   if (window.__PHOTO_LIGHTBOX_INTERACTIONS__) return;
   window.__PHOTO_LIGHTBOX_INTERACTIONS__ = true;
 
-  if (!window.lightbox || !window.lightboxImage) return;
+  if (typeof lightbox === 'undefined' || typeof lightboxImage === 'undefined') return;
 
   const MAX_ZOOM = 5;
   const ZOOM_EPSILON = 1.01;
