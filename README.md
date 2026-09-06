@@ -58,6 +58,7 @@ YouTube player 배경이나 embedded media처럼 **사이트 테마와 무관하
 - `sanity-config.js` — public Sanity 연결 설정.
 - `sanity-runtime.js` — Sanity query, image URL 생성과 필요한 enhancement module loading.
 - `sanity-site-bridge.js` — Homepage / Portfolio Item / About / Links 데이터를 실제 페이지 구조에 연결한다.
+- `video-collection.js` — YouTube playlist URL 하나를 받아 playlist 전체를 선택형 player + thumbnail grid로 표시한다.
 - `portfolio-ui-overrides.js` — poster-first YouTube와 Portfolio Item gallery lightbox의 동작 보정. 시각 스타일은 소유하지 않는다.
 - `sanity-gallery-layout.js` — Portfolio Item Image Gallery의 ratio-preserving row 계산과 확대 보기.
 - `photo-gallery-core.js` — Selected Photography의 기본 row layout, lightbox와 keyboard/touch navigation.
@@ -82,6 +83,17 @@ Sanity의 published/enabled `portfolioPhoto` 전체 pool을 하나의 random dec
 - mobile enlarged view는 pinch zoom과 확대 후 자유로운 one-finger pan을 지원한다. 1x 상태에서는 horizontal swipe가 사진 이동이다.
 - desktop enlarged view는 우측 상단 Close button을 제공한다.
 - lightbox를 닫으면 방금 보던 thumbnail에 현재 theme background와 같은 100% opaque overlay가 0.1초 표시된 뒤 1초 동안 fade-out된다.
+
+## Video Collection
+
+Portfolio Item의 `Video Collection` content block은 Sanity에 YouTube playlist URL 하나만 저장한다.
+
+- playlist 순서를 그대로 사용한다.
+- 선택된 영상은 상단 player에 표시하고 전체 영상은 thumbnail grid로 노출한다.
+- desktop은 4열, mobile은 2열 grid를 기본으로 한다.
+- mobile에서 thumbnail을 선택하면 player 위치로 smooth scroll한다.
+- playlist 해석, thumbnail 생성, player 상태와 선택 동작은 `video-collection.js`가 담당한다.
+- grid 열 수나 scroll 동작 같은 presentation 옵션은 Sanity에 저장하지 않는다.
 
 ## Sanity 경계
 
