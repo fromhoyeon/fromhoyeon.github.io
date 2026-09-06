@@ -15,7 +15,7 @@
   const SESSION_KEY = 'hoyeon-selected-photography-deck-v1';
   const SESSION_TTL_MS = 2 * 60 * 60 * 1000;
   const FULL_PRELOAD_COUNT = 1;
-  const RECENT_THUMBNAIL_MS = 2600;
+  const RECENT_THUMBNAIL_MS = 1100;
 
   let remotePoolPromise = null;
   let deck = [];
@@ -38,8 +38,8 @@
       #shuffle-photos:disabled{opacity:.4;cursor:wait}
       .photo-shuffle-icon{width:13px;height:13px;display:inline-flex;flex:0 0 auto}
       .photo-shuffle-icon svg{width:13px;height:13px;display:block;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-      .photo-cell.photo-recently-viewed::after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;border:2px solid var(--accent-blue);background:rgba(36,88,211,.07);animation:photoRecentViewed ${RECENT_THUMBNAIL_MS}ms ease-out forwards}
-      @keyframes photoRecentViewed{0%,72%{opacity:1}100%{opacity:0}}
+      .photo-cell.photo-recently-viewed::after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;border:0;background:var(--photo-recent-overlay,rgba(255,255,255,1));animation:photoRecentViewed ${RECENT_THUMBNAIL_MS}ms linear forwards}
+      @keyframes photoRecentViewed{0%,9.0909%{opacity:1}100%{opacity:0}}
     `;
     document.head.appendChild(style);
   }
