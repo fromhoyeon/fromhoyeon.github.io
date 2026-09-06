@@ -1,0 +1,54 @@
+name: Refresh YouTube thumbnails
+
+on:
+  push:
+    paths:
+      - '.github/workflows/refresh-youtube-thumbnails.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply thumbnail cache bust
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          js_path = Path('assets/content/video-collection.js')
+          js = js_path.read_text()
+
+          old_const = "  const INITIAL_VIDEO_ID = 'VvSIj9rhanA';\n"
+          new_const = "  const INITIAL_VIDEO_ID = 'VvSIj9rhanA';\n  const YOUTUBE_THUMBNAIL_VERSION = '20260907-1';\n"
+          if old_const not in js:
+              raise SystemExit('initial video constant pattern not found')
+          js = js.replace(old_const, new_const, 1)
+
+          old_thumb = """  function thumbnailUrl(videoId){\n    return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;\n  }\n"""
+          new_thumb = """  function thumbnailUrl(videoId){\n    return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg?v=${YOUTUBE_THUMBNAIL_VERSION}`;\n  }\n"""
+          if old_thumb not in js:
+              raise SystemExit('thumbnail URL pattern not found')
+          js = js.replace(old_thumb, new_thumb, 1)
+          js_path.write_text(js)
+
+          index_path = Path('index.html')
+          index = index_path.read_text()
+          old_script = 'assets/content/video-collection.js?v=20260907-4'
+          new_script = 'assets/content/video-collection.js?v=20260907-5'
+          if old_script not in index:
+              raise SystemExit('video collection cache version not found')
+          index = index.replace(old_script, new_script, 1)
+          index_path.write_text(index)
+          PY
+      - name: Validate JavaScript
+        run: node --check assets/content/video-collection.js
+      - name: Commit changes
+        run: |
+          git config user.name "fromhoyeon"
+          git config user.email "fromhoyeon@gmail.com"
+          git add assets/content/video-collection.js index.html
+          git commit -m "Refresh YouTube thumbnail cache"
+          git push
