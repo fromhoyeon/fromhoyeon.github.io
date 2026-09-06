@@ -1,134 +1,124 @@
 # fromhoyeon.github.io
 
-Hoyeon의 개인 웹사이트이자 포트폴리오를 위한 저장소다.
+Hoyeon의 개인 웹사이트이자 포트폴리오 저장소다.
 
-## 목적
+## 목적과 범위
 
-이 저장소는 `fromhoyeon.github.io`에 공개되는 개인 웹사이트를 소유한다.
+이 저장소는 `fromhoyeon.github.io`에 공개되는 개인 웹사이트의 **페이지 구조, 시각 시스템, 인터랙션, Sanity 연결과 배포 코드**를 소유한다.
 
-음악, 사진, 영상, 미디어아트, 웹 작업을 처음부터 고정된 직업 카테고리로 영구 분리하지 않는다. 사이트의 정보 구조와 표현 방식은 미리 정한 분류 체계보다 실제 작업과 예술적 의도에서 발전시킨다.
+음악, 사진, 영상, 미디어아트, 웹 작업을 처음부터 고정된 직업 카테고리로 영구 분리하지 않는다. 실제 작업과 사용 방식에 따라 Portfolio Item과 Tag를 조합하며, 개별 작품의 상세 구현은 가능한 경우 각 작품 repository가 소유한다.
 
-개별 작품과 웹 애플리케이션의 상세 구현은 적절한 경우 각 프로젝트 저장소가 소유한다. 이 저장소는 그 작업들을 개인 웹사이트에서 어떻게 소개하고, 연결하고, 맥락화할지를 담당한다.
+개인적 기억, 공개되지 않은 작품의 기원, 그 밖의 비공개 맥락은 이 공개 저장소에 자동으로 기록하지 않는다.
 
-개인적 기억, 공개되지 않은 작품의 기원, 그 밖의 비공개 개인 맥락은 기본적으로 이 공개 저장소에 복제하지 않는다.
+## v1 현재 구조
 
-## 현재 상태
+2026-09-06 기준으로 초기 prototype 단계를 정리하고 **v1 운영 구조**로 전환했다.
 
-평가를 위해 이전 포트폴리오 프로토타입들을 이 저장소에 복원해두었다. 파일이 존재한다는 사실만으로 해당 구조, 분류, 타이포그래피, 시각 방향이 최종안으로 채택된 것은 아니다.
+- `index.html` — 실제 공개 사이트의 루트 문서. 더 이상 별도 `prototype-*` 페이지로 redirect하지 않는다.
+- `assets/content/` — 현재 사이트의 CSS와 JavaScript runtime.
+- `sanity/` — Sanity content model과 schema 참고 source. 자세한 기준은 `sanity/README.md`를 따른다.
+- `scripts/` — 운영·import용 보조 스크립트. 현재 Photograph import 스크립트를 유지한다.
 
-현재 루트의 주요 프로토타입과 테스트:
+과거 font, embed, gallery, random-photo, multi-page portfolio 실험과 로컬 sample asset은 v1 public tree에서 제거했다. 필요한 과거 상태는 Git history에서 확인할 수 있으며 현재 운영 코드와 섞어 보관하지 않는다.
 
-- `index.html` — 현재 공개 사이트의 진입점. `prototype-functional-onepage.html`로 즉시 이동시킨다. 당분간 이 단일 페이지 프로토타입을 메인 사이트로 사용한다.
-- `prototype-random-photo-layout.html` — 10~15장의 사진이 서로 다른 비율로 유동적으로 들어온다고 가정하고, crop 없이 원본 비율을 유지한 채 화면 폭에 맞춰 justified row를 구성하는 사진 배치 실험.
-- `prototype-functional-onepage.html` — 중앙 집중형 정보 영역과 제한된 타이포그래피·간격 규칙을 사용하는 현재 메인 단일 페이지. `Selected Photography`는 Sanity `portfolioPhoto`의 published/enabled 전체 pool에서 한 번 만든 무작위 순서를 12장 단위로 보여준다. 같은 deck 안에서는 사진을 반복하지 않고, 확대 보기의 마지막 사진에 도달하면 다음 12장의 thumbnail과 다음 enlarged 일부를 준비한 뒤 오른쪽 이동 시 다음 batch의 첫 사진으로 이어진다. 최근 deck과 현재 batch는 같은 브라우저에서 2시간 동안 복원된다. 사진 목록 아래에는 `PAGE <현재 / 전체>` 상태를 표시하고 그 아래 `Shuffle order` 버튼을 둔다. 이 버튼은 전체 순서를 새로 섞고 첫 12장으로 돌아간다. 확대 보기에서 batch가 넘어가면 새 page 번호를 잠깐 표시하며, lightbox를 닫으면 방금 보던 사진의 현재 batch thumbnail을 약 2.6초 동안 강조한다. 모바일에서는 4개 행으로 배치하고 데스크탑에서는 mixed-ratio justified layout을 사용한다. 확대 보기에서 첫 사진 이전 이동은 막는다. Selected Photography lightbox는 별도 Close 버튼 없이 Esc 또는 배경 클릭으로 닫는다. Portfolio Item 내부 Image Gallery lightbox는 데스크탑에서 Close 버튼과 배경 클릭 종료를 없애고 Esc로 닫으며, 모바일에서는 Esc 키가 없으므로 배경 탭 종료를 유지한다. DODREI는 iframe을 즉시 로드하지 않고 투명한 외부 여백 안의 단일 dark-gray gate에서 `Play here / Open in new window`를 선택하게 한다. 주요 Portfolio Item의 제목·Period·설명·tag·media URL과 홈페이지 순서는 Sanity에서 읽는다.
-- `assets/content/site-copy.js` — Sanity-bound 전역 텍스트와 navigation bridge. Sanity 내용을 local copy로 복제하지 않으며 아직 remote 값이 없는 bound text/navigation은 `OFFLINE`으로 표시한다. 현재 기본 사이트 배경은 흰색이다. 하단 Email은 `Email: fromhoyeon@gmail.com`으로 표시하고 첫 클릭에 주소를 clipboard로 복사한 뒤 `Open mail app` mailto 동작을 별도로 제안한다.
-- `assets/content/sanity-config.js` / `sanity-runtime.js` / `sanity-prototype-bridge.js` — Sanity content adapter. Project ID `a707yvok`, dataset `production`에 연결되어 있으며 active prototyping 중에는 CDN cache를 사용하지 않고 published data를 직접 읽는다. Portfolio Item의 Tag reference는 frontend에서 label로 resolve한다.
-- `assets/content/portfolio-ui-overrides.js` — 현재 Portfolio Item media UI 보정 레이어. YouTube는 재생 전 iframe을 띄우지 않고 thumbnail + play button만 보여주며, 사용자가 재생을 시작한 뒤에만 YouTube 기본 player를 생성해 native seek/fullscreen controls를 사용한다. 연속된 YouTube block 간격을 일반 content block보다 좁게 유지하고 Portfolio Item gallery lightbox의 desktop 종료 동작도 여기서 보정한다.
-- `assets/content/sanity-gallery-layout.js` — Portfolio Item의 Image Gallery block에서 지정한 `Rows` 수를 기준으로 사진의 실제 비율을 읽어 행 분할을 자동 계산한다. 각 행 안에서는 사진 높이를 동일하게 맞추되 crop하지 않는다.
-- `sanity/` — `Portfolio Item`(`_type: workEntry`), `Tag`, `Photograph`(`_type: portfolioPhoto`), `homePage`, `siteCopy`, `siteNavigation`과 content block schema source 및 연결 기준. 실제 schema와 hosted Studio도 같은 content model로 배포되어 있다.
-- `assets/prototypes/photo-samples/` — 과거 사진 배치·확대 동작 테스트를 위한 로컬 샘플 이미지. 현재 Selected Photography의 canonical pool은 아니다.
-- `assets/prototypes/photo-samples-size-tests/` — 로컬 사진 크기 변형 테스트본.
-- `style.css` — 이전 루트 편집형 포트폴리오 프로토타입의 스타일시트. 현재 메인 진입점에서는 사용하지 않는다.
-- `gallery.html` / `gallery.css` — 연속 갤러리·아카이브 배치 실험.
-- `Font_test.html`, `Font_test-1.html` ~ `Font_test-3.html` — 타이포그래피와 팔레트 테스트.
-- `Embed_test_1.html` — 정지 이미지와 YouTube 임베드·배치 실험.
-- `portfolio-v2/` — 공용 CSS/JS와 카테고리·프로젝트 페이지를 가진 과거 다중 페이지 포트폴리오 프로토타입.
-- `styles.css` — 초기 최소 구조의 스타일시트. 현재 복원된 루트 프로토타입에서는 사용하지 않는다.
-- `LEGACY_README.md` / `LEGACY_PROJECT_STATE.md` — 이전 포트폴리오 단계의 보존 기록. 현재의 기준 문서와 분리해서 유지한다.
+## 색상과 시각 시스템
 
-현재 최종 프레임워크와 시각 시스템 전체가 확정된 것은 아니다. 다만 현재 공개 메인 화면은 `prototype-functional-onepage.html`을 사용한다.
+`assets/content/site.css`가 **사이트 전체 색상과 핵심 시각 token의 canonical source**다.
 
-## 2026-09-03 checkpoint
+테마 색은 palette 원본을 한 번만 정의하고, 실제 UI는 semantic token을 통해 참조한다.
 
-현재 메인 프로토타입의 **포맷과 기능은 실제 콘텐츠·문구 작업을 시작하기에 충분한 임시 기준선**으로 본다. 최종 디자인이나 정보 구조를 확정했다는 뜻은 아니며, 당분간 레이아웃 자체를 확장하기보다 무엇을 보여주고 어떤 문구를 사용할지 검토하는 단계로 이동했다.
+```css
+--palette-white-bg
+--palette-white-fg
+--palette-white-muted
+--palette-white-line
+--palette-white-panel
 
-이 checkpoint 이후 시작된 **작가의 작업 전반과 철학을 해석하는 논의는 홈페이지 구현 상태와 분리한다.** 해당 내용은 공개 사이트의 확정 문구나 이 저장소의 작가론으로 자동 반영하지 않고, 공개 가능한 내용만 추후 선택적으로 가져온다.
+--palette-black-bg
+--palette-black-fg
+--palette-black-muted
+--palette-black-line
+--palette-black-panel
+```
 
-## 2026-09-05 content-model checkpoint
+현재 값은 White 계열과 Black 계열 두 세트이며 기본 테마는 White다. 사용자가 Black을 선택하면 같은 브라우저의 `localStorage`에 선택을 보존한다.
 
-포트폴리오 콘텐츠가 실제로 늘어날 것을 전제로 Sanity의 일반 콘텐츠 모델을 단순화했다.
+페이지 배경, 글자, divider, panel, lightbox, photo-return overlay, Shuffle button, theme preview button 등 테마에 종속되는 UI는 위 palette에서 파생된 `--bg`, `--fg`, `--muted`, `--line`, `--panel` 등을 사용한다.
 
-- 일반 공개 콘텐츠를 `Music`, `Media Art`, `Project` 같은 상위 타입이나 계층으로 미리 나누지 않는다.
-- 일반 공개 항목은 모두 동등한 **Portfolio Item**으로 취급한다. 기존 데이터와 frontend reference를 보존하기 위해 기술적 `_type` 이름 `workEntry`는 유지한다.
-- Portfolio Item 사이의 관계와 향후 조회는 독립 `Tag` document reference로 표현한다.
-- 현재 모든 Tag는 완전히 동등하다. `year`, `series`, `tool`, `event`, `medium` 등의 tag group이나 hierarchy는 아직 만들지 않는다. 실제 콘텐츠가 충분히 쌓인 뒤 필요가 확인되면 추가한다.
-- Portfolio Item 작성 시 기존 Tag를 검색·재사용하고, 필요할 때 새 Tag를 만든다.
-- 사진은 현재 유일한 특수 케이스다. `Photograph` document pool을 따로 두되 일반 Portfolio Item과 동일한 Tag documents를 공유한다.
-- production의 기존 문자열 tag `TouchDesigner`, `Archive`, `Performance`, `Batman`은 독립 Tag documents로 이관했다. `Batman`은 기존 테스트 데이터 보존을 위한 값이며 채택된 taxonomy가 아니다.
-- Tag reference와 `homePage.featuredWorks` reference는 현재 작업 단계에서 삭제를 쉽게 하기 위해 weak reference로 운영한다. target 문서를 지워도 source 문서 삭제가 차단되지 않으며, 남은 dangling reference는 frontend에서 의미 있는 콘텐츠로 취급하지 않는 방향을 따른다.
-- Portfolio Item의 `Public title`은 Studio에서 줄바꿈 입력이 가능하도록 `text` 타입, 2-row 입력 UI로 변경했다.
-- 2026-09-06 Portfolio Item의 제목 옆 짧은 정보 영역을 자유 형식 **Period** 하나로 통일했다. 기존 `yearLabel` 값은 `period`로 이관했고 `yearLabel`과 `metaLines`는 production 데이터와 active schema에서 제거했다. `Period`는 `2025`, `2024/04`, `2022~2024`, `Ongoing`처럼 시점·기간만 표시하며 분류나 포맷 정보는 섞지 않는다.
-- 기존 5개 Portfolio Item의 공개 제목과 내용은 content-model 구조 변경 자체에서는 자동 변경하지 않았다. 실제 콘텐츠로 교체·보강하는 작업은 별도의 콘텐츠 편집으로 진행한다.
-- 사용되지 않는 `contentEntry`는 active repository schema 목록에서 제외하고 hosted Studio에서도 legacy type으로 숨겼다.
+따라서 향후 White를 미세한 beige 계열로 바꾸거나 Black을 warm black으로 바꾸더라도 각 palette 원본만 수정하면 된다. JavaScript나 Sanity document에 테마 색을 중복 저장하지 않는다.
 
-세부 schema와 runtime 기준은 `sanity/README.md`를 따른다.
+YouTube player 배경이나 embedded media처럼 **사이트 테마와 무관하게 절대적인 black/white가 필요한 요소**도 `site.css` 안의 별도 media token으로 명시한다. 테마 palette와 의도적으로 분리된 값이다.
 
-## 2026-09-05 interface checkpoint
+## frontend module 책임
 
-현재 콘텐츠 입력과 실제 모바일/데스크탑 사용을 시험하면서 다음 인터랙션을 적용했다.
+현재 `assets/content/`의 주요 파일:
 
-- YouTube 커스텀 seek bar 실험은 폐기했다. 간헐적으로 IFrame API와 DOM rerender timing이 엇갈리며 안정적이지 않았기 때문이다.
-- YouTube는 **poster-first** 방식으로 전환했다. 재생 전에는 YouTube iframe을 만들지 않고 thumbnail + play button만 표시하며, 사용자가 누른 뒤에는 YouTube native player와 기본 seek/fullscreen controls를 사용한다.
-- 한 Portfolio Item 안에 YouTube Video block이 연속될 경우 일반 block 간격보다 훨씬 좁게 보이도록 조정한다. 현재 desktop 약 10px, mobile 약 8px을 기준으로 한다.
-- Portfolio Item 내부 사진 확대 보기의 별도 Close 버튼은 제거했다. desktop은 Esc 중심으로 닫고, mobile은 backdrop tap을 남긴다.
-- 하단 Email 링크는 즉시 mail app을 여는 대신 주소 복사를 먼저 수행하고 `Email address copied. Open your mail app?` 안내와 `Open mail app` mailto action을 두 번째 단계로 표시한다.
+- `site.css` — palette, semantic color token, spacing, layout, component styling과 responsive rules.
+- `site-copy.js` — Sanity-bound 공통 copy/navigation bridge. remote 값이 없을 때 stale local copy 대신 `OFFLINE` 원칙을 유지한다.
+- `sanity-config.js` — public Sanity 연결 설정.
+- `sanity-runtime.js` — Sanity query, image URL 생성과 필요한 enhancement module loading.
+- `sanity-site-bridge.js` — Homepage / Portfolio Item / About / Links 데이터를 실제 페이지 구조에 연결한다.
+- `portfolio-ui-overrides.js` — poster-first YouTube와 Portfolio Item gallery lightbox의 동작 보정. 시각 스타일은 소유하지 않는다.
+- `sanity-gallery-layout.js` — Portfolio Item Image Gallery의 ratio-preserving row 계산과 확대 보기.
+- `photo-gallery-core.js` — Selected Photography의 기본 row layout, lightbox와 keyboard/touch navigation.
+- `photo-pool-controls.js` — 전체 Photograph pool의 random deck, 12장 batch, page 상태, Shuffle과 session 복원.
+- `photo-lightbox-interactions.js` — Selected Photography의 desktop close, mobile pinch/pan, thumbnail/enlarged loading state.
+- `presentation-controls.js` — White/Black theme state, lightbox spacing과 desktop navigation behavior.
 
-이 항목들은 현재 구현된 인터랙션 기준이며 사이트의 최종 디자인 시스템 전체를 확정한 것은 아니다.
+원칙은 **CSS는 시각 상태, JavaScript는 동작과 데이터 상태**를 담당하는 것이다. 런타임 JavaScript에서 테마별 색상 style을 동적으로 주입하지 않는다.
 
-## 콘텐츠 레이어 기준
+## Selected Photography
 
-- **GitHub Pages가 웹사이트 본체다.** HTML, CSS, JavaScript, 레이아웃, 인터랙션, 작품별 특수 구현, 텍스트의 시각적 포맷과 배포는 이 저장소가 계속 소유한다.
-- **Sanity는 DB형 콘텐츠와 asset을 제공하는 외부 content layer다.** Sanity가 웹페이지를 렌더링하거나 사이트 구조 전체를 소유하지 않는다.
-- **사이트 전역 문구는 Sanity `siteCopy` 문서에서 관리한다.** remote 값이 없거나 연결되지 않은 bound text는 `OFFLINE`으로 표시한다.
-- **상단 메뉴는 Sanity `siteNavigation`의 `primary-navigation` singleton에서 관리한다.**
-- **일반 공개 콘텐츠는 Sanity Portfolio Item 문서로 관리한다.** 기술적 `_type`은 기존 호환성을 위해 `workEntry`를 유지한다.
-- **Portfolio Item의 노출 여부와 홈페이지 순서는 `homePage.featuredWorks` reference 배열이 결정한다.** 현재 이 reference는 weak다.
-- **Portfolio Item의 제목 옆 시간 정보는 `period` 하나만 사용한다.** 날짜, 연도, 월, 기간, 진행 상태를 짧은 자유 형식 문자열로 표현한다.
-- **Portfolio Item과 Photograph의 관계·필터링용 메타데이터는 재사용 가능한 `tag` documents를 weak reference한다.** 현재 tag는 별도 그룹 없이 flat하게 운영한다.
-- **작품 내부 구성은 `contentBlocks` 배열을 우선한다.** 현재 YouTube Video, Text, Image Gallery, Web Embed block을 조합하고 순서를 바꿀 수 있다.
-- 기존 Portfolio Item 중 content block으로 아직 이관되지 않은 항목을 위해 legacy media fields는 compatibility 용도로 잠시 유지한다.
-- **Image Gallery는 사진 비율을 보고 지정된 행 수 안에서 균형 있는 분할 지점을 계산하며 crop하지 않는다.**
-- **YouTube는 재생 전 poster-only, 재생 후 native player 방식이다.** 커스텀 control bar는 현재 사용하지 않는다.
-- **Work 영역의 사용자-facing fallback은 `OFFLINE`이다.** Sanity query가 실패하거나 Homepage 데이터가 없으면 과거 하드코딩 콘텐츠를 대신 노출하지 않는다.
-- **Selected Photography의 canonical pool은 Sanity `portfolioPhoto`다.** enabled/published 전체 pool의 metadata를 한 번 받아 브라우저에서 무작위 deck을 만들고, 실제 화면에는 현재 12장 batch만 렌더링한다. 같은 deck을 끝까지 소비하는 동안 중복 사진은 나오지 않는다.
-- 어떤 콘텐츠를 remote/static으로 둘지는 영구 고정하지 않는다. 외부 content layer도 교체 가능해야 한다.
+Sanity의 published/enabled `portfolioPhoto` 전체 pool을 하나의 random deck으로 만든다.
 
-현재 Sanity 관리 Studio:
+- 한 번 만든 deck 안에서는 사진을 반복하지 않는다.
+- 현재 화면에는 12장씩 표시한다.
+- 같은 브라우저에서는 deck 순서와 현재 batch를 2시간 복원한다.
+- `Shuffle order`는 전체 deck을 다시 섞고 page 1로 돌아간다.
+- 목록 아래에 `PAGE <현재 / 전체>`를 표시한다.
+- 현재 batch의 마지막 enlarged 사진에 도달하면 다음 12장의 thumbnail을 preload하고, 다음 page 첫 enlarged 이미지 1장만 추가 preload한다.
+- 일반 enlarged 이동에서는 현재 사진 기준 이전/다음 enlarged 이미지를 각각 1장씩 preload한다.
+- thumbnail 또는 enlarged image가 느리게 로드되면 작은 `loading` 텍스트를 표시한다. 별도 서버 요청은 만들지 않는다.
+- mobile enlarged view는 pinch zoom과 확대 후 자유로운 one-finger pan을 지원한다. 1x 상태에서는 horizontal swipe가 사진 이동이다.
+- desktop enlarged view는 우측 상단 Close button을 제공한다.
+- lightbox를 닫으면 방금 보던 thumbnail에 현재 theme background와 같은 100% opaque overlay가 0.1초 표시된 뒤 1초 동안 fade-out된다.
 
-`https://hoyeon-website-content.sanity.studio/`
+## Sanity 경계
 
-## 현재 디자인 탐색 기준
+GitHub Pages가 웹사이트 본체이고 Sanity는 교체 가능한 content/asset layer다.
 
-2026-09-02 이후 대화에서 다음 취향과 작업 기준이 확인되었다. 이는 최종 시각안의 확정이 아니라 이후 프로토타입을 평가할 때 우선 참고할 기준이다.
+Sanity가 관리하는 것:
 
-- 시각적으로 여백 자체를 강조하는 미니멀리즘보다 **구조적으로 단순한 사이트**를 선호한다.
-- 빈 공간은 장식이나 분위기를 위해 만들기보다 가독성, 매체 크기, 조작 편의 등 **기능적 이유의 결과**로 생기는 편을 선호한다.
-- 많은 종류의 장식·타이포그래피를 쓰기보다 **몇 가지 글자 스타일, 간격, 블록 규격을 반복 조합**해 전체 미학을 만드는 방향을 선호한다.
-- 기능 요소와 정보 구조를 숨기기보다 제목, 번호, 기간, 상태, 버튼, 링크 같은 **실용적 인터페이스가 화면의 디자인 요소로 드러나는 방식**을 선호한다.
-- 모바일에서 본 `rushi.co`, `noplans.studio/work`, `bureauborsche.com`의 밀도와 반복 규칙을 긍정적으로 평가했다. 특히 Bureau Borsche의 화면을 꽉 채우는 성격과 Rushi의 제한된 타이포그래피 사용이 참고점이다. 데스크탑 버전 전체를 그대로 선호한다는 뜻은 아니다.
-- 한국어와 영어를 함께 사용할 예정이며 현재 기본 서체는 `IBM Plex Sans KR`이다.
-- 데스크탑에서도 화면 전체를 의무적으로 활용하지 않고, **텍스트와 일반 인터페이스는 중앙의 비교적 좁은 영역에 모으고 큰 사진·영상처럼 실제 필요가 있을 때만 폭을 확장**하는 방식을 선호한다.
-- 기본 구조는 한 페이지 중심을 선호하며, 필요할 때만 같은 규격의 개별 페이지를 추가하는 방식을 우선 검토한다. 사진의 `More Photography`가 자체 페이지인지 외부 서비스인지도 아직 고정하지 않는다.
-- 사진은 원본 비율을 디자인에 맞춰 자르기보다 그대로 유지하는 쪽을 우선한다.
-- 현재 메인 프로토타입의 기본 배경은 **순백색(`#fff`)**이다.
+- Portfolio Item
+- Tag
+- Photograph
+- Homepage curation/order
+- Site copy
+- Primary navigation
+- Portfolio Item content blocks
 
-## 작업 원칙
+GitHub가 관리하는 것:
 
-저장소의 현재 구조, 구현 상태, 기준 문서와 필요한 참조 경로를 확인할 때는 이 `README.md`를 최초 진입점으로 사용한다. 저장소에서 현재 상태를 확인할 수 있다면 프롬프트나 오래된 대화에서 변경 가능한 프로젝트 정보를 추정하지 않는다.
+- HTML 구조
+- CSS / theme / palette
+- layout
+- interaction
+- media runtime
+- Sanity adapter
+- deployment
 
-아이디어, 참고 자료, 제안된 탐색 구조, 복원된 과거 프로토타입, 디자인 실험은 명시적으로 현재 방향으로 선택되거나 구현되기 전까지 채택된 것으로 간주하지 않는다.
+색상이나 디자인 token은 Sanity에서 관리하지 않는다. presentation setting 중 실제 content editor가 조절할 필요가 있는 값만 제한적으로 Sanity에 둘 수 있다.
 
-## 문서 언어와 용어
+## v1 cleanup checkpoint — 2026-09-06
 
-- 이 저장소의 작업 문서와 README는 기본적으로 **한국어를 우선**한다.
-- 코드 식별자, 파일명·경로, API·제품명, 실제 UI 표기, 검색이나 외부 서비스가 원문을 요구하는 기술 용어는 원래 표기를 유지한다.
-- 공개 사이트의 실제 문구처럼 관객·서비스 요구상 영어가 적합한 결과물은 이 규칙의 예외다.
-- 정확한 기술 용어는 유지하되, 사용자를 실무 전문가가 아닌 **준전문가**로 가정한다. 불필요하게 전문 용어만으로 축약하지 않고 한국어로 자연스럽게 풀어쓸 수 있으면 먼저 풀어쓴 뒤 필요한 경우 첫 등장에 원래 용어를 괄호로 덧붙인다.
-- 할 일과 다음 작업을 적을 때는 내부 구조 용어보다 실제로 무엇을 해야 하는지 바로 이해되는 표현을 우선한다.
-- 현재 운영에 쓰이는 문서는 이 기준에 맞춰 유지한다. 과거 상태를 증거로 보존하는 `LEGACY_*` 문서는 역사 기록의 의미를 훼손하지 않기 위해 별도로 취급할 수 있다.
+이번 checkpoint에서 실제로 적용한 내용:
 
-## 배포
+- 공개 root를 redirect용 `index.html`에서 실제 사이트 문서로 승격했다.
+- main prototype의 inline CSS와 photo JavaScript를 각각 `site.css`, `photo-gallery-core.js`로 분리했다.
+- theme palette를 `site.css` 한 곳의 canonical palette token으로 통합했다.
+- photo deck, photo lightbox, presentation, portfolio media, Sanity runtime에서 중복 style injection과 theme color hardcoding을 제거했다.
+- active Sanity bridge 이름을 `sanity-prototype-bridge.js`에서 `sanity-site-bridge.js`로 정리했다.
+- 사용하지 않는 font/embed/gallery 테스트 페이지, 과거 random-photo prototype, 과거 multi-page `portfolio-v2`, prototype sample assets, 중복 legacy 문서를 public branch에서 제거했다.
+- 현재 repository root를 `README.md`, `index.html`, `assets/`, `sanity/`, `scripts/` 중심으로 정리했다.
 
-이 저장소는 다음 GitHub Pages 주소에서 개인 사이트를 제공한다.
-
-`https://fromhoyeon.github.io/`
+이 checkpoint는 사이트의 작품 분류나 최종 미학을 영구 확정한다는 뜻이 아니다. 현재 구현을 유지·확장하기 위한 **v1 기술 기준선**을 확정한 것이다.
