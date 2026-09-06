@@ -87,7 +87,7 @@ Sanity의 published/enabled `portfolioPhoto` 전체 pool을 하나의 random dec
 
 ## Video Collection
 
-기본 `Video Collection` content block은 영상마다 Sanity에서 `YouTube URL`, `Title`, `Description`을 개별 관리한다. Sanity 배열은 source order로만 보존하며, 페이지를 열 때마다 browser에서 전체 영상을 한 번 셔플하고 그 첫 영상을 초기 선택한다.
+기본 `Video Collection` content block은 영상마다 Sanity에서 `YouTube URL`, `Title`, `Description`을 개별 관리한다. Sanity 배열은 source order로만 보존한다. 페이지를 열 때는 `Jihye Lee Orchestra - We Are All From The Same Stream`을 첫 영상으로 고정하고 나머지 영상 순서만 browser에서 셔플한다.
 
 - 선택된 영상은 상단 16:9 player에 표시한다.
 - player 아래에서 선택 영상의 Title과 Description을 표시한다. Description은 현재 접거나 내부 scroll하지 않고 전체 길이를 표시한다.

@@ -8,6 +8,7 @@
   if (window.HOYEON_VIDEO_COLLECTION) return;
 
   const PAGE_SIZE = 4;
+  const INITIAL_VIDEO_ID = 'VvSIj9rhanA';
 
   function extractYouTubeId(value){
     if (!value || typeof value !== 'string') return '';
@@ -69,7 +70,9 @@
     let videos = (Array.isArray(block.videos) ? block.videos : [])
       .map((item) => ({...item, videoId: extractYouTubeId(item?.youtubeUrl || '')}))
       .filter((item) => item.videoId);
-    videos = shuffled(videos);
+    const initialVideo = videos.find((item) => item.videoId === INITIAL_VIDEO_ID);
+    const remainingVideos = videos.filter((item) => item.videoId !== INITIAL_VIDEO_ID);
+    videos = initialVideo ? [initialVideo, ...shuffled(remainingVideos)] : shuffled(videos);
 
     const breakout = document.createElement('div');
     breakout.className = 'video-collection-breakout';
