@@ -118,6 +118,7 @@
           text,
           youtubeUrl,
           playlistUrl,
+          videos[]{_key,youtubeUrl,title,description},
           embedUrl,
           externalUrl,
           rowCount,
