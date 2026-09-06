@@ -3,6 +3,7 @@
   - Desktop: provide an explicit close control without changing photo navigation.
   - Mobile: keep backdrop tap-to-close, add pinch zoom and free panning while zoomed.
   - Keep the recently closed thumbnail cue as a theme-matched fade.
+  - Show minimal loading text only while thumbnail or enlarged image requests are pending.
 */
 
 (function installPhotoLightboxInteractions(){
@@ -121,6 +122,47 @@
         0%,9.0909%{opacity:1}
         100%{opacity:0}
       }
+      .photo-cell.is-image-loading::before{
+        content:'loading';
+        position:absolute;
+        inset:0;
+        z-index:0;
+        display:grid;
+        place-items:center;
+        color:var(--muted);
+        font-size:9px;
+        font-weight:400;
+        letter-spacing:.08em;
+        text-transform:lowercase;
+        pointer-events:none;
+        opacity:0;
+        animation:photoLoadingReveal .15s .15s linear forwards;
+      }
+      .photo-cell img{
+        position:relative;
+        z-index:1;
+        transition:opacity .12s ease;
+      }
+      .photo-cell.is-image-loading img{opacity:0}
+      #photo-lightbox.is-image-loading::before{
+        content:'loading';
+        position:fixed;
+        left:50%;
+        top:50%;
+        z-index:99;
+        transform:translate(-50%,-50%);
+        color:var(--muted);
+        font-size:9px;
+        font-weight:400;
+        letter-spacing:.09em;
+        text-transform:lowercase;
+        pointer-events:none;
+        opacity:0;
+        animation:photoLoadingReveal .15s .15s linear forwards;
+      }
+      #photo-lightbox #lightbox-image{transition:opacity .12s ease}
+      #photo-lightbox.is-image-loading #lightbox-image{opacity:0}
+      @keyframes photoLoadingReveal{to{opacity:.68}}
       .photo-lightbox-close{
         position:fixed;
         top:18px;
@@ -194,6 +236,36 @@
     });
     lightbox.appendChild(button);
   }
+
+  function bindThumbnailLoading(root = document){
+    const images = root instanceof HTMLImageElement
+      ? [root]
+      : Array.from(root.querySelectorAll?.('.photo-cell img') || []);
+
+    images.forEach((img) => {
+      if (img.dataset.photoLoadingBound === 'true') return;
+      const cell = img.closest('.photo-cell');
+      if (!cell) return;
+      img.dataset.photoLoadingBound = 'true';
+
+      const finish = () => cell.classList.remove('is-image-loading');
+      if (img.complete && img.naturalWidth > 0) {
+        finish();
+        return;
+      }
+
+      cell.classList.add('is-image-loading');
+      img.addEventListener('load', finish, {once:true});
+      img.addEventListener('error', finish, {once:true});
+    });
+  }
+
+  function finishLightboxLoading(){
+    lightbox.classList.remove('is-image-loading');
+  }
+
+  lightboxImage.addEventListener('load', finishLightboxLoading);
+  lightboxImage.addEventListener('error', finishLightboxLoading);
 
   lightboxImage.addEventListener('touchstart', (event) => {
     if (!isMobile()) return;
@@ -301,12 +373,17 @@
   const previousShowLightboxIndex = showLightboxIndex;
   showLightboxIndex = function(index){
     resetZoom();
+    lightbox.classList.add('is-image-loading');
     previousShowLightboxIndex(index);
+    if (lightboxImage.complete && lightboxImage.naturalWidth > 0) {
+      requestAnimationFrame(finishLightboxLoading);
+    }
   };
 
   const previousCloseLightbox = closeLightbox;
   closeLightbox = function(){
     resetZoom();
+    finishLightboxLoading();
     previousCloseLightbox();
   };
 
@@ -316,6 +393,19 @@
     applyZoom();
   });
 
+  const thumbnailObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        if (!(node instanceof Element)) return;
+        bindThumbnailLoading(node);
+      });
+    });
+  });
+
   ensureStyles();
   installCloseButton();
+  bindThumbnailLoading(document);
+  if (typeof photoGrid !== 'undefined' && photoGrid) {
+    thumbnailObserver.observe(photoGrid, {childList:true, subtree:true});
+  }
 })();
