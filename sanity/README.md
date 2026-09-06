@@ -29,7 +29,8 @@
 - `homePage` — `featuredWorks` reference 배열로 홈페이지 표시 항목과 순서를 관리한다.
 - `siteCopy` — Site brand, Intro, About, Footer 등 공통 문구와 제한된 presentation setting.
 - `siteNavigation` — 상단 primary navigation.
-- `workVideoBlock` — YouTube video block.
+- `workVideoBlock` — 단일 YouTube video block.
+- `workVideoCollectionBlock` — YouTube playlist 기반 video collection block.
 - `workTextBlock` — text block.
 - `workGalleryBlock` / `workGalleryImage` — image gallery block.
 - `workWebEmbedBlock` — interactive web embed block.
@@ -71,9 +72,14 @@ Portfolio Item과 Photograph의 Tag reference는 현재 `weak: true`다. target 
 현재 지원 block:
 
 - `YouTube Video`
+- `Video Collection`
 - `Text`
 - `Image Gallery`
 - `Web Embed`
+
+`Video Collection`은 초기 운용 편의성을 우선해 `playlistUrl` 하나를 필수값으로 둔다. playlist 안의 영상 순서와 포함 여부는 YouTube playlist 자체를 source로 사용하며 Sanity에 개별 영상 document를 중복 생성하지 않는다. 같은 block을 여러 Portfolio Item에서 사용할 수 있으므로 `Videography`, `Music Video`, `Film`, `Performance` 등 공개 제목은 Portfolio Item이 결정한다.
+
+player, thumbnail grid, desktop/mobile 열 수, 선택 후 scroll 같은 표시 동작은 GitHub frontend가 담당한다. 개별 영상별 custom description이나 metadata override가 실제로 필요해질 때만 schema 확장을 검토한다.
 
 기존 Portfolio Item 가운데 아직 이관되지 않은 항목을 위해 `mediaType`, `youtubeUrl`, `embedUrl`, `photoCount`는 compatibility field로 잠시 유지한다.
 
@@ -111,6 +117,7 @@ thumbnail/enlarged image의 실제 loading, preload, mobile zoom/pan 등 표시 
 - `assets/content/sanity-config.js` — public Sanity 연결 설정
 - `assets/content/sanity-runtime.js` — query, image URL과 module loading
 - `assets/content/sanity-site-bridge.js` — Sanity document를 실제 `index.html` 구조에 연결
+- `assets/content/video-collection.js` — YouTube playlist를 selected player + thumbnail grid로 표시
 - `assets/content/portfolio-ui-overrides.js` — poster-first YouTube와 gallery lightbox behavior
 - `assets/content/sanity-gallery-layout.js` — Image Gallery ratio-preserving layout
 
@@ -119,6 +126,8 @@ thumbnail/enlarged image의 실제 loading, preload, mobile zoom/pan 등 표시 
 primary navigation은 `_id == "primary-navigation"`인 `siteNavigation` singleton의 `items` 배열을 읽는다.
 
 YouTube Video block은 **poster-first** 방식이다. 재생 전에는 iframe을 만들지 않고 thumbnail + play button만 표시하며, 실제 사용자 interaction 뒤에만 native YouTube player를 생성한다.
+
+Video Collection block은 YouTube IFrame API의 playlist 정보를 이용해 playlist 전체의 video ID를 브라우저에서 가져온다. 따라서 Sanity에는 playlist URL 하나만 유지하고, 실제 thumbnail 목록과 현재 선택 상태는 frontend runtime이 만든다.
 
 ## schema 관리
 
@@ -134,6 +143,7 @@ schema 변경 시 repository source와 hosted Studio 사이에 서로 다른 상
 - 사진 pool → 별도 Photograph documents
 - 비공개 archival metadata → 별도 private dataset/schema
 - 홈페이지 큐레이션과 순서 → `homePage.featuredWorks`
+- 여러 YouTube 영상 묶음 → `Video Collection` + playlist URL
 - 자주 바뀌는 콘텐츠·메뉴 → Sanity
 - 구조·palette·layout·interaction → GitHub
 - remote 콘텐츠가 없거나 연결되지 않음 → stale local copy 대신 `OFFLINE`
