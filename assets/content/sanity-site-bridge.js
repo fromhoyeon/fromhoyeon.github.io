@@ -272,6 +272,18 @@
       return wrapper;
     }
 
+    if (block._type === 'workVideoCollectionBlock') {
+      if (window.HOYEON_VIDEO_COLLECTION?.render) {
+        wrapper.appendChild(window.HOYEON_VIDEO_COLLECTION.render(block, work));
+      } else {
+        const empty = document.createElement('div');
+        empty.className = 'video-collection-message';
+        empty.textContent = 'Video collection unavailable';
+        wrapper.appendChild(empty);
+      }
+      return wrapper;
+    }
+
     if (block._type === 'workTextBlock') {
       const text = document.createElement('p');
       text.className = 'sanity-text-block';
