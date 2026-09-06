@@ -38,6 +38,7 @@ export const workEntry = defineType({
       type: 'array',
       of: [
         defineArrayMember({type: 'workVideoBlock'}),
+        defineArrayMember({type: 'workVideoCollectionBlock'}),
         defineArrayMember({type: 'workTextBlock'}),
         defineArrayMember({type: 'workGalleryBlock'}),
         defineArrayMember({type: 'workWebEmbedBlock'}),
