@@ -1,0 +1,65 @@
+name: Apply conditional work header divider
+
+on:
+  push:
+    paths:
+      - '.github/workflows/conditional-header-line.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch header divider behavior
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(text, old, new, label):
+              if old not in text:
+                  raise SystemExit(f'missing pattern: {label}')
+              return text.replace(old, new, 1)
+
+          css_path = Path('assets/content/site.css')
+          css = css_path.read_text()
+          css = replace_once(
+              css,
+              '.work-head{display:grid;grid-template-columns:32px 1fr auto;gap:var(--m);align-items:start;border-top:1px solid var(--fg);border-bottom:1px solid var(--line);padding:10px 0 11px;margin-bottom:18px}',
+              '.work-head{display:grid;grid-template-columns:32px 1fr auto;gap:var(--m);align-items:start;border-top:1px solid var(--fg);padding:10px 0 var(--m)}\n.work-head.has-description{border-bottom:1px solid var(--line);padding-bottom:11px;margin-bottom:18px}',
+              'desktop work head'
+          )
+          css = replace_once(
+              css,
+              '  .work-head{margin-bottom:14px}',
+              '  .work-head.has-description{margin-bottom:14px}',
+              'mobile work head'
+          )
+          css_path.write_text(css)
+
+          bridge_path = Path('assets/content/sanity-site-bridge.js')
+          bridge = bridge_path.read_text()
+          bridge = replace_once(
+              bridge,
+              "    const hasSummary = Boolean(summary.trim());\n    if (description) {",
+              "    const hasSummary = Boolean(summary.trim());\n    section.querySelector(':scope > .work-head')?.classList.toggle('has-description', hasSummary);\n    if (description) {",
+              'header class toggle'
+          )
+          bridge_path.write_text(bridge)
+
+          index_path = Path('index.html')
+          index = index_path.read_text()
+          index = index.replace('assets/content/site.css?v=20260907-1', 'assets/content/site.css?v=20260907-2')
+          index = index.replace('assets/content/sanity-site-bridge.js?v=20260907-1', 'assets/content/sanity-site-bridge.js?v=20260907-2')
+          index_path.write_text(index)
+          PY
+          node --check assets/content/sanity-site-bridge.js
+      - name: Commit change
+        run: |
+          git config user.name "fromhoyeon"
+          git config user.email "fromhoyeon@gmail.com"
+          git add assets/content/site.css assets/content/sanity-site-bridge.js index.html
+          git commit -m "Show work header divider only with description"
+          git push
