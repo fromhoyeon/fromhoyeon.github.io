@@ -273,6 +273,18 @@
     }
 
     if (block._type === 'workVideoCollectionBlock') {
+      if (window.HOYEON_PLAYLIST_VIDEO_COLLECTION?.render) {
+        wrapper.appendChild(window.HOYEON_PLAYLIST_VIDEO_COLLECTION.render(block, work));
+      } else {
+        const empty = document.createElement('div');
+        empty.className = 'video-collection-message';
+        empty.textContent = 'Playlist video collection unavailable';
+        wrapper.appendChild(empty);
+      }
+      return wrapper;
+    }
+
+    if (block._type === 'workCuratedVideoCollectionBlock') {
       if (window.HOYEON_VIDEO_COLLECTION?.render) {
         wrapper.appendChild(window.HOYEON_VIDEO_COLLECTION.render(block, work));
       } else {
