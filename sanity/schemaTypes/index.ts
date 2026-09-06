@@ -7,6 +7,7 @@ import {
   workGalleryImage,
   workTextBlock,
   workVideoBlock,
+  workVideoCollectionBlock,
   workWebEmbedBlock,
 } from './workContentBlocks'
 import {workEntry} from './workEntry'
@@ -18,6 +19,7 @@ export const schemaTypes = [
   tag,
   portfolioPhoto,
   workVideoBlock,
+  workVideoCollectionBlock,
   workTextBlock,
   workGalleryImage,
   workGalleryBlock,
