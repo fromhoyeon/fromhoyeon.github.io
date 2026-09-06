@@ -226,7 +226,7 @@
 
   function loadPhotoPoolControls(){
     if (!isEnabled() || config.features?.portfolioPhotos === false) return;
-    loadScriptOnce('assets/content/photo-pool-controls.js?v=20260905-3', 'data-photo-pool-controls');
+    loadScriptOnce('assets/content/photo-pool-controls.js?v=20260906-2', 'data-photo-pool-controls');
   }
 
   function observePhotoGridWidth(){
