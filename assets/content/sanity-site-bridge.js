@@ -11,6 +11,7 @@
 
   const LEGACY_SECTIONS = {
     'dual-conversation': '#dual',
+    'dual-observation': '#dual',
     photography: '#photo',
     dodrei: '#dodrei',
     music: '#moving'
@@ -46,6 +47,14 @@
   function anchorForWork(work){
     const selector = LEGACY_SECTIONS[work.slug];
     return selector ? selector.slice(1) : work.slug;
+  }
+
+  function normalizeCurrentWorkPresentation(work){
+    const isDualObservation = work && (
+      work.slug === 'dual-conversation' || work.slug === 'dual-observation'
+    );
+    if (!isDualObservation || work.title !== 'Dual Conversation') return work;
+    return {...work, title:'Dual Observation'};
   }
 
   function extractYouTubeId(value){
@@ -499,7 +508,8 @@
 
   function applyHomepageWorks(works, forceMedia = false){
     if (!Array.isArray(works) || !works.length) return;
-    currentHomepageWorks = works;
+    const presentationWorks = works.map(normalizeCurrentWorkPresentation);
+    currentHomepageWorks = presentationWorks;
 
     const index = document.querySelector('#work');
     const about = document.querySelector('#about');
@@ -513,7 +523,7 @@
     });
     index.replaceChildren();
 
-    works.forEach((work, position) => {
+    presentationWorks.forEach((work, position) => {
       const selector = LEGACY_SECTIONS[work.slug];
       let section = selector ? document.querySelector(selector) : null;
       if (!section) section = createGenericWorkSection(work);
