@@ -163,31 +163,13 @@
       activeIndex = index;
 
       stage.replaceChildren();
-      const poster = document.createElement('button');
-      poster.className = 'yt-poster';
-      poster.type = 'button';
-      poster.setAttribute('aria-label', `Play ${item.title || 'video'}`);
-
-      const image = document.createElement('img');
-      image.src = thumbnailUrl(item.videoId);
-      image.alt = '';
-
-      const play = document.createElement('span');
-      play.className = 'yt-play';
-      play.setAttribute('aria-hidden', 'true');
-      play.textContent = '▶';
-
-      poster.append(image, play);
-      poster.addEventListener('click', () => {
-        const iframe = document.createElement('iframe');
-        iframe.title = `${item.title || 'YouTube'} video player`;
-        iframe.src = `https://www.youtube-nocookie.com/embed/${item.videoId}?autoplay=1&controls=0&rel=0&playsinline=1&iv_load_policy=3&cc_load_policy=0`;
-        iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
-        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
-        iframe.setAttribute('allowfullscreen', '');
-        stage.replaceChildren(iframe);
-      });
-      stage.appendChild(poster);
+      const iframe = document.createElement('iframe');
+      iframe.title = `${item.title || 'YouTube'} video player`;
+      iframe.src = `https://www.youtube.com/embed/${item.videoId}`;
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+      iframe.setAttribute('allowfullscreen', '');
+      stage.appendChild(iframe);
 
       currentTitle.textContent = item.title || 'Untitled video';
       currentDescription.textContent = item.description || '';
