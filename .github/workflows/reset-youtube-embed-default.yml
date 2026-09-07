@@ -1,0 +1,91 @@
+name: Reset YouTube embed defaults
+
+on:
+  push:
+    paths:
+      - '.github/workflows/reset-youtube-embed-default.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reset curated video embed to default YouTube player
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          js_path = Path('assets/content/video-collection.js')
+          js = js_path.read_text()
+
+          old = """      stage.replaceChildren();
+      const poster = document.createElement('button');
+      poster.className = 'yt-poster';
+      poster.type = 'button';
+      poster.setAttribute('aria-label', `Play ${item.title || 'video'}`);
+
+      const image = document.createElement('img');
+      image.src = thumbnailUrl(item.videoId);
+      image.alt = '';
+
+      const play = document.createElement('span');
+      play.className = 'yt-play';
+      play.setAttribute('aria-hidden', 'true');
+      play.textContent = '▶';
+
+      poster.append(image, play);
+      poster.addEventListener('click', () => {
+        const iframe = document.createElement('iframe');
+        iframe.title = `${item.title || 'YouTube'} video player`;
+        iframe.src = `https://www.youtube-nocookie.com/embed/${item.videoId}?autoplay=1&controls=0&rel=0&playsinline=1&iv_load_policy=3&cc_load_policy=0`;
+        iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+        iframe.setAttribute('allowfullscreen', '');
+        stage.replaceChildren(iframe);
+      });
+      stage.appendChild(poster);
+"""
+          new = """      stage.replaceChildren();
+      const iframe = document.createElement('iframe');
+      iframe.title = `${item.title || 'YouTube'} video player`;
+      iframe.src = `https://www.youtube.com/embed/${item.videoId}`;
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+      iframe.setAttribute('allowfullscreen', '');
+      stage.appendChild(iframe);
+"""
+          if old not in js:
+              raise SystemExit('curated video poster/embed block not found')
+          js = js.replace(old, new, 1)
+          js_path.write_text(js)
+
+          index_path = Path('index.html')
+          index = index_path.read_text()
+          index, count = re.subn(r'assets/content/video-collection\.js\?v=20260907-\d+', 'assets/content/video-collection.js?v=20260907-8', index, count=1)
+          if count != 1:
+              raise SystemExit('video collection script cache version not found')
+          index_path.write_text(index)
+
+          readme_path = Path('README.md')
+          readme = readme_path.read_text()
+          old_readme = '- 선택된 영상은 상단 16:9 player에 표시한다. poster를 누르면 autoplay로 전환하며 YouTube native controls는 표시하지 않는다. 자막은 강제 활성화하지 않으며 player 요청에서도 비활성 방향으로 둔다.\n'
+          new_readme = '- 선택된 영상은 상단 16:9 YouTube 기본 embed player에 표시한다. 별도 player parameter를 붙이지 않으며 재생, controls, 자막과 기타 UI는 YouTube 기본 동작을 따른다.\n'
+          if old_readme in readme:
+              readme = readme.replace(old_readme, new_readme, 1)
+          else:
+              readme = re.sub(r'- 선택된 영상은 상단 16:9 player에 표시한다\.[^\n]*\n', new_readme, readme, count=1)
+          readme_path.write_text(readme)
+          PY
+      - name: Validate JavaScript
+        run: node --check assets/content/video-collection.js
+      - name: Commit changes
+        run: |
+          git config user.name "fromhoyeon"
+          git config user.email "fromhoyeon@gmail.com"
+          git add assets/content/video-collection.js index.html README.md
+          git commit -m "Reset YouTube embed to default player"
+          git push
