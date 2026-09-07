@@ -8,7 +8,7 @@
   if (window.HOYEON_VIDEO_COLLECTION) return;
 
   const PAGE_SIZE = 4;
-  const INITIAL_VIDEO_ID = 'VvSIj9rhanA';
+  const INITIAL_VIDEO_ID = 'L_sos-H7nH0';
   const YOUTUBE_THUMBNAIL_VERSION = '20260907-3';
 
   function extractYouTubeId(value){
