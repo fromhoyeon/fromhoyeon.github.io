@@ -60,6 +60,7 @@ YouTube player 배경이나 embedded media처럼 **사이트 테마와 무관하
 - `sanity-site-bridge.js` — Homepage / Portfolio Item / About / Links 데이터를 실제 페이지 구조에 연결한다.
 - `video-collection.js` — Sanity에서 개별 관리되는 Video Collection의 selected player, 4개 단위 thumbnail pagination, page-load randomization과 browser-only Shuffle을 담당한다.
 - `playlist-video-collection.js` — YouTube playlist URL 하나로 전체 목록을 자동 구성하는 보존용 playlist renderer.
+- `youtube-start-skin.js` — 일반 `.yt-stage`의 재생 전 순정 YouTube iframe만 thumbnail + 중앙 재생 버튼 start poster로 감싸고, 클릭 후 `autoplay=1` 순정 iframe으로 전환한다. 재생 이후 player는 다시 쓰지 않는다.
 - `portfolio-ui-overrides.js` — Portfolio Item gallery lightbox의 동작만 보정한다. YouTube 렌더링에는 개입하지 않는다.
 - `sanity-gallery-layout.js` — Portfolio Item Image Gallery의 ratio-preserving row 계산과 확대 보기.
 - `photo-gallery-core.js` — Selected Photography의 기본 row layout, lightbox와 keyboard/touch navigation.
@@ -96,6 +97,8 @@ Sanity의 published/enabled `portfolioPhoto` 전체 pool을 하나의 random dec
 - thumbnail 선택 시 mobile에서는 짧은 custom transition으로 player 위치로 빠르게 이동한다.
 - 파란색 `Shuffle order`는 browser 안의 영상 순서와 선택 영상만 섞고 page 1로 돌아간다. Sanity 배열 순서는 수정하지 않는다.
 - `Playlist Video Collection · backup`은 playlist URL 하나로 목록을 자동 생성하는 별도 보존 기능이다.
+
+일반 Portfolio Item의 YouTube 영상도 같은 start poster 원칙을 사용한다. Sanity bridge는 우선 순정 `youtube.com/embed/<videoId>` iframe을 생성하고, `youtube-start-skin.js`가 재생 전 상태에만 start poster를 적용한다. 클릭 후에는 `autoplay=1`이 붙은 순정 iframe으로 전환하며 이후 YouTube UI에는 개입하지 않는다.
 
 Portfolio Item에는 `Title description`과 기존 `Description`이 별도로 존재한다. `Title description`은 제목 바로 아래, 모든 content 이전에 표시되며 이 값이 있을 때만 제목 하단 divider가 나타난다. 기존 `Description`은 content 설명으로 기존 위치를 유지한다.
 
@@ -143,9 +146,9 @@ GitHub가 관리하는 것:
 
 이번 checkpoint에서는 Video Collection과 YouTube embed에 실제로 적용된 최신 상태만 기록한다.
 
-- curated Videography의 상단 player는 재생 전 YouTube `hqdefault` thumbnail과 중앙 재생 버튼만 있는 start poster를 표시한다. 클릭 후에는 `youtube.com/embed/<videoId>?autoplay=1`로 전환하고 이후 UI는 YouTube 기본 동작을 따른다.
+- curated Videography의 상단 player와 일반 Portfolio Item의 YouTube player 모두 재생 전 YouTube `hqdefault` thumbnail과 중앙 재생 버튼만 있는 start poster를 표시한다. 클릭 후에는 `youtube.com/embed/<videoId>?autoplay=1`로 전환하고 이후 UI는 YouTube 기본 동작을 따른다.
 - `autoplay=1`을 제외하고 `controls`, `cc_load_policy`, `rel`, `playsinline`, `iv_load_policy` 등 별도 player parameter는 추가하지 않는다.
-- 과거 player를 다시 쓰거나 변환하던 `portfolio-ui-overrides.js`의 YouTube 개입은 제거된 상태를 유지한다.
+- 과거 player를 다시 쓰거나 변환하던 `portfolio-ui-overrides.js`의 YouTube 개입은 제거된 상태를 유지한다. 공용 start poster는 별도 `youtube-start-skin.js`가 재생 전 상태에만 적용한다.
 - `Jihye Lee Orchestra - We Are All From The Same Stream`의 Sanity `YouTube URL`은 `https://www.youtube.com/watch?v=VvSIj9rhanA`을 사용한다.
 - page load 시 첫 영상 고정도 같은 ID `VvSIj9rhanA`을 기준으로 하며, 나머지 영상만 browser에서 셔플한다.
 - thumbnail grid는 video ID의 YouTube 표준 `hqdefault.jpg` URL 하나만 사용한다. cache-busting query, 대체 thumbnail 파일 순회, custom fallback은 두지 않으며 thumbnail 파일을 repository에 별도 저장하지 않는다.
