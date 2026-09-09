@@ -139,14 +139,14 @@ GitHub가 관리하는 것:
 
 이 checkpoint는 사이트의 작품 분류나 최종 미학을 영구 확정한다는 뜻이 아니다. 현재 구현을 유지·확장하기 위한 **v1 기술 기준선**을 확정한 것이다.
 
-## Video Collection checkpoint — 2026-09-08
+## Video Collection checkpoint — 2026-09-10
 
 이번 checkpoint에서는 Video Collection과 YouTube embed에 실제로 적용된 최신 상태만 기록한다.
 
 - curated Videography의 상단 player는 YouTube 기본 embed를 그대로 사용한다. `controls`, `cc_load_policy`, `rel`, `playsinline`, `iv_load_policy`, `autoplay` 등 별도 player parameter를 추가하지 않는다.
 - 이전에 YouTube native UI와 자막을 줄이기 위해 시험했던 custom player parameter는 모두 제거했다. 현재 기준은 YouTube 기본 재생 버튼과 기본 player UI를 따르는 것이다.
-- `Jihye Lee Orchestra - We Are All From The Same Stream`의 Sanity `YouTube URL`은 현재 공식 공개본 `https://www.youtube.com/watch?v=L_sos-H7nH0`을 사용한다.
-- page load 시 첫 영상 고정도 같은 공개본 ID `L_sos-H7nH0`을 기준으로 하며, 나머지 영상만 browser에서 셔플한다.
-- thumbnail grid는 YouTube CDN `hqdefault.jpg`를 직접 사용한다. YouTube에서 thumbnail을 교체했는데 browser cache가 이전 이미지를 유지하는 경우를 위해 `YOUTUBE_THUMBNAIL_VERSION` query 값을 cache-busting 용도로만 사용한다. thumbnail 파일을 repository에 별도 저장하지 않는다.
+- `Jihye Lee Orchestra - We Are All From The Same Stream`의 Sanity `YouTube URL`은 `https://www.youtube.com/watch?v=VvSIj9rhanA`을 사용한다.
+- page load 시 첫 영상 고정도 같은 ID `VvSIj9rhanA`을 기준으로 하며, 나머지 영상만 browser에서 셔플한다.
+- thumbnail grid는 YouTube CDN `hqdefault.jpg`를 우선 사용한다. 해당 thumbnail이 로드되지 않으면 같은 video ID의 `0.jpg`, `mqdefault.jpg`, `default.jpg` 순서로 자동 fallback한다. `YOUTUBE_THUMBNAIL_VERSION` query 값은 browser cache-busting 용도로만 사용하며 thumbnail 파일을 repository에 별도 저장하지 않는다.
 
 이 checkpoint는 YouTube의 자체 UI를 사이트가 재설계한다는 의미가 아니다. embed 내부의 UI와 자막 동작은 YouTube 기본 동작을 따른다.
