@@ -194,8 +194,6 @@
         const image = document.createElement('img');
         image.src = thumbnailUrl(item.videoId);
         image.alt = '';
-        image.loading = 'lazy';
-        image.decoding = 'async';
 
         const thumbTitle = document.createElement('span');
         thumbTitle.className = 'video-collection-thumb-title';
