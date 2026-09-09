@@ -197,7 +197,7 @@
   }
 
   function loadPortfolioUiOverrides(){
-    loadScriptOnce('assets/content/portfolio-ui-overrides.js?v=20260906-2', 'data-portfolio-ui-overrides');
+    loadScriptOnce('assets/content/portfolio-ui-overrides.js?v=20260910-1', 'data-portfolio-ui-overrides');
   }
 
   function loadPhotoPoolControls(){
