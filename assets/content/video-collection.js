@@ -29,7 +29,7 @@
   }
 
   function thumbnailUrl(videoId){
-    return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+    return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
   }
 
   function shuffled(items){
