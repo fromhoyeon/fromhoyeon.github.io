@@ -60,6 +60,7 @@
 
   function randomIndex(length, current = -1){
     if (length <= 1) return 0;
+    if (current < 0) return Math.floor(Math.random() * length);
     const offset = Math.floor(Math.random() * (length - 1)) + 1;
     return (current + offset) % length;
   }
