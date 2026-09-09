@@ -1,4 +1,4 @@
-import {defineField, defineType} from 'sanity'
+import {defineArrayMember, defineField, defineType} from 'sanity'
 
 const textField = (name: string, title: string, rows = 2) => defineField({
   name,
@@ -28,12 +28,46 @@ export const siteCopy = defineType({
         textField('title', 'Title', 2),
         textField('body', 'Body', 4),
         defineField({
+          name: 'accentImages',
+          title: 'Dog image pool',
+          description: 'Images available to the homepage intro accent. Add as many images as needed.',
+          type: 'array',
+          of: [
+            defineArrayMember({
+              type: 'image',
+              options: {hotspot: true},
+              fields: [
+                defineField({
+                  name: 'alt',
+                  title: 'Alt text',
+                  type: 'string',
+                }),
+              ],
+            }),
+          ],
+        }),
+        defineField({
           name: 'accentImage',
-          title: 'Accent image',
+          title: 'Accent image (legacy fallback)',
+          description: 'Preserved as a fallback until the Dog image pool contains images.',
           type: 'image',
           options: {hotspot: true},
+          readOnly: true,
+          hidden: true,
+          deprecated: {
+            reason: 'Use Dog image pool instead.',
+          },
         }),
-        textField('accentImageAlt', 'Accent image alt text', 1),
+        defineField({
+          name: 'accentImageAlt',
+          title: 'Accent image alt text (legacy fallback)',
+          type: 'string',
+          readOnly: true,
+          hidden: true,
+          deprecated: {
+            reason: 'Use alt text on each Dog image pool item instead.',
+          },
+        }),
         defineField({
           name: 'accentImageEnabled',
           title: 'Show accent image',
