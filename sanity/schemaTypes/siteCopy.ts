@@ -29,33 +29,31 @@ export const siteCopy = defineType({
         textField('body', 'Body', 4),
         defineField({
           name: 'accentImages',
-          title: 'Dog image pool',
-          description: 'Images available to the homepage intro accent. Add as many images as needed.',
+          title: 'Dog images',
+          description: 'Tap Add, then choose one or multiple photos from your phone gallery. These images are used randomly on the homepage.',
           type: 'array',
+          options: {
+            layout: 'grid',
+          },
           of: [
             defineArrayMember({
+              name: 'dogImage',
+              title: 'Dog image',
               type: 'image',
               options: {hotspot: true},
-              fields: [
-                defineField({
-                  name: 'alt',
-                  title: 'Alt text',
-                  type: 'string',
-                }),
-              ],
             }),
           ],
         }),
         defineField({
           name: 'accentImage',
           title: 'Accent image (legacy fallback)',
-          description: 'Preserved as a fallback until the Dog image pool contains images.',
+          description: 'Preserved as a fallback until Dog images contains images.',
           type: 'image',
           options: {hotspot: true},
           readOnly: true,
           hidden: true,
           deprecated: {
-            reason: 'Use Dog image pool instead.',
+            reason: 'Use Dog images instead.',
           },
         }),
         defineField({
@@ -65,7 +63,7 @@ export const siteCopy = defineType({
           readOnly: true,
           hidden: true,
           deprecated: {
-            reason: 'Use alt text on each Dog image pool item instead.',
+            reason: 'Legacy fallback only.',
           },
         }),
         defineField({
