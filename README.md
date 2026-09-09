@@ -147,6 +147,6 @@ GitHub가 관리하는 것:
 - 이전에 YouTube native UI와 자막을 줄이기 위해 시험했던 custom player parameter는 모두 제거했다. 현재 기준은 YouTube 기본 재생 버튼과 기본 player UI를 따르는 것이다.
 - `Jihye Lee Orchestra - We Are All From The Same Stream`의 Sanity `YouTube URL`은 `https://www.youtube.com/watch?v=VvSIj9rhanA`을 사용한다.
 - page load 시 첫 영상 고정도 같은 ID `VvSIj9rhanA`을 기준으로 하며, 나머지 영상만 browser에서 셔플한다.
-- thumbnail grid는 YouTube CDN `hqdefault.jpg`를 우선 사용한다. 해당 thumbnail이 로드되지 않으면 같은 video ID의 `0.jpg`, `mqdefault.jpg`, `default.jpg` 순서로 자동 fallback한다. `YOUTUBE_THUMBNAIL_VERSION` query 값은 browser cache-busting 용도로만 사용하며 thumbnail 파일을 repository에 별도 저장하지 않는다.
+- thumbnail grid는 video ID의 YouTube 표준 `hqdefault.jpg` URL 하나만 사용한다. cache-busting query, 대체 thumbnail 파일 순회, custom fallback은 두지 않으며 thumbnail 파일을 repository에 별도 저장하지 않는다.
 
 이 checkpoint는 YouTube의 자체 UI를 사이트가 재설계한다는 의미가 아니다. embed 내부의 UI와 자막 동작은 YouTube 기본 동작을 따른다.
