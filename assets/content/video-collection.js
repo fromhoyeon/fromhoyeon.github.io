@@ -8,8 +8,9 @@
   if (window.HOYEON_VIDEO_COLLECTION) return;
 
   const PAGE_SIZE = 4;
-  const INITIAL_VIDEO_ID = 'L_sos-H7nH0';
-  const YOUTUBE_THUMBNAIL_VERSION = '20260907-3';
+  const INITIAL_VIDEO_ID = 'VvSIj9rhanA';
+  const YOUTUBE_THUMBNAIL_VERSION = '20260910-1';
+  const YOUTUBE_THUMBNAIL_FILES = ['hqdefault.jpg', '0.jpg', 'mqdefault.jpg', 'default.jpg'];
 
   function extractYouTubeId(value){
     if (!value || typeof value !== 'string') return '';
@@ -29,8 +30,8 @@
     return '';
   }
 
-  function thumbnailUrl(videoId){
-    return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg?v=${YOUTUBE_THUMBNAIL_VERSION}`;
+  function thumbnailUrl(videoId, filename = YOUTUBE_THUMBNAIL_FILES[0]){
+    return `https://i.ytimg.com/vi/${videoId}/${filename}?v=${YOUTUBE_THUMBNAIL_VERSION}`;
   }
 
   function shuffled(items){
@@ -193,10 +194,17 @@
         button.setAttribute('aria-label', `Select ${item.title || `video ${index + 1}`}`);
 
         const image = document.createElement('img');
-        image.src = thumbnailUrl(item.videoId);
+        let thumbnailIndex = 0;
+        image.src = thumbnailUrl(item.videoId, YOUTUBE_THUMBNAIL_FILES[thumbnailIndex]);
         image.alt = '';
         image.loading = 'lazy';
         image.decoding = 'async';
+        image.addEventListener('error', () => {
+          thumbnailIndex += 1;
+          if (thumbnailIndex < YOUTUBE_THUMBNAIL_FILES.length) {
+            image.src = thumbnailUrl(item.videoId, YOUTUBE_THUMBNAIL_FILES[thumbnailIndex]);
+          }
+        });
 
         const thumbTitle = document.createElement('span');
         thumbTitle.className = 'video-collection-thumb-title';
