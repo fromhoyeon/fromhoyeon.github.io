@@ -22,20 +22,47 @@
   let currentBatchStart = 0;
   let preparedBatchStart = null;
   let pageStatus = null;
+  let pagePrevButton = null;
+  let pageNextButton = null;
   let recentThumbnailTimer = null;
 
   function installInterface(){
     const actions = shufflePhotos?.parentElement;
     if (!actions) return;
 
-    pageStatus = document.querySelector('#photo-page-status');
-    if (!pageStatus) {
-      pageStatus = document.createElement('div');
+    let pagination = actions.querySelector('.photo-pagination');
+    if (!pagination) {
+      pagination = document.createElement('div');
+      pagination.className = 'photo-pagination';
+      pagination.setAttribute('role', 'navigation');
+      pagination.setAttribute('aria-label', 'Photography thumbnail pages');
+
+      pagePrevButton = document.createElement('button');
+      pagePrevButton.type = 'button';
+      pagePrevButton.className = 'photo-page-button photo-page-button-prev';
+      pagePrevButton.setAttribute('aria-label', 'Previous photography page');
+      pagePrevButton.title = 'Previous page';
+      pagePrevButton.textContent = '‹';
+
+      pageStatus = document.createElement('span');
       pageStatus.id = 'photo-page-status';
       pageStatus.className = 'photo-page-status';
       pageStatus.setAttribute('aria-live', 'polite');
       pageStatus.textContent = 'PAGE <1 / 1>';
-      actions.insertBefore(pageStatus, shufflePhotos);
+
+      pageNextButton = document.createElement('button');
+      pageNextButton.type = 'button';
+      pageNextButton.className = 'photo-page-button photo-page-button-next';
+      pageNextButton.setAttribute('aria-label', 'Next photography page');
+      pageNextButton.title = 'Next page';
+      pageNextButton.textContent = '›';
+
+      pagination.append(pagePrevButton, pageStatus, pageNextButton);
+      actions.insertBefore(pagination, shufflePhotos);
+    } else {
+      pageStatus = pagination.querySelector('#photo-page-status');
+      pagePrevButton = pagination.querySelector('.photo-page-button-prev');
+      pageNextButton = pagination.querySelector('.photo-page-button-next');
     }
 
     shufflePhotos.innerHTML = `
@@ -52,6 +79,9 @@
     `;
     shufflePhotos.setAttribute('aria-label', 'Shuffle the full photography order and return to page 1');
     shufflePhotos.title = 'Shuffle the full photography order and return to page 1';
+
+    pagePrevButton?.addEventListener('click', () => moveThumbnailPage(-1));
+    pageNextButton?.addEventListener('click', () => moveThumbnailPage(1));
   }
 
   function identity(item){
@@ -68,8 +98,9 @@
   }
 
   function updatePageStatus(){
-    if (!pageStatus) return;
-    pageStatus.textContent = `PAGE <${currentPage()} / ${totalPages()}>`;
+    if (pageStatus) pageStatus.textContent = `PAGE <${currentPage()} / ${totalPages()}>`;
+    if (pagePrevButton) pagePrevButton.disabled = !deck.length || currentBatchStart <= 0 || photoShuffleInProgress;
+    if (pageNextButton) pageNextButton.disabled = !deck.length || currentBatchStart + BATCH_SIZE >= deck.length || photoShuffleInProgress;
   }
 
   function annotateThumbnailCells(){
@@ -135,6 +166,8 @@
     photoGrid.replaceChildren(offline);
     photoGrid.dataset.photoPoolState = 'offline';
     if (pageStatus) pageStatus.textContent = 'PAGE <– / –>';
+    if (pagePrevButton) pagePrevButton.disabled = true;
+    if (pageNextButton) pageNextButton.disabled = true;
   }
 
   function readSavedState(pool){
@@ -198,6 +231,13 @@
     return true;
   }
 
+  function preparePreviousImage(){
+    const previousItem = deck[currentBatchStart - 1];
+    if (!previousItem) return false;
+    preloadImage(previousItem.fullSrc || previousItem.src);
+    return true;
+  }
+
   function renderBatch(start, {preservePosition = false} = {}){
     if (!deck.length) return false;
 
@@ -217,6 +257,13 @@
     return true;
   }
 
+  function moveThumbnailPage(direction){
+    if (!deck.length || photoShuffleInProgress || !direction) return false;
+    const targetStart = currentBatchStart + Math.sign(direction) * BATCH_SIZE;
+    if (targetStart < 0 || targetStart >= deck.length) return false;
+    return renderBatch(targetStart, {preservePosition:true});
+  }
+
   async function initializeDeck({preservePosition = false, forceShuffle = false} = {}){
     const pool = await remotePool();
     if (!pool.length) {
@@ -227,6 +274,7 @@
 
     photoShuffleInProgress = true;
     shufflePhotos.disabled = true;
+    updatePageStatus();
     if (preservePosition) shufflePhotos.blur();
 
     try {
@@ -237,6 +285,7 @@
     } finally {
       shufflePhotos.disabled = false;
       photoShuffleInProgress = false;
+      updatePageStatus();
     }
   }
 
@@ -250,6 +299,7 @@
 
     photoShuffleInProgress = true;
     shufflePhotos.disabled = true;
+    updatePageStatus();
     shufflePhotos.blur();
 
     try {
@@ -259,7 +309,32 @@
     } finally {
       shufflePhotos.disabled = false;
       photoShuffleInProgress = false;
+      updatePageStatus();
     }
+  }
+
+  function moveLightboxToBatch(start, index){
+    if (start < 0 || start >= deck.length) return false;
+
+    const anchorTop = photoGrid.getBoundingClientRect().top;
+    currentBatchStart = start;
+    photos = deck.slice(currentBatchStart, currentBatchStart + BATCH_SIZE);
+    preparedBatchStart = null;
+    clearRecentThumbnail();
+    layoutPhotos();
+    restoreGalleryViewport(anchorTop);
+    updatePageStatus();
+    saveState();
+
+    if (lightbox.classList.contains('is-open')) {
+      const targetIndex = Math.max(0, Math.min(index, photos.length - 1));
+      lightboxIndex = targetIndex;
+      showLightboxIndex(targetIndex);
+      showLightboxMessage(`Page ${currentPage()} / ${totalPages()}`, 1500, 'info');
+    } else {
+      lightboxIndex = -1;
+    }
+    return true;
   }
 
   function advanceFromLightboxEnd(){
@@ -271,24 +346,20 @@
       return false;
     }
 
-    const anchorTop = photoGrid.getBoundingClientRect().top;
-    currentBatchStart = nextStart;
-    photos = deck.slice(currentBatchStart, currentBatchStart + BATCH_SIZE);
-    preparedBatchStart = null;
-    clearRecentThumbnail();
-    layoutPhotos();
-    restoreGalleryViewport(anchorTop);
-    updatePageStatus();
-    saveState();
+    return moveLightboxToBatch(nextStart, 0);
+  }
 
-    if (lightbox.classList.contains('is-open')) {
-      lightboxIndex = 0;
-      showLightboxIndex(0);
-      showLightboxMessage(`Page ${currentPage()} / ${totalPages()}`, 1500, 'info');
-    } else {
-      lightboxIndex = -1;
+  function retreatFromLightboxStart(){
+    if (!photos.length || lightboxIndex > 0) return false;
+
+    const previousStart = currentBatchStart - BATCH_SIZE;
+    if (previousStart < 0) {
+      showLightboxMessage(`First image · 1 / ${deck.length}`);
+      return false;
     }
-    return true;
+
+    const previousLength = Math.min(BATCH_SIZE, deck.length - previousStart);
+    return moveLightboxToBatch(previousStart, previousLength - 1);
   }
 
   const baseLayoutPhotos = layoutPhotos;
@@ -302,6 +373,7 @@
     clearRecentThumbnail();
     baseShowLightboxIndex(index);
     if (lightboxIndex === photos.length - 1) prepareNextBatch();
+    if (lightboxIndex === 0) preparePreviousImage();
   };
 
   const baseCloseLightbox = closeLightbox;
@@ -316,12 +388,14 @@
 
     if (direction < 0) {
       if (lightboxIndex <= 0) {
-        showLightboxMessage(`First image · 1 / ${photos.length}`);
+        retreatFromLightboxStart();
         return;
       }
       const nextIndex = lightboxIndex - 1;
       showLightboxIndex(nextIndex);
-      if (nextIndex === 0) showLightboxMessage(`First image · 1 / ${photos.length}`);
+      if (nextIndex === 0 && currentBatchStart === 0) {
+        showLightboxMessage(`First image · 1 / ${deck.length}`);
+      }
       return;
     }
 
@@ -363,6 +437,7 @@
   installInterface();
   clearLocalSelection();
   shufflePhotos.disabled = true;
+  updatePageStatus();
 
   initializeDeck().catch((error) => {
     console.warn('[Photography] Could not load remote photo pool.', error);
