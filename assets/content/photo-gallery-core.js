@@ -9,6 +9,7 @@ const shufflePhotos = document.querySelector('#shuffle-photos');
 const lightbox = document.querySelector('#photo-lightbox');
 const lightboxImage = document.querySelector('#lightbox-image');
 const lightboxStatus = document.querySelector('#lightbox-status');
+const PHOTO_VIRTUAL_SLOT_RATIO = 1.35;
 let photos = [];
 let resizeTimer = null;
 let lightboxIndex = -1;
@@ -84,20 +85,6 @@ function balancedPhotoRows(items, slotsPerRow){
   return rows;
 }
 
-function representativePhotoRatio(items){
-  const ratios = items
-    .map((item) => Number(item?.ratio))
-    .filter((ratio) => Number.isFinite(ratio) && ratio > 0)
-    .sort((a, b) => a - b);
-  if (!ratios.length) return 1.35;
-
-  const middle = Math.floor(ratios.length / 2);
-  const median = ratios.length % 2
-    ? ratios[middle]
-    : (ratios[middle - 1] + ratios[middle]) / 2;
-  return Math.max(.9, Math.min(1.6, median));
-}
-
 function layoutPhotos(){
   const width = photoGrid.clientWidth;
   if (!width || !photos.length) return;
@@ -105,13 +92,12 @@ function layoutPhotos(){
   const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s')) || 8;
   const slotsPerRow = photoSlotsPerRow(width);
   const rows = balancedPhotoRows(photos, slotsPerRow);
-  const virtualSlotRatio = representativePhotoRatio(photos);
   photoGrid.innerHTML = '';
 
   rows.forEach((row) => {
     const missingSlots = Math.max(0, slotsPerRow - row.length);
     const realRatioSum = row.reduce((sum, item) => sum + item.ratio, 0);
-    const layoutRatioSum = realRatioSum + missingSlots * virtualSlotRatio;
+    const layoutRatioSum = realRatioSum + missingSlots * PHOTO_VIRTUAL_SLOT_RATIO;
     const usableWidth = width - gap * (slotsPerRow - 1);
     const rowHeight = usableWidth / Math.max(.01, layoutRatioSum);
 
