@@ -63,62 +63,57 @@ function clearLightboxMessage(){
 // Replaced by photo-pool-controls.js once the canonical Sanity pool is available.
 async function createPhotoSet(){ return false; }
 
-function desiredRowHeight(width){
-  if (width < 420) return 118;
-  if (width < 620) return 150;
-  if (width < 900) return 205;
-  return 250;
+function photoSlotsPerRow(width){
+  const preferredSlotWidth = 190;
+  return Math.max(3, Math.min(4, Math.round(width / preferredSlotWidth)));
 }
 
-function makeRows(items, width, gap, targetHeight){
-  const rows = [];
-  let current = [];
-  let ratioSum = 0;
-  items.forEach((item, index) => {
-    current.push(item);
-    ratioSum += item.ratio;
-    const estimatedWidth = ratioSum * targetHeight + gap * (current.length - 1);
-    const isLast = index === items.length - 1;
-    if (estimatedWidth >= width * .94 || isLast) {
-      rows.push(current);
-      current = [];
-      ratioSum = 0;
-    }
-  });
-  return rows;
-}
-
-function makeMobileRows(items, rowCount = 4){
-  const rows = [];
-  const base = Math.floor(items.length / rowCount);
+function balancedPhotoRows(items, slotsPerRow){
+  if (!items.length) return [];
+  const rowCount = Math.ceil(items.length / slotsPerRow);
+  const baseCount = Math.floor(items.length / rowCount);
   const remainder = items.length % rowCount;
+  const rows = [];
   let cursor = 0;
-  for (let i = 0; i < rowCount; i += 1) {
-    const count = base + (i < remainder ? 1 : 0);
-    if (count <= 0) continue;
+
+  for (let rowIndex = 0; rowIndex < rowCount; rowIndex += 1) {
+    const count = baseCount + (rowIndex < remainder ? 1 : 0);
     rows.push(items.slice(cursor, cursor + count));
     cursor += count;
   }
   return rows;
 }
 
+function representativePhotoRatio(items){
+  const ratios = items
+    .map((item) => Number(item?.ratio))
+    .filter((ratio) => Number.isFinite(ratio) && ratio > 0)
+    .sort((a, b) => a - b);
+  if (!ratios.length) return 1.35;
+
+  const middle = Math.floor(ratios.length / 2);
+  const median = ratios.length % 2
+    ? ratios[middle]
+    : (ratios[middle - 1] + ratios[middle]) / 2;
+  return Math.max(.9, Math.min(1.6, median));
+}
+
 function layoutPhotos(){
   const width = photoGrid.clientWidth;
   if (!width || !photos.length) return;
+
   const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s')) || 8;
-  const targetHeight = desiredRowHeight(width);
-  const isMobile = window.matchMedia('(max-width:620px)').matches;
-  const rows = isMobile ? makeMobileRows(photos, 4) : makeRows(photos, width, gap, targetHeight);
+  const slotsPerRow = photoSlotsPerRow(width);
+  const rows = balancedPhotoRows(photos, slotsPerRow);
+  const virtualSlotRatio = representativePhotoRatio(photos);
   photoGrid.innerHTML = '';
 
-  rows.forEach((row, rowIndex) => {
-    const isLast = rowIndex === rows.length - 1;
-    const ratioSum = row.reduce((sum, item) => sum + item.ratio, 0);
-    const usableWidth = width - gap * (row.length - 1);
-    const justifiedHeight = usableWidth / ratioSum;
-    let rowHeight = justifiedHeight;
-    if (!isMobile && isLast && justifiedHeight > targetHeight * 1.18) rowHeight = targetHeight;
-    if (!isMobile) rowHeight = Math.max(82, Math.min(rowHeight, 330));
+  rows.forEach((row) => {
+    const missingSlots = Math.max(0, slotsPerRow - row.length);
+    const realRatioSum = row.reduce((sum, item) => sum + item.ratio, 0);
+    const layoutRatioSum = realRatioSum + missingSlots * virtualSlotRatio;
+    const usableWidth = width - gap * (slotsPerRow - 1);
+    const rowHeight = usableWidth / Math.max(.01, layoutRatioSum);
 
     const rowEl = document.createElement('div');
     rowEl.className = 'photo-row';
