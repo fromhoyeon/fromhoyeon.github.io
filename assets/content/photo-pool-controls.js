@@ -48,7 +48,7 @@
       pageStatus.id = 'photo-page-status';
       pageStatus.className = 'photo-page-status';
       pageStatus.setAttribute('aria-live', 'polite');
-      pageStatus.textContent = 'PAGE <1 / 1>';
+      pageStatus.textContent = '1 / 1';
 
       pageNextButton = document.createElement('button');
       pageNextButton.type = 'button';
@@ -98,7 +98,7 @@
   }
 
   function updatePageStatus(){
-    if (pageStatus) pageStatus.textContent = `PAGE <${currentPage()} / ${totalPages()}>`;
+    if (pageStatus) pageStatus.textContent = `${currentPage()} / ${totalPages()}`;
     if (pagePrevButton) pagePrevButton.disabled = !deck.length || currentBatchStart <= 0 || photoShuffleInProgress;
     if (pageNextButton) pageNextButton.disabled = !deck.length || currentBatchStart + BATCH_SIZE >= deck.length || photoShuffleInProgress;
   }
@@ -165,7 +165,7 @@
     offline.textContent = 'OFFLINE';
     photoGrid.replaceChildren(offline);
     photoGrid.dataset.photoPoolState = 'offline';
-    if (pageStatus) pageStatus.textContent = 'PAGE <– / –>';
+    if (pageStatus) pageStatus.textContent = '– / –';
     if (pagePrevButton) pagePrevButton.disabled = true;
     if (pageNextButton) pageNextButton.disabled = true;
   }
