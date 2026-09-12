@@ -2,6 +2,7 @@
   Current prototype bridge.
   Sanity owns work records and homepage curation; GitHub keeps layout and interaction.
   The old HTML sections are structural shells only and are never public content fallbacks.
+  Selected Photography deck state is owned exclusively by photo-pool-controls.js.
 */
 
 (async function connectPrototypeToSanity(){
@@ -18,7 +19,6 @@
   };
 
   let currentHomepageWorks = [];
-  let currentPhotoPoolTotal = null;
 
   function ensureBlockStyles(){
     if (document.querySelector('#sanity-work-block-styles')) return;
@@ -512,53 +512,6 @@
     });
   }
 
-  function resolvePhotoDimensions(item){
-    if (item.ratio && item.width && item.height) return Promise.resolve(item);
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve({
-        ...item,
-        width: img.naturalWidth,
-        height: img.naturalHeight,
-        ratio: img.naturalWidth / img.naturalHeight
-      });
-      img.onerror = reject;
-      img.src = item.src;
-    });
-  }
-
-  async function connectRemotePhotoPool(){
-    try {
-      const rawPhotos = await window.SANITY_CONTENT.fetchPortfolioPhotos();
-      if (!rawPhotos.length) return;
-
-      const loaded = await Promise.allSettled(rawPhotos.map(resolvePhotoDimensions));
-      const remotePhotos = loaded
-        .filter((item) => item.status === 'fulfilled')
-        .map((item) => item.value);
-      if (!remotePhotos.length) return;
-
-      currentPhotoPoolTotal = remotePhotos.length;
-      const renderRemoteSelection = () => {
-        const photoWork = currentHomepageWorks.find((work) => work.mediaType === 'photoCollection');
-        const requested = Number(photoWork?.photoCount) || 12;
-        const count = Math.min(requested, remotePhotos.length);
-        photos = shuffled(remotePhotos).slice(0, count);
-        lightboxIndex = -1;
-        layoutPhotos();
-        if (currentHomepageWorks.length) applyHomepageWorks(currentHomepageWorks, false);
-      };
-
-      if (typeof shufflePhotos !== 'undefined' && typeof createPhotoSet === 'function') {
-        shufflePhotos.removeEventListener('click', createPhotoSet);
-        shufflePhotos.addEventListener('click', renderRemoteSelection);
-      }
-      renderRemoteSelection();
-    } catch (error) {
-      console.warn('[Sanity] Photo pool unavailable. OFFLINE state remains active.', error);
-    }
-  }
-
   try {
     const works = await window.SANITY_CONTENT.fetchHomePageWorks();
     if (works.length) applyHomepageWorks(works, true);
@@ -570,6 +523,4 @@
     if (!currentHomepageWorks.length) return;
     setTimeout(() => applyHomepageWorks(currentHomepageWorks, true), 0);
   });
-
-  connectRemotePhotoPool();
 })();
