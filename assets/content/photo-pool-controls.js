@@ -428,10 +428,19 @@
   };
 
   // Capture first so the base click handler does not perform a second reset.
-  shufflePhotos.addEventListener('click', (event) => {
+  shufflePhotos.addEventListener('click', async (event) => {
     event.preventDefault();
     event.stopImmediatePropagation();
-    createPhotoSet({preservePosition:true, forceShuffle:true});
+    const shuffledSuccessfully = await createPhotoSet({preservePosition:false, forceShuffle:true});
+    if (!shuffledSuccessfully) return;
+
+    requestAnimationFrame(() => {
+      const titleHeader = document.querySelector('#photo .work-head');
+      if (!titleHeader) return;
+      const topbarHeight = document.querySelector('.topbar')?.getBoundingClientRect().height || 0;
+      const targetTop = window.scrollY + titleHeader.getBoundingClientRect().top - topbarHeight - 8;
+      window.scrollTo({top:Math.max(0, targetTop), behavior:'smooth'});
+    });
   }, {capture:true});
 
   installInterface();
