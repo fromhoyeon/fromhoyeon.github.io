@@ -211,7 +211,7 @@
     };
 
     const poolScript = loadScriptOnce(
-      'assets/content/photo-pool-controls.js?v=20260906-4',
+      'assets/content/photo-pool-controls.js?v=20260912-1',
       'data-photo-pool-controls'
     );
 
